@@ -1,29 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "purpose": "Curated external design-skill, QA, token and production-example sources for ACE",
   "art_direction": [
     {
       "name": "Anthropic Frontend Design",
       "repository": "anthropics/claude-plugins-official",
       "path": "plugins/frontend-design/skills/frontend-design/SKILL.md",
+      "revision": "37f1792bccd5f3f151414e920b59c349ea062df4",
       "license": "Apache-2.0",
-      "priority": "S"
+      "priority": "S",
+      "role": "pre-code art direction and anti-template critique"
     },
     {
       "name": "Impeccable",
       "repository": "pbakaus/impeccable",
+      "revision": "ae388ac58fb33aade50fc47e2be07c3192dcaabd",
+      "vendored_as_submodule": "vendor/design-skills/impeccable",
       "license": "Apache-2.0",
-      "priority": "S"
+      "priority": "S",
+      "role": "operational critique, layout/typeset/distill/audit/polish"
     }
   ],
   "anti_slop_and_ui_rules": [
     {
       "name": "UI Skills",
       "repository": "ibelick/ui-skills",
+      "revision": "146fcd0b34fca2d80333b120d67f5009ccf58b28",
+      "vendored_as_submodule": "vendor/design-skills/ui-skills",
       "paths": [
         "skills/baseline-ui/SKILL.md",
-        "skills/improve-ui",
-        "skills/create-design-md",
+        "skills/improve-ui/SKILL.md",
+        "skills/create-design-md/SKILL.md",
         "skills/fixing-accessibility",
         "skills/fixing-motion-performance"
       ],
@@ -36,11 +43,14 @@
       "path": "skills/web-design-guidelines/SKILL.md",
       "guidelines_repository": "vercel-labs/web-interface-guidelines",
       "guidelines_path": "command.md",
-      "priority": "S"
+      "priority": "S",
+      "role": "technical and interface release gate"
     },
     {
       "name": "UI UX Pro Max",
       "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "revision": "97eb2a20032f0833e3d317162208a60385b0f96e",
+      "vendored_as_submodule": "vendor/design-skills/ui-ux-pro-max",
       "license": "MIT",
       "priority": "A-reference-only"
     },
@@ -60,6 +70,8 @@
     {
       "name": "Style Dictionary",
       "repository": "style-dictionary/style-dictionary",
+      "revision": "2b03351d3d52399203deeaf231b3831c1f5fd707",
+      "vendored_as_submodule": "vendor/design-skills/style-dictionary",
       "license": "Apache-2.0",
       "role": "token transformation and build pipeline"
     },
