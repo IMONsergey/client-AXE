@@ -167,3 +167,24 @@ For the next concept:
 - use the official ACE logo;
 - do not reuse the visual design of the supplied gray wireframe;
 - treat that wireframe only as information architecture and content source.
+
+## 11. Design-system intelligence — mandatory reading
+
+Before any new visual design or frontend redesign, read and follow:
+
+1. `design-system/DESIGN-INTELLIGENCE.md`;
+2. `design-system/decisions/ace-design-system-v1.md`;
+3. the relevant file under `design-system/patterns/`;
+4. donor notes under `design-system/donors/` only for the problem being solved.
+
+The donor stack is intentionally layered:
+
+- Stripe + Primer Brand — public composition;
+- Reshaped + Coss — visual component discipline;
+- Base UI — interaction/accessibility behaviour;
+- ReUI — Trade Requests forms/tables;
+- Figma SDS + SEED — design-system architecture.
+
+Do not adopt any donor as a complete ACE skin. Do not pull a component into the design simply because it exists in a donor library.
+
+`design-system/patterns/anti-patterns.md` is a hard visual blacklist for the current project. A future design must pass that audit before it is shown for review.
