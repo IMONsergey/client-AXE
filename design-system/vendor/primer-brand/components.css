@@ -1,0 +1,226 @@
+/*
+ * Primer Brand structural component snapshot — adapted for static HTML.
+ * Upstream: primer/brand (MIT), components Grid / Hero / Bento / River.
+ * The component anatomy follows Primer Brand; ACE tokens provide the visual theme.
+ */
+
+.PrimerGrid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.PrimerGrid--gutter {
+  column-gap: var(--ace-space-6);
+  padding-inline: var(--ace-gutter-mobile);
+}
+
+.PrimerGrid__column { grid-column: auto / span 12; }
+.PrimerGrid__column--span-2 { grid-column: auto / span 2; }
+.PrimerGrid__column--span-3 { grid-column: auto / span 3; }
+.PrimerGrid__column--span-4 { grid-column: auto / span 4; }
+.PrimerGrid__column--span-5 { grid-column: auto / span 5; }
+.PrimerGrid__column--span-6 { grid-column: auto / span 6; }
+.PrimerGrid__column--span-7 { grid-column: auto / span 7; }
+.PrimerGrid__column--span-8 { grid-column: auto / span 8; }
+.PrimerGrid__column--span-9 { grid-column: auto / span 9; }
+.PrimerGrid__column--span-10 { grid-column: auto / span 10; }
+.PrimerGrid__column--span-12 { grid-column: auto / span 12; }
+.PrimerGrid__column--start-1 { grid-column-start: 1; }
+.PrimerGrid__column--start-2 { grid-column-start: 2; }
+.PrimerGrid__column--start-3 { grid-column-start: 3; }
+.PrimerGrid__column--start-4 { grid-column-start: 4; }
+.PrimerGrid__column--start-5 { grid-column-start: 5; }
+.PrimerGrid__column--start-6 { grid-column-start: 6; }
+.PrimerGrid__column--start-7 { grid-column-start: 7; }
+.PrimerGrid__column--start-8 { grid-column-start: 8; }
+.PrimerGrid__column--start-9 { grid-column-start: 9; }
+
+.PrimerHero {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.PrimerHero__contained {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.PrimerHero--gridline {
+  border-block: 1px solid var(--ace-border-default);
+}
+
+.PrimerHero--gridline .PrimerHero__contained {
+  border-inline: 1px solid var(--ace-border-default);
+}
+
+.PrimerHero--expressive .PrimerHero__header,
+.PrimerHero--expressive .PrimerHero__body {
+  padding: var(--ace-space-8) var(--ace-gutter-mobile);
+}
+
+.PrimerHero--expressive .PrimerHero__header {
+  border-bottom: 1px solid var(--ace-border-default);
+}
+
+.PrimerHero__heading {
+  margin: 0;
+  max-width: 924px;
+}
+
+.PrimerHero__description {
+  margin: var(--ace-space-6) 0 0;
+  max-width: 600px;
+}
+
+.PrimerHero__actions {
+  margin-top: var(--ace-space-7);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ace-space-2) var(--ace-space-4);
+}
+
+.PrimerHero__media {
+  width: 100%;
+  overflow: hidden;
+}
+
+.PrimerHero__media--block {
+  border-top: 1px solid var(--ace-border-default);
+}
+
+.PrimerBento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(80px, max-content);
+  gap: var(--ace-space-4);
+  width: 100%;
+}
+
+.PrimerBento__item {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border-radius: var(--ace-radius-md);
+  background: var(--ace-surface-subtle);
+}
+
+.PrimerBento__item--span-4 { grid-column: auto / span 4; }
+.PrimerBento__item--span-5 { grid-column: auto / span 5; }
+.PrimerBento__item--span-6 { grid-column: auto / span 6; }
+.PrimerBento__item--span-7 { grid-column: auto / span 7; }
+.PrimerBento__item--span-8 { grid-column: auto / span 8; }
+.PrimerBento__item--span-12 { grid-column: auto / span 12; }
+.PrimerBento__item--rows-2 { grid-row: auto / span 2; }
+
+.PrimerBento__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--ace-space-8);
+}
+
+.PrimerBento__visual {
+  min-height: 160px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.PrimerRiver {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  border-top: 1px solid var(--ace-border-default);
+}
+
+.PrimerRiver + .PrimerRiver {
+  border-top: 0;
+}
+
+.PrimerRiver__content,
+.PrimerRiver__visual {
+  grid-column: auto / span 12;
+  padding: var(--ace-space-8) var(--ace-gutter-mobile);
+}
+
+.PrimerRiver__content {
+  border-bottom: 1px solid var(--ace-border-default);
+}
+
+.PrimerRiver__visual {
+  min-height: 220px;
+  border-bottom: 1px solid var(--ace-border-default);
+}
+
+@media (min-width: 660px) {
+  .PrimerGrid--gutter { padding-inline: var(--ace-gutter-tablet); }
+  .PrimerHero--expressive .PrimerHero__header,
+  .PrimerHero--expressive .PrimerHero__body { padding-inline: var(--ace-gutter-tablet); }
+  .PrimerRiver__content,
+  .PrimerRiver__visual { padding-inline: var(--ace-gutter-tablet); }
+}
+
+@media (min-width: 900px) {
+  .PrimerGrid--gutter { padding-inline: var(--ace-gutter-desktop); }
+
+  .PrimerHero--expressive .PrimerHero__contained {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .PrimerHero--expressive .PrimerHero__header {
+    grid-column: 1 / span 7;
+    padding: var(--ace-space-16) var(--ace-space-16) var(--ace-space-16) var(--ace-gutter-desktop);
+    border-bottom: 0;
+    border-right: 1px solid var(--ace-border-default);
+  }
+
+  .PrimerHero--expressive .PrimerHero__body {
+    grid-column: 8 / span 5;
+    padding: var(--ace-space-16) var(--ace-gutter-desktop) var(--ace-space-16) var(--ace-space-16);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .PrimerRiver__content {
+    grid-column: 1 / span 5;
+    padding: var(--ace-space-16) var(--ace-space-12) var(--ace-space-16) var(--ace-gutter-desktop);
+    border-right: 1px solid var(--ace-border-default);
+  }
+
+  .PrimerRiver__visual {
+    grid-column: 6 / span 7;
+    min-height: 360px;
+    padding: var(--ace-space-16);
+  }
+
+  .PrimerRiver--reverse .PrimerRiver__content {
+    grid-column: 8 / span 5;
+    order: 2;
+    border-right: 0;
+    border-left: 1px solid var(--ace-border-default);
+    padding-inline: var(--ace-space-12) var(--ace-gutter-desktop);
+  }
+
+  .PrimerRiver--reverse .PrimerRiver__visual {
+    grid-column: 1 / span 7;
+    order: 1;
+  }
+}
+
+@media (max-width: 899px) {
+  .PrimerBento { grid-template-columns: 1fr; }
+  .PrimerBento__item--span-4,
+  .PrimerBento__item--span-5,
+  .PrimerBento__item--span-6,
+  .PrimerBento__item--span-7,
+  .PrimerBento__item--span-8,
+  .PrimerBento__item--span-12 { grid-column: 1; }
+}
