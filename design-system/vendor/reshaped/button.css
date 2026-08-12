@@ -1,0 +1,73 @@
+/*
+ * Reshaped Button anatomy — static HTML adaptation.
+ * Upstream: reshaped-ui/reshaped (MIT), Button.module.css.
+ */
+
+.RsButton {
+  --rs-button-bg: var(--ace-action-primary);
+  --rs-button-fg: #fff;
+  --rs-button-hover: #0053a3;
+
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ace-space-2);
+  padding: var(--ace-space-2) var(--ace-space-4);
+  border: 0;
+  border-radius: var(--ace-radius-sm);
+  background: var(--rs-button-bg);
+  color: var(--rs-button-fg);
+  font-family: var(--ace-font-body);
+  font-size: var(--ace-type-small);
+  line-height: var(--ace-type-small-line);
+  font-weight: var(--ace-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--ace-motion-fast) var(--ace-ease-standard),
+    color var(--ace-motion-fast) var(--ace-ease-standard),
+    border-color var(--ace-motion-fast) var(--ace-ease-standard),
+    box-shadow var(--ace-motion-fast) var(--ace-ease-standard),
+    transform var(--ace-motion-fast) var(--ace-ease-standard);
+}
+
+.RsButton:hover { background: var(--rs-button-hover); }
+.RsButton:active { transform: scale(.985); }
+.RsButton:focus-visible {
+  outline: 3px solid rgb(0 94 184 / 24%);
+  outline-offset: 2px;
+}
+
+.RsButton--neutral {
+  --rs-button-bg: var(--ace-neutral-950);
+  --rs-button-hover: var(--ace-neutral-850);
+}
+
+.RsButton--inverse {
+  --rs-button-bg: #fff;
+  --rs-button-fg: var(--ace-neutral-950);
+  --rs-button-hover: var(--ace-neutral-100);
+}
+
+.RsButton--outline {
+  --rs-button-bg: transparent;
+  --rs-button-fg: var(--ace-neutral-950);
+  --rs-button-hover: var(--ace-neutral-50);
+  border: 1px solid var(--ace-border-default);
+  box-shadow: var(--ace-shadow-outline);
+}
+
+.RsButton--compact {
+  min-height: 36px;
+  padding: var(--ace-space-1) var(--ace-space-3);
+  font-size: 13px;
+}
+
+.RsButton--large {
+  min-height: 48px;
+  padding-inline: var(--ace-space-5);
+  font-size: var(--ace-type-body);
+}
