@@ -1,5 +1,17 @@
 /* Final v6 corrections: no glass surfaces, complete editorial visual objects. */
 
+/* Brand integrity: the supplied logo is never recoloured, even in the dark direction. */
+.v6-three .AceHeader {
+  background: #fff;
+  border-color: var(--ace-border-subtle);
+}
+.v6-three .AceLogo { filter: none; }
+.v6-three .AceNav a { color: #282e34; }
+.v6-three .AceLanguage span { color: var(--ace-text-muted); }
+.v6-three .AceLanguage .is-active { color: var(--ace-neutral-950); background: var(--ace-neutral-50); }
+.v6-three .AceHeader__tools .RsButton--inverse { background: var(--ace-neutral-950); color: #fff; }
+.v6-three .AceHeader__tools .RsButton--inverse:hover { background: var(--ace-neutral-850); }
+
 .v6-five .hero-five__proof {
   background: #003f7b;
   border-color: #003f7b;
