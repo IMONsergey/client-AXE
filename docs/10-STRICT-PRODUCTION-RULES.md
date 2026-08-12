@@ -44,22 +44,22 @@ The content may be **recomposed visually**, but its wording must remain unchange
 
 ## 2. Reference rule
 
-Stripe is the primary visual benchmark for the current concept pass.
+Stripe is the primary quality/art-direction benchmark, not a kit to imitate mechanically.
 
 Use transferable design principles from the reference:
 
-- large, confident typography;
+- confident hierarchy;
 - clean light surfaces;
-- layered composition;
-- strong spatial hierarchy;
-- product-grade presentation;
-- proof placed near the main claim;
+- authored composition;
+- strong spatial relationships;
+- product-grade finish;
+- proof placed with intent;
 - carefully designed modular surfaces;
-- controlled gradients and depth;
-- generous spacing;
+- disciplined use of colour/depth;
+- generous but controlled spacing;
 - precise navigation and CTA treatment.
 
-Do **not** copy Stripe's proprietary copy, brand assets, illustrations, data, case studies or product screenshots. The result must be an ACE design using ACE content and ACE brand constraints.
+Do **not** copy Stripe's proprietary copy, brand assets, illustrations, data, case studies or product screenshots. Do not reduce “Stripe-like” to gradients, floating UI, large numbers or fintech tropes.
 
 ## 3. Brand integrity
 
@@ -71,6 +71,7 @@ Do **not** copy Stripe's proprietary copy, brand assets, illustrations, data, ca
   - ACE Green `#00B140`;
   - Cool Gray `#5B5B5B`.
 - Colour may be used in lighter tints and transparent layers for web composition, but the base brand colours must remain recognisable.
+- Corporate colours are signals, not a requirement to show all three simultaneously.
 - Until licensed corporate font files are supplied, use a neutral professional system sans-serif stack. Do not add remote font dependencies for the concept.
 
 ## 4. HTML and CSS
@@ -97,11 +98,11 @@ The markup must remain portable into the client's future CMS / backend implement
 
 ## 6. Responsive behaviour
 
-Templates must be designed and checked at three layout ranges:
+Templates must be deliberately designed and visually checked at minimum at:
 
-1. desktop;
-2. tablet;
-3. mobile.
+1. 1440px desktop;
+2. 1024px tablet/desktop transition;
+3. 390px mobile.
 
 The implementation must display correctly in current versions of:
 
@@ -111,6 +112,14 @@ The implementation must display correctly in current versions of:
 - Edge.
 
 Responsive changes must be deliberate layout decisions, not simple proportional shrinking.
+
+Automatic rejection conditions include:
+
+- clipped/off-canvas content;
+- accidental horizontal scroll;
+- navigation wrapping that changes hierarchy;
+- utility controls pushed outside the viewport;
+- decorative elements obscuring content.
 
 ## 7. Integration comments
 
@@ -154,55 +163,115 @@ Required qualities:
 - variables/tokens used where they improve maintainability;
 - straightforward CSS that another developer can safely continue.
 
-The goal is not to imitate a person's mistakes. The goal is professional, maintainable frontend code with no obvious AI-generated patterns.
+The goal is professional, maintainable frontend code with no obvious AI-generated patterns.
 
-## 10. Design-system reading order
+## 10. Mandatory design reading order
 
 Before changing any public-site visual/frontend implementation, read and follow:
 
-1. `design-system/DESIGN-INTELLIGENCE.md`;
-2. `design-system/decisions/ace-design-system-v1.md`;
-3. `design-system/patterns/public-site.md`;
-4. `design-system/patterns/components.md`;
-5. `design-system/patterns/anti-patterns.md`;
-6. relevant donor notes under `design-system/donors/`.
+1. `design-system/skills/ACE-DESIGN-GATES.md`;
+2. `design-system/skills/README.md`;
+3. `docs/16-DESIGN-SKILLS-AND-TASTE-AUDIT.md`;
+4. `design-system/DESIGN-INTELLIGENCE.md`;
+5. `design-system/patterns/public-site.md`;
+6. `design-system/patterns/components.md`;
+7. `design-system/patterns/anti-patterns.md`;
+8. relevant donor notes under `design-system/donors/`.
 
 Trade Requests work additionally requires `design-system/patterns/trade-requests.md`.
 
-## 11. Component-first implementation rule
+## 11. Art-direction-first rule
 
-The physical component layer in `design-system/runtime/` is mandatory for new static concepts and production-facing templates.
+The former “component-first” interpretation is explicitly superseded.
+
+**Components do not determine the visual concept.**
 
 Required order:
 
-1. use the existing foundation tokens;
-2. use an existing runtime primitive;
-3. use an existing runtime composition or add a justified modifier;
-4. create a new reusable component only when the actual content/interaction cannot be represented by the existing system;
-5. one-off page CSS is the last resort, not the default.
+1. ground the direction in ACE's subject, audience and page job;
+2. define palette roles, typography roles, grid, section rhythm and exactly one justified signature mechanism;
+3. critique the written direction against generic AI/frontend defaults;
+4. implement only the header + hero + immediate proof;
+5. capture and review real screenshots at 1440 / 1024 / 390;
+6. only after the first viewport passes, select existing primitives/components that support the approved direction;
+7. extend the approved language to the rest of the page;
+8. run independent visual and technical audits before publication.
 
-Forbidden:
+A donor component name is never an art direction. `Primer Hero`, `Bento`, `River`, `Reshaped Button`, etc. are implementation options only.
 
-- rebuilding buttons, navigation, metrics, document records, capability rows, country registers, headers or hero scaffolding from scratch inside a page stylesheet when an ACE runtime component already exists;
-- copying donor component skins wholesale into a page;
-- bypassing tokens with repeated hard-coded spacing/radius/color values;
-- creating five unrelated CSS implementations for five concept variants.
+## 12. Component-use rule
 
-Concept variants must be assembled from shared primitives/compositions with explicit modifiers. The design can change substantially between variants, but the underlying component language must remain coherent.
+Once art direction is approved, prefer existing tested primitives where they fit the intended design and interaction.
 
-## 12. Current concept direction
+However:
 
-For the current concept lab:
+- never distort the composition to accommodate a donor component;
+- never choose Bento/cards simply because a Bento/card component exists;
+- never reuse a component's default skin if it conflicts with the approved ACE direction;
+- never mix unrelated primitive systems inside one interaction surface;
+- accessible behavior may be borrowed from Base UI/React Aria/Radix where relevant;
+- ReUI remains reserved primarily for real Trade Requests form/table workflows.
 
-- build five genuinely different compositions for comparison;
-- use Stripe as the dominant art-direction benchmark;
-- use Primer Brand for public-site composition/grid/hero anatomy;
-- use Reshaped/Coss for component proportions and surface discipline;
-- use Base UI behaviour as the accessibility/interaction reference;
-- reserve ReUI for the real Trade Requests form/table layer;
-- retain ACE institutional seriousness;
-- retain the prototype's content only;
+Create a new ACE-native composition when the approved design cannot be represented cleanly by existing primitives.
+
+## 13. Anti-template rules
+
+Reject a direction before code if its identity is mainly any of these:
+
+- diagonal/aurora/multicolour gradient;
+- large KPI numbers over decorative colour;
+- Bento as the core visual idea;
+- generic feature cards with coloured rules/icons;
+- fake product dashboard;
+- random network topology;
+- glow/beam/node theatre;
+- dark fintech + one neon accent;
+- editorial hairlines used without subject-specific meaning;
+- oversized typography used as the entire concept.
+
+All structural devices must encode real content or a justified ACE-specific concept.
+
+## 14. Mandatory external skill gates
+
+Apply the substance of these vetted sources during the workflow:
+
+### Before code
+- Anthropic `frontend-design`: subject grounding, hero thesis, typography, single signature, written plan and self-critique.
+- Impeccable `shape` / `critique` principles.
+
+### During visual correction
+- Impeccable `layout`, `typeset`, `distill`, `bolder`/`quieter` as appropriate.
+- ibelick `baseline-ui` rules adapted to the project's pure HTML/CSS requirements.
+
+### Before publish
+- Vercel Web Interface Guidelines.
+- Impeccable `audit` / `polish` / `adapt` principles.
+- project anti-pattern and browser/responsive rules.
+
+## 15. Screenshot gate
+
+A concept may not be presented as finished or published as the active direction unless screenshots have actually been reviewed.
+
+Minimum evidence:
+
+- hero/header at 1440px;
+- hero/header at 1024px;
+- hero/header at 390px;
+- full page desktop;
+- full page mobile.
+
+Publishing is not a substitute for visual QA.
+
+## 16. Current redesign direction
+
+For the next redesign pass:
+
+- do not inherit the visual layer of v3/v4/v5/v6;
+- do not start with five coded concepts;
+- first produce three written art directions and critique them;
+- build one first-screen prototype only after selecting a direction;
+- use only prototype content;
 - use the official ACE logo;
-- do not reuse the visual design of the supplied gray wireframe;
-- do not inherit the failed v3/v4 visual layer;
-- treat the prototype only as information architecture and content source.
+- keep institutional seriousness without falling into generic corporate/banking templates;
+- use Stripe and strong production products as a quality benchmark, not a bag of stylistic motifs;
+- treat the supplied prototype only as information architecture and content source.

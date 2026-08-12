@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "purpose": "Curated external design-skill, QA, token and production-example sources for ACE",
+  "art_direction": [
+    {
+      "name": "Anthropic Frontend Design",
+      "repository": "anthropics/claude-plugins-official",
+      "path": "plugins/frontend-design/skills/frontend-design/SKILL.md",
+      "license": "Apache-2.0",
+      "priority": "S"
+    },
+    {
+      "name": "Impeccable",
+      "repository": "pbakaus/impeccable",
+      "license": "Apache-2.0",
+      "priority": "S"
+    }
+  ],
+  "anti_slop_and_ui_rules": [
+    {
+      "name": "UI Skills",
+      "repository": "ibelick/ui-skills",
+      "paths": [
+        "skills/baseline-ui/SKILL.md",
+        "skills/improve-ui",
+        "skills/create-design-md",
+        "skills/fixing-accessibility",
+        "skills/fixing-motion-performance"
+      ],
+      "license": "MIT",
+      "priority": "S"
+    },
+    {
+      "name": "Vercel Web Interface Guidelines",
+      "repository": "vercel-labs/agent-skills",
+      "path": "skills/web-design-guidelines/SKILL.md",
+      "guidelines_repository": "vercel-labs/web-interface-guidelines",
+      "guidelines_path": "command.md",
+      "priority": "S"
+    },
+    {
+      "name": "UI UX Pro Max",
+      "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "license": "MIT",
+      "priority": "A-reference-only"
+    },
+    {
+      "name": "Frontend Design Audit",
+      "repository": "mistyhx/frontend-design-audit",
+      "license": "MIT",
+      "priority": "A-secondary"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Design Tokens Community Group",
+      "repository": "design-tokens/community-group",
+      "role": "canonical token specification"
+    },
+    {
+      "name": "Style Dictionary",
+      "repository": "style-dictionary/style-dictionary",
+      "license": "Apache-2.0",
+      "role": "token transformation and build pipeline"
+    },
+    {
+      "name": "Tokens Studio",
+      "repository": "tokens-studio/figma-plugin",
+      "license": "MIT",
+      "role": "Figma token workflow"
+    },
+    {
+      "name": "Figma SDS",
+      "repository": "figma/sds",
+      "role": "design-code system architecture"
+    },
+    {
+      "name": "SEED Design",
+      "repository": "daangn/seed-design",
+      "role": "primitive-semantic-recipe-component layering"
+    }
+  ],
+  "production_examples": [
+    {"repository": "supabase/supabase", "license": "Apache-2.0", "usage": "study-and-allowed-code-subject-to-file-review"},
+    {"repository": "calcom/cal.diy", "license": "MIT", "usage": "study-and-allowed-code-subject-to-file-review"},
+    {"repository": "dubinc/dub", "license": "verify-relevant-files", "usage": "visual/code-read reference"},
+    {"repository": "midday-ai/midday", "license": "AGPL-3.0", "usage": "reference-only by default"},
+    {"repository": "twentyhq/twenty", "license": "verify-relevant-files", "usage": "reference-only until verified"},
+    {"repository": "formbricks/formbricks", "license": "verify-relevant-files", "usage": "reference-only until verified"},
+    {"repository": "unkeyed/unkey", "license": "verify-relevant-files", "usage": "reference-only until verified"},
+    {"repository": "primer/brand", "usage": "structural donor, never automatic art direction"}
+  ],
+  "watchlist_not_source_of_truth": [
+    "Krishna-Modi12/frontend-design-pro",
+    "Ga14ctic/awwwards-skill"
+  ]
+}
