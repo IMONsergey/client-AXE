@@ -1,0 +1,44 @@
+/* Final v6 corrections: no glass surfaces, complete editorial visual objects. */
+
+.v6-five .hero-five__proof {
+  background: #003f7b;
+  border-color: #003f7b;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.v6-four .editorial-number {
+  position: relative;
+  width: min(100%, 430px);
+  height: 220px;
+  border-top: 1px solid var(--ace-border-default);
+  border-bottom: 1px solid var(--ace-border-default);
+}
+
+.v6-four .editorial-number::before,
+.v6-four .editorial-number::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.v6-four .editorial-number::before {
+  top: 50%;
+  height: 14px;
+  background: var(--ace-brand-blue);
+  transform: translateY(-50%);
+}
+
+.v6-four .editorial-number::after {
+  top: 28%;
+  bottom: 28%;
+  left: 42%;
+  right: auto;
+  width: 1px;
+  background: var(--ace-border-strong);
+}
+
+.v6-four .PrimerRiver:nth-child(2) .editorial-number::before { background: var(--ace-brand-red); }
+.v6-four .PrimerRiver:nth-child(3) .editorial-number::before { background: var(--ace-brand-green); }

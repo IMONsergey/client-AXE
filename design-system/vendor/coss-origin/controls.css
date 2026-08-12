@@ -1,0 +1,46 @@
+/*
+ * Coss / Origin UI compact control adaptation.
+ * Source boundary: cosscom/coss apps/origin (MIT).
+ * The upstream button uses h-9 / h-10 sizing, rounded-md, medium 14px text,
+ * subtle outline/shadow and visible focus-ring states.
+ */
+
+.OriginControl {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-inline: 12px;
+  border: 1px solid var(--ace-border-default);
+  border-radius: var(--ace-radius-sm);
+  background: var(--ace-surface-page);
+  color: var(--ace-text-primary);
+  font: 500 13px/1 var(--ace-font-body);
+  white-space: nowrap;
+  box-shadow: var(--ace-shadow-outline);
+  transition:
+    color var(--ace-motion-fast) var(--ace-ease-standard),
+    background-color var(--ace-motion-fast) var(--ace-ease-standard),
+    border-color var(--ace-motion-fast) var(--ace-ease-standard),
+    box-shadow var(--ace-motion-fast) var(--ace-ease-standard);
+}
+
+.OriginControl:hover { background: var(--ace-surface-muted); }
+.OriginControl:focus-visible {
+  outline: 0;
+  border-color: var(--ace-action-primary);
+  box-shadow: 0 0 0 3px rgb(0 94 184 / 18%);
+}
+
+.OriginControl--ghost {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.OriginControl--strong {
+  border-color: var(--ace-neutral-950);
+  background: var(--ace-neutral-950);
+  color: #fff;
+}
