@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACE</title>
+  <style>
+    :root {
+      --blue: #005eb8;
+      --red: #af272f;
+      --green: #00b140;
+      --gray: #5b5b5b;
+      --ink: #0c0f12;
+      --ink-2: #3b4046;
+      --muted: #737980;
+      --line: rgba(12, 15, 18, 0.12);
+      --line-soft: rgba(12, 15, 18, 0.08);
+      --paper: #fff;
+      --paper-2: #f7f7f8;
+      --paper-3: #fbfbfc;
+      --strong: #0c0f12;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+      --max: 1280px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { background: #0b0d10; scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    input[type="radio"] { position: fixed; left: -9999px; }
+
+    .lab-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 58px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 0 18px;
+      color: #fff;
+      background: #0b0d10;
+      border-bottom: 1px solid #262a30;
+    }
+    .lab-toolbar__brand { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+    .lab-toolbar__switcher { display: flex; justify-content: center; gap: 4px; }
+    .lab-toolbar__switcher label {
+      min-width: 42px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #9da4ad;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .lab-toolbar__switcher label:hover { color: #fff; background: #171a1f; }
+    .lab-toolbar__meta { color: #68717c; font-size: 11px; }
+
+    #variant-1:checked ~ .lab-toolbar label[for="variant-1"],
+    #variant-2:checked ~ .lab-toolbar label[for="variant-2"],
+    #variant-3:checked ~ .lab-toolbar label[for="variant-3"],
+    #variant-4:checked ~ .lab-toolbar label[for="variant-4"],
+    #variant-5:checked ~ .lab-toolbar label[for="variant-5"] {
+      color: #11151a;
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .concept { display: none; min-height: calc(100vh - 58px); background: #fff; }
+    #variant-1:checked ~ .concept-stage .c1,
+    #variant-2:checked ~ .concept-stage .c2,
+    #variant-3:checked ~ .concept-stage .c3,
+    #variant-4:checked ~ .concept-stage .c4,
+    #variant-5:checked ~ .concept-stage .c5 { display: block; }
+
+    .wrap { width: min(calc(100% - 80px), var(--max)); margin-inline: auto; }
+    .site-logo { width: 238px; flex: 0 0 auto; }
+    .site-logo img { width: 100%; height: auto; }
+    .site-nav { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 22px; }
+    .site-nav a { font-size: 13px; line-height: 1.2; white-space: nowrap; }
+    .site-actions { display: flex; align-items: center; gap: 14px; }
+    .lang { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .lang strong { color: var(--ink); }
+    .trade {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 17px;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .trade--dark { background: var(--ink); }
+    .trade--light { background: #fff; color: #111; }
+    .kicker { color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .metric__value { display: block; font-weight: 700; letter-spacing: -0.055em; line-height: .9; }
+    .metric__caption { display: block; margin-top: 12px; color: var(--ink-2); font-size: 14px; line-height: 1.35; }
+    .document-record { display: grid; grid-template-columns: 72px 1fr; gap: 20px; align-items: start; padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .document-record__type { color: var(--red); font-size: 12px; font-weight: 800; }
+    .document-record__title { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 600; }
+    .country-list { list-style: none; margin: 0; padding: 0; }
+
+    /* Concept 01 — kinetic public platform */
+    .c1 { --c1-blue-2: #e8f2fc; --c1-blue-3: #d4e9fb; }
+    .c1 .site-header {
+      position: relative;
+      z-index: 5;
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .c1 .site-header__inner { display: grid; grid-template-columns: 244px 1fr auto; gap: 28px; align-items: center; }
+    .c1 .site-nav a { color: #2b3138; }
+    .c1 .hero { position: relative; overflow: hidden; background: #fff; }
+    .c1 .hero::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: -80px;
+      right: -150px;
+      width: 62%;
+      height: 870px;
+      background: linear-gradient(143deg, #f4f8fd 0 18%, #dcecf9 18% 34%, #1b77c7 34% 58%, #005eb8 58% 78%, #004c95 78% 100%);
+      transform: skewY(-5deg);
+      transform-origin: top right;
+    }
+    .c1 .hero::after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      right: 6%;
+      bottom: 82px;
+      width: 27%;
+      height: 7px;
+      background: linear-gradient(90deg, var(--red) 0 48%, transparent 48% 53%, var(--green) 53% 100%);
+    }
+    .c1 .hero__inner {
+      position: relative;
+      z-index: 2;
+      min-height: 720px;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      align-items: center;
+      padding: 90px 0 82px;
+    }
+    .c1 .hero__copy { grid-column: 1 / span 7; max-width: 760px; }
+    .c1 .hero__title { margin: 0; font-size: clamp(54px, 5.3vw, 78px); line-height: .98; letter-spacing: -0.045em; font-weight: 700; }
+    .c1 .hero__text { max-width: 680px; margin: 30px 0 0; color: #434b55; font-size: 19px; line-height: 1.5; }
+    .c1 .hero__actions { margin-top: 32px; }
+    .c1 .hero__proof {
+      grid-column: 9 / span 4;
+      align-self: end;
+      margin-bottom: 58px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(255,255,255,.55);
+      border-bottom: 1px solid rgba(255,255,255,.55);
+      color: #fff;
+    }
+    .c1 .hero__proof .metric { padding: 22px 18px 24px 0; }
+    .c1 .hero__proof .metric + .metric { padding-left: 22px; border-left: 1px solid rgba(255,255,255,.4); }
+    .c1 .hero__proof .metric__value { font-size: 54px; }
+    .c1 .hero__proof .metric__caption { color: rgba(255,255,255,.84); font-size: 13px; }
+    .c1 .about { padding: 132px 0; }
+    .c1 .about__head { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap: 24px; margin-bottom: 58px; }
+    .c1 .about__head .kicker { grid-column: 1 / span 2; padding-top: 12px; }
+    .c1 .about__heading { grid-column: 3 / span 8; margin: 0; font-size: 50px; line-height: 1; letter-spacing: -.035em; }
+    .c1 .about__body { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap: 24px; }
+    .c1 .about__copy { grid-column: 3 / span 6; }
+    .c1 .about__copy p { margin: 0; font-size: 26px; line-height: 1.38; letter-spacing: -.02em; }
+    .c1 .about__more { display: inline-block; margin-top: 30px; color: var(--blue); font-size: 14px; font-weight: 700; }
+    .c1 .about__evidence { grid-column: 10 / span 3; }
+    .c1 .about__evidence .metric { padding: 0 0 26px; }
+    .c1 .about__evidence .metric + .metric { padding-top: 26px; border-top: 1px solid var(--line); }
+    .c1 .about__evidence .metric__value { font-size: 58px; }
+    .c1 .about__evidence .document-record { margin-top: 32px; grid-template-columns: 52px 1fr; }
+    .c1 .about__evidence .document-record__title { font-size: 16px; }
+    .c1 .directions { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #fbfbfc; }
+    .c1 .direction { display: grid; grid-template-columns: 1.5fr 2fr 1fr; gap: 24px; align-items: center; min-height: 188px; border-bottom: 1px solid var(--line); }
+    .c1 .direction:last-child { border-bottom: 0; }
+    .c1 .direction__title { margin: 0; font-size: 34px; letter-spacing: -.03em; }
+    .c1 .direction__text { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; }
+    .c1 .direction__signal { height: 2px; background: var(--blue); }
+    .c1 .direction:nth-child(2) .direction__signal { background: var(--red); }
+    .c1 .direction:nth-child(3) .direction__signal { background: var(--green); }
+    .c1 .countries { padding: 92px 0 120px; }
+    .c1 .country-list { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .c1 .country-list li { padding: 24px 14px 24px 0; border-right: 1px solid var(--line); font-size: 16px; font-weight: 600; }
+    .c1 .country-list li:last-child { border-right: 0; }
+
+    /* Concept 02 — institutional exchange grid */
+    .c2 { background: #fff; }
+    .c2 .site-header { min-height: 70px; display: flex; align-items: center; border-bottom: 1px solid #111; }
+    .c2 .site-header__inner { display: grid; grid-template-columns: 236px 1fr auto; gap: 24px; align-items: center; }
+    .c2 .site-logo { width: 222px; }
+    .c2 .site-nav a { color: #111; font-size: 12px; font-weight: 600; }
+    .c2 .trade { min-height: 38px; padding-inline: 14px; border-radius: 4px; background: #111; }
+    .c2 .hero { position: relative; border-bottom: 1px solid #111; }
+    .c2 .hero__gridlines { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, transparent calc(100% - 1px), rgba(12,15,18,.07) calc(100% - 1px)); background-size: calc(100% / 12) 100%; }
+    .c2 .hero__inner { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap: 0; min-height: 690px; }
+    .c2 .hero__copy { grid-column: 1 / span 8; align-self: center; padding: 90px 56px 90px 0; }
+    .c2 .hero__title { max-width: 860px; margin: 0; font-size: clamp(52px, 5vw, 76px); line-height: 1; letter-spacing: -.04em; font-weight: 650; }
+    .c2 .hero__text { max-width: 650px; margin: 30px 0 0; color: #40454b; font-size: 18px; line-height: 1.55; }
+    .c2 .hero__actions { margin-top: 34px; }
+    .c2 .hero__proof { grid-column: 9 / span 4; display: grid; grid-template-rows: 1fr 1fr; border-left: 1px solid #111; }
+    .c2 .hero__proof .metric { display: flex; flex-direction: column; justify-content: flex-end; padding: 42px; }
+    .c2 .hero__proof .metric + .metric { border-top: 1px solid #111; }
+    .c2 .hero__proof .metric__value { font-size: clamp(82px, 8vw, 128px); font-weight: 600; }
+    .c2 .hero__proof .metric__caption { max-width: 230px; font-size: 14px; }
+    .c2 .hero__proof .metric:first-child { color: var(--blue); }
+    .c2 .about { padding: 110px 0 116px; }
+    .c2 .about__top { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; padding-bottom: 42px; border-bottom: 1px solid #111; }
+    .c2 .about__top .kicker { grid-column: 1 / span 2; }
+    .c2 .about__heading { grid-column: 3 / span 7; margin: 0; font-size: 44px; letter-spacing: -.03em; }
+    .c2 .about__content { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; padding-top: 42px; }
+    .c2 .about__copy { grid-column: 3 / span 7; }
+    .c2 .about__copy p { margin: 0; font-size: 24px; line-height: 1.45; }
+    .c2 .about__more { display: inline-block; margin-top: 30px; font-size: 14px; color: var(--blue); font-weight: 700; }
+    .c2 .about__document { grid-column: 10 / span 3; }
+    .c2 .document-record { grid-template-columns: 50px 1fr; padding-top: 0; border-top: 0; }
+    .c2 .document-record__title { font-size: 17px; }
+    .c2 .directions { background: #101215; color: #fff; }
+    .c2 .directions__inner { display: grid; grid-template-columns: repeat(3,1fr); }
+    .c2 .direction { min-height: 360px; padding: 52px 40px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid rgba(255,255,255,.2); }
+    .c2 .direction:last-child { border-right: 0; }
+    .c2 .direction__title { margin: 0; max-width: 320px; font-size: 34px; line-height: 1.08; letter-spacing: -.03em; }
+    .c2 .direction__text { margin: 0; max-width: 330px; color: rgba(255,255,255,.7); font-size: 16px; line-height: 1.5; }
+    .c2 .direction::before { content: ""; width: 42px; height: 3px; background: var(--blue); }
+    .c2 .direction:nth-child(2)::before { background: var(--red); }
+    .c2 .direction:nth-child(3)::before { background: var(--green); }
+    .c2 .countries { padding: 90px 0 110px; }
+    .c2 .country-list { display: grid; grid-template-columns: repeat(4,1fr); border-top: 1px solid #111; }
+    .c2 .country-list li { padding: 26px 12px 26px 0; border-bottom: 1px solid #111; font-size: 18px; }
+
+    /* Concept 03 — product protocol */
+    .c3 { background: #f6f7f8; }
+    .c3 .site-header { min-height: 78px; display: flex; align-items: center; background: #0d1116; color: #fff; border-bottom: 1px solid rgba(255,255,255,.13); }
+    .c3 .site-header__inner { display: grid; grid-template-columns: 252px 1fr auto; gap: 28px; align-items: center; }
+    .c3 .site-logo { width: 230px; padding: 9px 11px; background: #fff; border-radius: 4px; }
+    .c3 .site-nav a { color: rgba(255,255,255,.76); }
+    .c3 .lang { color: rgba(255,255,255,.56); }
+    .c3 .lang strong { color: #fff; }
+    .c3 .hero { background: #0d1116; color: #fff; }
+    .c3 .hero__inner { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; min-height: 710px; padding: 86px 0 92px; }
+    .c3 .hero__copy { grid-column: 1 / span 7; align-self: center; }
+    .c3 .hero__title { margin: 0; max-width: 820px; font-size: clamp(54px, 5.1vw, 76px); line-height: .99; letter-spacing: -.044em; font-weight: 650; }
+    .c3 .hero__text { max-width: 680px; margin: 30px 0 0; color: rgba(255,255,255,.7); font-size: 18px; line-height: 1.55; }
+    .c3 .hero__actions { margin-top: 32px; }
+    .c3 .hero__system { grid-column: 9 / span 4; align-self: center; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; overflow: hidden; }
+    .c3 .hero__system-row { position: relative; min-height: 142px; padding: 25px 26px 24px 34px; border-bottom: 1px solid rgba(255,255,255,.16); }
+    .c3 .hero__system-row:last-child { border-bottom: 0; }
+    .c3 .hero__system-row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--blue); }
+    .c3 .hero__system-row:nth-child(2)::before { background: var(--red); }
+    .c3 .hero__system-row:nth-child(3)::before { background: var(--green); }
+    .c3 .hero__system-row h3 { margin: 0; font-size: 20px; line-height: 1.15; letter-spacing: -.02em; }
+    .c3 .hero__system-row p { margin: 13px 0 0; color: rgba(255,255,255,.62); font-size: 14px; line-height: 1.45; }
+    .c3 .proof { background: #fff; border-bottom: 1px solid var(--line); }
+    .c3 .proof__inner { display: grid; grid-template-columns: 1fr 1fr; }
+    .c3 .proof .metric { padding: 38px 0 40px; display: grid; grid-template-columns: 170px 1fr; align-items: end; gap: 24px; }
+    .c3 .proof .metric + .metric { padding-left: 46px; border-left: 1px solid var(--line); }
+    .c3 .proof .metric__value { font-size: 74px; }
+    .c3 .proof .metric__caption { margin: 0 0 6px; max-width: 240px; }
+    .c3 .about { padding: 122px 0; background: #fff; }
+    .c3 .about__grid { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; }
+    .c3 .about__label { grid-column: 1 / span 2; }
+    .c3 .about__content { grid-column: 3 / span 7; }
+    .c3 .about__content h2 { margin: 0 0 28px; font-size: 48px; letter-spacing: -.035em; }
+    .c3 .about__content p { margin: 0; font-size: 25px; line-height: 1.42; letter-spacing: -.018em; }
+    .c3 .about__more { display: inline-block; margin-top: 28px; color: var(--blue); font-size: 14px; font-weight: 700; }
+    .c3 .about__aside { grid-column: 10 / span 3; }
+    .c3 .about__aside .document-record { grid-template-columns: 50px 1fr; }
+    .c3 .about__aside .document-record__title { font-size: 17px; }
+    .c3 .countries { padding: 88px 0 112px; background: #f6f7f8; }
+    .c3 .country-list { display: grid; grid-template-columns: repeat(7,1fr); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+    .c3 .country-list li { min-height: 88px; display: flex; align-items: center; padding: 18px; border-right: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+    .c3 .country-list li:last-child { border-right: 0; }
+
+    /* Concept 04 — editorial institution */
+    .c4 { background: #f8f7f4; }
+    .c4 .site-header { min-height: 76px; display: flex; align-items: center; background: #f8f7f4; border-bottom: 1px solid #c9c7c2; }
+    .c4 .site-header__inner { display: grid; grid-template-columns: 244px 1fr auto; gap: 26px; align-items: center; }
+    .c4 .site-nav a { color: #2d2c29; }
+    .c4 .trade { background: transparent; color: #111; border: 1px solid #111; border-radius: 4px; }
+    .c4 .hero { background: #f8f7f4; }
+    .c4 .hero__inner { padding: 94px 0 84px; }
+    .c4 .hero__title-row { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; align-items: end; }
+    .c4 .hero__title { grid-column: 1 / span 9; margin: 0; font-size: clamp(56px, 6vw, 88px); line-height: .94; letter-spacing: -.046em; font-weight: 620; }
+    .c4 .hero__text { grid-column: 10 / span 3; margin: 0 0 8px; color: #4a4945; font-size: 17px; line-height: 1.55; }
+    .c4 .hero__action-row { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; margin-top: 52px; padding-top: 28px; border-top: 1px solid #a8a59f; }
+    .c4 .hero__actions { grid-column: 1 / span 3; }
+    .c4 .hero__proof { grid-column: 7 / span 6; display: grid; grid-template-columns: 1fr 1fr; }
+    .c4 .hero__proof .metric { padding-left: 28px; border-left: 1px solid #a8a59f; }
+    .c4 .hero__proof .metric__value { font-size: 64px; font-weight: 620; }
+    .c4 .hero__proof .metric:first-child .metric__value { color: var(--blue); }
+    .c4 .about { padding: 112px 0; background: #fff; }
+    .c4 .about__grid { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; }
+    .c4 .about__heading { grid-column: 1 / span 4; }
+    .c4 .about__heading .kicker { display: block; margin-bottom: 22px; }
+    .c4 .about__heading h2 { margin: 0; font-size: 46px; letter-spacing: -.035em; }
+    .c4 .about__copy { grid-column: 5 / span 5; }
+    .c4 .about__copy p { margin: 0; font-size: 23px; line-height: 1.5; }
+    .c4 .about__more { display: inline-block; margin-top: 26px; color: var(--blue); font-weight: 700; font-size: 14px; }
+    .c4 .about__proof { grid-column: 10 / span 3; }
+    .c4 .about__proof .metric { padding-bottom: 25px; }
+    .c4 .about__proof .metric + .metric { padding-top: 25px; border-top: 1px solid var(--line); }
+    .c4 .about__proof .metric__value { font-size: 50px; }
+    .c4 .about__proof .document-record { margin-top: 28px; grid-template-columns: 48px 1fr; }
+    .c4 .about__proof .document-record__title { font-size: 16px; }
+    .c4 .directions { padding: 112px 0 118px; background: #f8f7f4; }
+    .c4 .direction { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; min-height: 210px; padding: 42px 0; border-top: 1px solid #8f8b84; }
+    .c4 .direction:last-child { border-bottom: 1px solid #8f8b84; }
+    .c4 .direction__title { grid-column: 1 / span 5; margin: 0; font-size: 38px; line-height: 1.06; letter-spacing: -.035em; }
+    .c4 .direction__text { grid-column: 7 / span 4; margin: 0; color: #4a4945; font-size: 18px; line-height: 1.55; }
+    .c4 .direction__mark { grid-column: 12; justify-self: end; width: 28px; height: 28px; border-top: 3px solid var(--blue); }
+    .c4 .direction:nth-child(2) .direction__mark { border-color: var(--red); }
+    .c4 .direction:nth-child(3) .direction__mark { border-color: var(--green); }
+    .c4 .countries { padding: 86px 0 110px; background: #fff; }
+    .c4 .country-list { display: grid; grid-template-columns: repeat(4,1fr); column-gap: 28px; }
+    .c4 .country-list li { padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 18px; }
+
+    /* Concept 05 — structured exchange surface */
+    .c5 { background: #fff; }
+    .c5 .site-header { min-height: 74px; display: flex; align-items: center; background: #fff; border-bottom: 1px solid var(--line); }
+    .c5 .site-header__inner { display: grid; grid-template-columns: 238px 1fr auto; gap: 26px; align-items: center; }
+    .c5 .site-logo { width: 226px; }
+    .c5 .site-nav a { font-size: 12px; font-weight: 600; }
+    .c5 .hero { padding: 54px 0 82px; }
+    .c5 .hero__frame { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); border: 1px solid #cfd2d6; }
+    .c5 .hero__main { grid-column: 1 / span 8; padding: 68px 60px 72px; min-height: 610px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #cfd2d6; }
+    .c5 .hero__title { margin: 0; max-width: 840px; font-size: clamp(52px, 5vw, 74px); line-height: .99; letter-spacing: -.044em; }
+    .c5 .hero__text { max-width: 670px; margin: 30px 0 0; color: var(--ink-2); font-size: 18px; line-height: 1.55; }
+    .c5 .hero__actions { margin-top: 32px; }
+    .c5 .hero__side { grid-column: 9 / span 4; display: grid; grid-template-rows: 1fr 1fr auto; }
+    .c5 .hero__side .metric { padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; border-bottom: 1px solid #cfd2d6; }
+    .c5 .hero__side .metric__value { font-size: 82px; }
+    .c5 .hero__side .metric:first-child .metric__value { color: var(--blue); }
+    .c5 .hero__signals { height: 62px; display: grid; grid-template-columns: 5fr 2fr 1fr; }
+    .c5 .hero__signals span:nth-child(1) { background: var(--blue); }
+    .c5 .hero__signals span:nth-child(2) { background: var(--red); }
+    .c5 .hero__signals span:nth-child(3) { background: var(--green); }
+    .c5 .about { padding: 112px 0; }
+    .c5 .about__grid { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); gap: 24px; }
+    .c5 .about__heading { grid-column: 1 / span 3; }
+    .c5 .about__heading h2 { margin: 20px 0 0; font-size: 46px; letter-spacing: -.035em; }
+    .c5 .about__copy { grid-column: 4 / span 6; }
+    .c5 .about__copy p { margin: 0; font-size: 24px; line-height: 1.47; }
+    .c5 .about__more { display: inline-block; margin-top: 28px; color: var(--blue); font-weight: 700; font-size: 14px; }
+    .c5 .about__doc { grid-column: 10 / span 3; }
+    .c5 .about__doc .document-record { grid-template-columns: 50px 1fr; }
+    .c5 .about__doc .document-record__title { font-size: 17px; }
+    .c5 .directions { padding: 0 0 112px; }
+    .c5 .directions__frame { border: 1px solid #cfd2d6; }
+    .c5 .directions__head { min-height: 54px; background: #0d1116; }
+    .c5 .direction { display: grid; grid-template-columns: 4fr 5fr 1fr; gap: 24px; align-items: center; min-height: 178px; padding: 34px 42px; border-top: 1px solid #cfd2d6; }
+    .c5 .direction__title { margin: 0; font-size: 34px; letter-spacing: -.03em; }
+    .c5 .direction__text { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; }
+    .c5 .direction__bar { justify-self: end; width: 6px; height: 64px; background: var(--blue); }
+    .c5 .direction:nth-child(3) .direction__bar { background: var(--red); }
+    .c5 .direction:nth-child(4) .direction__bar { background: var(--green); }
+    .c5 .countries { padding-bottom: 116px; }
+    .c5 .country-list { display: grid; grid-template-columns: repeat(7,1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .c5 .country-list li { padding: 22px 12px 22px 0; border-right: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+    .c5 .country-list li:last-child { border-right: 0; }
+
+    @media (max-width: 1120px) {
+      .site-nav { gap: 8px 14px; }
+      .site-nav a { font-size: 12px; }
+      .site-logo { width: 205px; }
+      .c1 .site-header__inner, .c2 .site-header__inner, .c3 .site-header__inner, .c4 .site-header__inner, .c5 .site-header__inner { grid-template-columns: 212px 1fr auto; gap: 18px; }
+      .c1 .hero::before { width: 55%; }
+      .c1 .hero__copy { grid-column: 1 / span 7; }
+      .c1 .hero__proof { grid-column: 9 / span 4; }
+    }
+
+    @media (max-width: 899px) {
+      .wrap { width: min(calc(100% - 64px), var(--max)); }
+      .lab-toolbar { grid-template-columns: auto 1fr; }
+      .lab-toolbar__meta { display: none; }
+      .site-nav { display: none; }
+      .c1 .site-header__inner, .c2 .site-header__inner, .c3 .site-header__inner, .c4 .site-header__inner, .c5 .site-header__inner { grid-template-columns: 1fr auto; }
+      .site-logo, .c1 .site-logo, .c2 .site-logo, .c3 .site-logo, .c5 .site-logo { width: 220px; }
+      .c1 .hero::before { right: -180px; width: 58%; opacity: .88; }
+      .c1 .hero__inner { min-height: 650px; }
+      .c1 .hero__copy { grid-column: 1 / span 8; }
+      .c1 .hero__proof { grid-column: 9 / span 4; }
+      .c1 .about__head .kicker { grid-column: 1 / span 2; }
+      .c1 .about__heading { grid-column: 3 / span 10; }
+      .c1 .about__copy { grid-column: 3 / span 7; }
+      .c1 .about__evidence { grid-column: 10 / span 3; }
+      .c1 .direction { grid-template-columns: 1.4fr 1.8fr .5fr; }
+      .c1 .country-list, .c3 .country-list, .c5 .country-list { grid-template-columns: repeat(4,1fr); }
+      .c1 .country-list li, .c3 .country-list li, .c5 .country-list li { border-bottom: 1px solid var(--line); }
+      .c2 .hero__copy { grid-column: 1 / span 8; padding-right: 34px; }
+      .c2 .hero__proof { grid-column: 9 / span 4; }
+      .c2 .directions__inner { grid-template-columns: 1fr; }
+      .c2 .direction { min-height: 220px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.2); }
+      .c2 .direction:last-child { border-bottom: 0; }
+      .c3 .hero__copy { grid-column: 1 / span 7; }
+      .c3 .hero__system { grid-column: 8 / span 5; }
+      .c3 .proof .metric { grid-template-columns: 120px 1fr; }
+      .c4 .hero__title { grid-column: 1 / span 9; }
+      .c4 .hero__text { grid-column: 10 / span 3; }
+      .c4 .hero__proof { grid-column: 6 / span 7; }
+      .c4 .about__heading { grid-column: 1 / span 4; }
+      .c4 .about__copy { grid-column: 5 / span 5; }
+      .c4 .about__proof { grid-column: 10 / span 3; }
+      .c5 .hero__main { grid-column: 1 / span 8; padding: 50px 42px; }
+      .c5 .hero__side { grid-column: 9 / span 4; }
+      .c5 .about__heading { grid-column: 1 / span 3; }
+      .c5 .about__copy { grid-column: 4 / span 6; }
+      .c5 .about__doc { grid-column: 10 / span 3; }
+    }
+
+    @media (max-width: 659px) {
+      .wrap { width: calc(100% - 40px); }
+      .lab-toolbar { height: 54px; padding-inline: 12px; gap: 10px; }
+      .lab-toolbar__brand { display: none; }
+      .lab-toolbar__switcher { justify-content: flex-start; overflow-x: auto; }
+      .lab-toolbar__switcher label { min-width: 46px; }
+      .concept { min-height: calc(100vh - 54px); }
+      .site-actions { gap: 10px; }
+      .lang { gap: 6px; }
+      .trade { min-height: 38px; padding-inline: 12px; font-size: 12px; }
+      .site-logo, .c1 .site-logo, .c2 .site-logo, .c3 .site-logo, .c5 .site-logo { width: 170px; }
+
+      .c1 .site-header, .c2 .site-header, .c3 .site-header, .c4 .site-header, .c5 .site-header { min-height: 66px; }
+      .c1 .site-header__inner, .c2 .site-header__inner, .c3 .site-header__inner, .c4 .site-header__inner, .c5 .site-header__inner { gap: 10px; }
+      .c1 .hero::before { top: auto; right: -120px; bottom: -200px; width: 125%; height: 510px; transform: skewY(-8deg); opacity: .9; }
+      .c1 .hero::after { display: none; }
+      .c1 .hero__inner { min-height: auto; display: block; padding: 64px 0 58px; }
+      .c1 .hero__copy { max-width: none; }
+      .c1 .hero__title { font-size: 46px; }
+      .c1 .hero__text { margin-top: 24px; font-size: 17px; }
+      .c1 .hero__proof { margin: 72px 0 0; display: grid; grid-template-columns: 1fr 1fr; color: #fff; }
+      .c1 .about { padding: 86px 0; }
+      .c1 .about__head, .c1 .about__body { display: block; }
+      .c1 .about__heading { margin-top: 18px; font-size: 40px; }
+      .c1 .about__copy { margin-top: 36px; }
+      .c1 .about__copy p { font-size: 21px; }
+      .c1 .about__evidence { margin-top: 52px; }
+      .c1 .direction { display: block; min-height: 0; padding: 34px 0; }
+      .c1 .direction__title { font-size: 29px; }
+      .c1 .direction__text { margin-top: 18px; }
+      .c1 .direction__signal { margin-top: 30px; width: 72px; }
+      .c1 .country-list { grid-template-columns: 1fr 1fr; }
+
+      .c2 .hero__gridlines { display: none; }
+      .c2 .hero__inner { display: block; min-height: auto; }
+      .c2 .hero__copy { padding: 64px 0 54px; }
+      .c2 .hero__title { font-size: 44px; }
+      .c2 .hero__text { font-size: 17px; }
+      .c2 .hero__proof { display: grid; grid-template-columns: 1fr 1fr; border-left: 0; border-top: 1px solid #111; }
+      .c2 .hero__proof .metric { min-height: 220px; padding: 28px 20px; }
+      .c2 .hero__proof .metric + .metric { border-top: 0; border-left: 1px solid #111; }
+      .c2 .hero__proof .metric__value { font-size: 72px; }
+      .c2 .about { padding: 80px 0; }
+      .c2 .about__top, .c2 .about__content { display: block; }
+      .c2 .about__heading { margin-top: 18px; font-size: 38px; }
+      .c2 .about__copy { margin-top: 36px; }
+      .c2 .about__copy p { font-size: 20px; }
+      .c2 .about__document { margin-top: 44px; }
+      .c2 .direction { min-height: 210px; padding: 38px 20px; }
+      .c2 .direction__title { font-size: 30px; }
+      .c2 .country-list { grid-template-columns: 1fr 1fr; }
+
+      .c3 .hero__inner { display: block; padding: 62px 0 70px; }
+      .c3 .hero__title { font-size: 44px; }
+      .c3 .hero__text { font-size: 17px; }
+      .c3 .hero__system { margin-top: 56px; }
+      .c3 .proof__inner { display: block; }
+      .c3 .proof .metric { display: grid; grid-template-columns: 115px 1fr; padding: 30px 0; }
+      .c3 .proof .metric + .metric { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+      .c3 .proof .metric__value { font-size: 58px; }
+      .c3 .about { padding: 82px 0; }
+      .c3 .about__grid { display: block; }
+      .c3 .about__content { margin-top: 18px; }
+      .c3 .about__content h2 { font-size: 38px; }
+      .c3 .about__content p { font-size: 20px; }
+      .c3 .about__aside { margin-top: 46px; }
+      .c3 .country-list { grid-template-columns: 1fr 1fr; }
+
+      .c4 .hero__inner { padding: 64px 0; }
+      .c4 .hero__title-row, .c4 .hero__action-row { display: block; }
+      .c4 .hero__title { font-size: 46px; }
+      .c4 .hero__text { margin-top: 30px; font-size: 17px; }
+      .c4 .hero__action-row { margin-top: 36px; }
+      .c4 .hero__proof { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; }
+      .c4 .hero__proof .metric { padding-left: 20px; }
+      .c4 .hero__proof .metric__value { font-size: 50px; }
+      .c4 .about { padding: 82px 0; }
+      .c4 .about__grid { display: block; }
+      .c4 .about__copy { margin-top: 36px; }
+      .c4 .about__copy p { font-size: 20px; }
+      .c4 .about__proof { margin-top: 48px; }
+      .c4 .directions { padding: 78px 0 86px; }
+      .c4 .direction { display: block; min-height: 0; padding: 34px 0; }
+      .c4 .direction__title { font-size: 30px; }
+      .c4 .direction__text { margin-top: 18px; }
+      .c4 .direction__mark { margin-top: 28px; }
+      .c4 .country-list { grid-template-columns: 1fr 1fr; }
+
+      .c5 .hero { padding: 34px 0 66px; }
+      .c5 .hero__frame { display: block; }
+      .c5 .hero__main { min-height: 0; padding: 48px 22px 50px; border-right: 0; border-bottom: 1px solid #cfd2d6; }
+      .c5 .hero__title { font-size: 44px; }
+      .c5 .hero__text { font-size: 17px; }
+      .c5 .hero__side { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+      .c5 .hero__side .metric { min-height: 210px; padding: 26px 22px; }
+      .c5 .hero__side .metric + .metric { border-left: 1px solid #cfd2d6; }
+      .c5 .hero__side .metric__value { font-size: 62px; }
+      .c5 .hero__signals { grid-column: 1 / -1; }
+      .c5 .about { padding: 84px 0; }
+      .c5 .about__grid { display: block; }
+      .c5 .about__copy { margin-top: 34px; }
+      .c5 .about__copy p { font-size: 20px; }
+      .c5 .about__doc { margin-top: 44px; }
+      .c5 .directions { padding-bottom: 84px; }
+      .c5 .directions__head { height: 42px; min-height: 42px; }
+      .c5 .direction { display: block; min-height: 0; padding: 32px 22px; }
+      .c5 .direction__title { font-size: 29px; }
+      .c5 .direction__text { margin-top: 18px; }
+      .c5 .direction__bar { margin-top: 26px; width: 62px; height: 4px; }
+      .c5 .country-list { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <input type="radio" name="variant" id="variant-1" checked>
+  <input type="radio" name="variant" id="variant-2">
+  <input type="radio" name="variant" id="variant-3">
+  <input type="radio" name="variant" id="variant-4">
+  <input type="radio" name="variant" id="variant-5">
+
+  <div class="lab-toolbar" aria-label="ACE">
+    <div class="lab-toolbar__brand">ACE</div>
+    <div class="lab-toolbar__switcher" role="group" aria-label="ACE">
+      <label for="variant-1">01</label>
+      <label for="variant-2">02</label>
+      <label for="variant-3">03</label>
+      <label for="variant-4">04</label>
+      <label for="variant-5">05</label>
+    </div>
+    <div class="lab-toolbar__meta">ACE</div>
+  </div>
+
+  <main class="concept-stage">
+    <!-- 01: blue kinetic field; Stripe/Primer-style public composition without product theatre. -->
+    <article class="concept c1">
+      <header class="site-header">
+        <div class="wrap site-header__inner">
+          <a class="site-logo" href="#"><img src="../concepts/assets/ace-logo.svg" alt="ACE"></a>
+          <nav class="site-nav" aria-label="ACE">
+            <a href="#c1-about">Об ассоциации</a><a href="#">Медиа</a><a href="#">Органы управления</a><a href="#">Члены ассоциации</a><a href="#c1-document">Документы</a><a href="#">Новости</a><a href="#">Вступление</a><a href="#">Контакты</a>
+          </nav>
+          <div class="site-actions"><div class="lang"><strong>RU</strong><span>EN</span></div><a class="trade" href="#">Trade Requests</a></div>
+        </div>
+      </header>
+      <section class="hero">
+        <div class="wrap hero__inner">
+          <div class="hero__copy">
+            <h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1>
+            <p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
+            <div class="hero__actions"><a class="trade" href="#">Войти в Trade Requests</a></div>
+          </div>
+          <div class="hero__proof">
+            <div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div>
+            <div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="about" id="c1-about">
+        <div class="wrap">
+          <div class="about__head"><div class="kicker">КТО МЫ</div><h2 class="about__heading">Об ассоциации</h2></div>
+          <div class="about__body">
+            <div class="about__copy"><p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p><a class="about__more" href="#">Читать полностью ▼</a></div>
+            <aside class="about__evidence">
+              <div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div>
+              <div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div>
+              <div class="document-record" id="c1-document"><span class="document-record__type">PDF</span><p class="document-record__title">Декларация о создании ассоциации</p></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+      <section class="directions">
+        <div class="wrap">
+          <article class="direction"><h3 class="direction__title">Межбиржевые линки</h3><p class="direction__text">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p><span class="direction__signal" aria-hidden="true"></span></article>
+          <article class="direction"><h3 class="direction__title">Ценовое агентство</h3><p class="direction__text">Независимая система ценовых индикаторов по ключевым товарным группам.</p><span class="direction__signal" aria-hidden="true"></span></article>
+          <article class="direction"><h3 class="direction__title">Торговая платформа</h3><p class="direction__text">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p><span class="direction__signal" aria-hidden="true"></span></article>
+        </div>
+      </section>
+      <section class="countries"><div class="wrap"><ul class="country-list"><li>Россия</li><li>Беларусь</li><li>Казахстан</li><li>Узбекистан</li><li>Китай</li><li>Иран</li><li>Египет</li></ul></div></section>
+    </article>
+
+    <!-- 02: strict institutional grid; hierarchy carried by type, rules and 12-column alignment. -->
+    <article class="concept c2">
+      <header class="site-header"><div class="wrap site-header__inner"><a class="site-logo" href="#"><img src="../concepts/assets/ace-logo.svg" alt="ACE"></a><nav class="site-nav" aria-label="ACE"><a href="#c2-about">Об ассоциации</a><a href="#">Медиа</a><a href="#">Органы управления</a><a href="#">Члены ассоциации</a><a href="#c2-document">Документы</a><a href="#">Новости</a><a href="#">Вступление</a><a href="#">Контакты</a></nav><div class="site-actions"><div class="lang"><strong>RU</strong><span>EN</span></div><a class="trade" href="#">Trade Requests</a></div></div></header>
+      <section class="hero"><div class="hero__gridlines" aria-hidden="true"></div><div class="wrap hero__inner"><div class="hero__copy"><h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1><p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p><div class="hero__actions"><a class="trade" href="#">Войти в Trade Requests</a></div></div><div class="hero__proof"><div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div><div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div></div></div></section>
+      <section class="about" id="c2-about"><div class="wrap"><div class="about__top"><div class="kicker">КТО МЫ</div><h2 class="about__heading">Об ассоциации</h2></div><div class="about__content"><div class="about__copy"><p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p><a class="about__more" href="#">Читать полностью ▼</a></div><aside class="about__document"><div class="document-record" id="c2-document"><span class="document-record__type">PDF</span><p class="document-record__title">Декларация о создании ассоциации</p></div></aside></div></div></section>
+      <section class="directions"><div class="wrap directions__inner"><article class="direction"><h3 class="direction__title">Межбиржевые линки</h3><p class="direction__text">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p></article><article class="direction"><h3 class="direction__title">Ценовое агентство</h3><p class="direction__text">Независимая система ценовых индикаторов по ключевым товарным группам.</p></article><article class="direction"><h3 class="direction__title">Торговая платформа</h3><p class="direction__text">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p></article></div></section>
+      <section class="countries"><div class="wrap"><ul class="country-list"><li>Россия</li><li>Беларусь</li><li>Казахстан</li><li>Узбекистан</li><li>Китай</li><li>Иран</li><li>Египет</li></ul></div></section>
+    </article>
+
+    <!-- 03: product protocol; actual strategic directions become the product surface instead of fake UI. -->
+    <article class="concept c3">
+      <header class="site-header"><div class="wrap site-header__inner"><a class="site-logo" href="#"><img src="../concepts/assets/ace-logo.svg" alt="ACE"></a><nav class="site-nav" aria-label="ACE"><a href="#c3-about">Об ассоциации</a><a href="#">Медиа</a><a href="#">Органы управления</a><a href="#">Члены ассоциации</a><a href="#c3-document">Документы</a><a href="#">Новости</a><a href="#">Вступление</a><a href="#">Контакты</a></nav><div class="site-actions"><div class="lang"><strong>RU</strong><span>EN</span></div><a class="trade trade--light" href="#">Trade Requests</a></div></div></header>
+      <section class="hero"><div class="wrap hero__inner"><div class="hero__copy"><h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1><p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p><div class="hero__actions"><a class="trade" href="#">Войти в Trade Requests</a></div></div><div class="hero__system"><div class="hero__system-row"><h3>Межбиржевые линки</h3><p>Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p></div><div class="hero__system-row"><h3>Ценовое агентство</h3><p>Независимая система ценовых индикаторов по ключевым товарным группам.</p></div><div class="hero__system-row"><h3>Торговая платформа</h3><p>Единая цифровая платформа для проведения сделок и учёта контрагентов.</p></div></div></div></section>
+      <section class="proof"><div class="wrap proof__inner"><div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div><div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div></div></section>
+      <section class="about" id="c3-about"><div class="wrap about__grid"><div class="about__label"><span class="kicker">КТО МЫ</span></div><div class="about__content"><h2>Об ассоциации</h2><p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p><a class="about__more" href="#">Читать полностью ▼</a></div><aside class="about__aside"><div class="document-record" id="c3-document"><span class="document-record__type">PDF</span><p class="document-record__title">Декларация о создании ассоциации</p></div></aside></div></section>
+      <section class="countries"><div class="wrap"><ul class="country-list"><li>Россия</li><li>Беларусь</li><li>Казахстан</li><li>Узбекистан</li><li>Китай</li><li>Иран</li><li>Египет</li></ul></div></section>
+    </article>
+
+    <!-- 04: editorial institution; no decorative product object, hierarchy carried by proportion and typography. -->
+    <article class="concept c4">
+      <header class="site-header"><div class="wrap site-header__inner"><a class="site-logo" href="#"><img src="../concepts/assets/ace-logo.svg" alt="ACE"></a><nav class="site-nav" aria-label="ACE"><a href="#c4-about">Об ассоциации</a><a href="#">Медиа</a><a href="#">Органы управления</a><a href="#">Члены ассоциации</a><a href="#c4-document">Документы</a><a href="#">Новости</a><a href="#">Вступление</a><a href="#">Контакты</a></nav><div class="site-actions"><div class="lang"><strong>RU</strong><span>EN</span></div><a class="trade" href="#">Trade Requests</a></div></div></header>
+      <section class="hero"><div class="wrap hero__inner"><div class="hero__title-row"><h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1><p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p></div><div class="hero__action-row"><div class="hero__actions"><a class="trade" href="#">Войти в Trade Requests</a></div><div class="hero__proof"><div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div><div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div></div></div></div></section>
+      <section class="about" id="c4-about"><div class="wrap about__grid"><div class="about__heading"><span class="kicker">КТО МЫ</span><h2>Об ассоциации</h2></div><div class="about__copy"><p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p><a class="about__more" href="#">Читать полностью ▼</a></div><aside class="about__proof"><div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div><div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div><div class="document-record" id="c4-document"><span class="document-record__type">PDF</span><p class="document-record__title">Декларация о создании ассоциации</p></div></aside></div></section>
+      <section class="directions"><div class="wrap"><article class="direction"><h3 class="direction__title">Межбиржевые линки</h3><p class="direction__text">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p><span class="direction__mark" aria-hidden="true"></span></article><article class="direction"><h3 class="direction__title">Ценовое агентство</h3><p class="direction__text">Независимая система ценовых индикаторов по ключевым товарным группам.</p><span class="direction__mark" aria-hidden="true"></span></article><article class="direction"><h3 class="direction__title">Торговая платформа</h3><p class="direction__text">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p><span class="direction__mark" aria-hidden="true"></span></article></div></section>
+      <section class="countries"><div class="wrap"><ul class="country-list"><li>Россия</li><li>Беларусь</li><li>Казахстан</li><li>Узбекистан</li><li>Китай</li><li>Иран</li><li>Египет</li></ul></div></section>
+    </article>
+
+    <!-- 05: structured exchange surface; product feeling comes from exact grid and boundaries. -->
+    <article class="concept c5">
+      <header class="site-header"><div class="wrap site-header__inner"><a class="site-logo" href="#"><img src="../concepts/assets/ace-logo.svg" alt="ACE"></a><nav class="site-nav" aria-label="ACE"><a href="#c5-about">Об ассоциации</a><a href="#">Медиа</a><a href="#">Органы управления</a><a href="#">Члены ассоциации</a><a href="#c5-document">Документы</a><a href="#">Новости</a><a href="#">Вступление</a><a href="#">Контакты</a></nav><div class="site-actions"><div class="lang"><strong>RU</strong><span>EN</span></div><a class="trade trade--dark" href="#">Trade Requests</a></div></div></header>
+      <section class="hero"><div class="wrap"><div class="hero__frame"><div class="hero__main"><h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1><p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p><div class="hero__actions"><a class="trade" href="#">Войти в Trade Requests</a></div></div><aside class="hero__side"><div class="metric"><strong class="metric__value">8</strong><span class="metric__caption">бирж - 7 стран-участниц</span></div><div class="metric"><strong class="metric__value">~15</strong><span class="metric__caption">стран рассматривают вступление</span></div><div class="hero__signals" aria-hidden="true"><span></span><span></span><span></span></div></aside></div></div></section>
+      <section class="about" id="c5-about"><div class="wrap about__grid"><div class="about__heading"><span class="kicker">КТО МЫ</span><h2>Об ассоциации</h2></div><div class="about__copy"><p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p><a class="about__more" href="#">Читать полностью ▼</a></div><aside class="about__doc"><div class="document-record" id="c5-document"><span class="document-record__type">PDF</span><p class="document-record__title">Декларация о создании ассоциации</p></div></aside></div></section>
+      <section class="directions"><div class="wrap directions__frame"><div class="directions__head" aria-hidden="true"></div><article class="direction"><h3 class="direction__title">Межбиржевые линки</h3><p class="direction__text">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p><span class="direction__bar" aria-hidden="true"></span></article><article class="direction"><h3 class="direction__title">Ценовое агентство</h3><p class="direction__text">Независимая система ценовых индикаторов по ключевым товарным группам.</p><span class="direction__bar" aria-hidden="true"></span></article><article class="direction"><h3 class="direction__title">Торговая платформа</h3><p class="direction__text">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p><span class="direction__bar" aria-hidden="true"></span></article></div></section>
+      <section class="countries"><div class="wrap"><ul class="country-list"><li>Россия</li><li>Беларусь</li><li>Казахстан</li><li>Узбекистан</li><li>Китай</li><li>Иран</li><li>Египет</li></ul></div></section>
+    </article>
+  </main>
+</body>
+</html>
