@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACE</title>
+  <link rel="stylesheet" href="../assets/css/home.css">
+</head>
+<body>
+  <!-- Шапка остаётся самостоятельным блоком: её можно перенести в CMS без изменений структуры страницы. -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-header__logo" href="#">
+        <img src="../../concepts/assets/ace-logo.svg" alt="ACE" width="320" height="40">
+      </a>
+
+      <nav class="site-header__nav">
+        <a class="site-header__nav-link" href="#about">Об ассоциации</a>
+        <a class="site-header__nav-link" href="#">Медиа</a>
+        <a class="site-header__nav-link" href="#">Органы управления</a>
+        <a class="site-header__nav-link" href="#">Члены ассоциации</a>
+        <a class="site-header__nav-link" href="#document">Документы</a>
+        <a class="site-header__nav-link" href="#">Новости</a>
+        <a class="site-header__nav-link" href="#">Вступление</a>
+        <a class="site-header__nav-link" href="#">Контакты</a>
+      </nav>
+
+      <div class="site-header__actions">
+        <div class="language-switcher">
+          <span class="language-switcher__item language-switcher__item--active">RU</span>
+          <span class="language-switcher__item">EN</span>
+        </div>
+        <a class="site-header__trade-link" href="#">Trade Requests</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Первый экран: исходный контент прототипа, полностью новая композиция. -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <h1 class="hero__title">Международная ассоциация товарных и фьючерсных бирж</h1>
+          <p class="hero__text">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
+          <div class="hero__actions">
+            <a class="button-primary" href="#">Войти в Trade Requests</a>
+          </div>
+        </div>
+
+        <!-- Абстрактный визуальный слой не имитирует реальные данные или интерфейс Trade Requests. -->
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-visual__plane hero-visual__plane--back"></div>
+          <div class="hero-visual__plane hero-visual__plane--middle"></div>
+          <div class="hero-visual__plane hero-visual__plane--front">
+            <div class="hero-visual__signal-row">
+              <span class="hero-visual__signal"></span>
+              <span class="hero-visual__signal"></span>
+              <span class="hero-visual__signal"></span>
+            </div>
+
+            <div class="hero-visual__network">
+              <span class="hero-visual__route hero-visual__route--one"></span>
+              <span class="hero-visual__route hero-visual__route--two"></span>
+              <span class="hero-visual__route hero-visual__route--three"></span>
+              <span class="hero-visual__node hero-visual__node--one"></span>
+              <span class="hero-visual__node hero-visual__node--two"></span>
+              <span class="hero-visual__node hero-visual__node--three"></span>
+              <span class="hero-visual__node hero-visual__node--four"></span>
+              <span class="hero-visual__node hero-visual__node--five"></span>
+            </div>
+
+            <div class="hero-visual__footer">
+              <span class="hero-visual__footer-item"></span>
+              <span class="hero-visual__footer-item"></span>
+              <span class="hero-visual__footer-item"></span>
+              <span class="hero-visual__footer-item"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Доказательные цифры вынесены из hero в самостоятельный слой, но формулировки не изменены. -->
+    <section class="hero-proof">
+      <div class="container hero-proof__inner">
+        <div class="hero-proof__item">
+          <strong class="hero-proof__value">8</strong>
+          <span class="hero-proof__caption">бирж - 7 стран-участниц</span>
+        </div>
+        <div class="hero-proof__item">
+          <strong class="hero-proof__value">~15</strong>
+          <span class="hero-proof__caption">стран рассматривают вступление</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container">
+        <div class="about__kicker">КТО МЫ</div>
+        <h2 class="about__heading">Об ассоциации</h2>
+
+        <div class="about__layout">
+          <div>
+            <p class="about__lead">Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p>
+            <a class="about__more" href="#">Читать полностью ▼</a>
+          </div>
+
+          <aside class="about__side">
+            <section class="info-panel">
+              <div class="info-panel__header">ЦИФРЫ</div>
+              <div class="info-panel__body">
+                <div class="info-panel__metric">
+                  <strong class="info-panel__metric-value">8</strong>
+                  <span class="info-panel__metric-caption">бирж - 7 стран-участниц</span>
+                </div>
+                <div class="info-panel__metric">
+                  <strong class="info-panel__metric-value">~15</strong>
+                  <span class="info-panel__metric-caption">стран рассматривают вступление</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="info-panel" id="document">
+              <div class="info-panel__header">ДОКУМЕНТ</div>
+              <div class="info-panel__body">
+                <div class="document-row">
+                  <span class="document-row__badge">PDF</span>
+                  <p class="document-row__title">Декларация о создании ассоциации</p>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <!-- Три направления собраны в одну продуктовую композицию, а не в одинаковый ряд карточек. -->
+        <div class="services">
+          <article class="service-card service-card--large">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8.4 15.6 15.6 8.4"></path>
+                <path d="M7.2 6.1 5.1 8.2a4 4 0 0 0 5.7 5.7l2.1-2.1"></path>
+                <path d="m11.1 12.2 2.1-2.1a4 4 0 1 1 5.7 5.7l-2.1 2.1"></path>
+              </svg>
+            </div>
+            <h3 class="service-card__title">Межбиржевые линки</h3>
+            <p class="service-card__text">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p>
+            <div class="service-card__art" aria-hidden="true"></div>
+          </article>
+
+          <article class="service-card service-card--red">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M5 19V9"></path>
+                <path d="M10 19V5"></path>
+                <path d="M15 19v-7"></path>
+                <path d="M20 19V8"></path>
+              </svg>
+            </div>
+            <h3 class="service-card__title">Ценовое агентство</h3>
+            <p class="service-card__text">Независимая система ценовых индикаторов по ключевым товарным группам.</p>
+          </article>
+
+          <article class="service-card service-card--green">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="8"></circle>
+                <path d="M4 12h16"></path>
+                <path d="M12 4a12 12 0 0 1 0 16"></path>
+                <path d="M12 4a12 12 0 0 0 0 16"></path>
+              </svg>
+            </div>
+            <h3 class="service-card__title">Торговая платформа</h3>
+            <p class="service-card__text">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p>
+          </article>
+        </div>
+
+        <div class="countries">
+          <span class="country-chip">Россия</span>
+          <span class="country-chip">Беларусь</span>
+          <span class="country-chip">Казахстан</span>
+          <span class="country-chip">Узбекистан</span>
+          <span class="country-chip">Китай</span>
+          <span class="country-chip">Иран</span>
+          <span class="country-chip">Египет</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
