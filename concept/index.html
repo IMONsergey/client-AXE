@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ACE — Design Concept v1</title>
+  <meta name="description" content="Design concept for the International Association of Commodity & Futures Exchanges." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="concept-note">
+    <div class="shell concept-note__inner">
+      <span>Design concept · desktop v1</span>
+      <span class="concept-note__status"><i></i> visual direction for approval</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="shell header-grid">
+      <a class="brand" href="#" aria-label="ACE home">
+        <img src="data:image/png;base64,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" alt="ACE — International Association of Commodity & Futures Exchanges" />
+      </a>
+
+      <nav class="primary-nav" aria-label="Основная навигация">
+        <a href="#about">Об ассоциации</a>
+        <a href="#">Медиа</a>
+        <a href="#">Управление</a>
+        <a href="#">Участники</a>
+        <a href="#">Документы</a>
+        <a href="#">Новости</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang" aria-label="Language switcher">
+          <button class="is-active">RU</button><button>EN</button>
+        </div>
+        <a class="button button--dark button--small" href="#">Trade Requests <span>↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-mark"></span> INTERNATIONAL MARKET INFRASTRUCTURE</div>
+          <h1>Инфраструктура<br/>международной<br/>межбиржевой торговли</h1>
+          <p class="hero-lead">ACE объединяет товарные и фьючерсные биржи для технологического взаимодействия, взаимного доступа к торгам и прозрачного международного ценообразования.</p>
+
+          <div class="hero-actions">
+            <a class="button button--blue" href="#">Войти в Trade Requests <span>↗</span></a>
+            <a class="text-link" href="#about">Об Ассоциации <span>↓</span></a>
+          </div>
+
+          <div class="hero-proof" aria-label="Ключевые показатели">
+            <div class="proof-item">
+              <div class="proof-value">08</div>
+              <div class="proof-label">бирж в контуре</div>
+            </div>
+            <div class="proof-item">
+              <div class="proof-value">07</div>
+              <div class="proof-label">стран-участниц</div>
+            </div>
+            <div class="proof-item">
+              <div class="proof-value">~15</div>
+              <div class="proof-label">стран рассматривают вступление</div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="network-panel" aria-label="Международная сеть ACE">
+          <div class="network-panel__top">
+            <div>
+              <span class="micro">ACE NETWORK / 2026</span>
+              <strong>Межбиржевая сеть</strong>
+            </div>
+            <span class="network-live"><i></i> ACTIVE</span>
+          </div>
+
+          <div class="network-stage">
+            <svg viewBox="0 0 720 520" role="img" aria-label="Абстрактная схема международной биржевой сети">
+              <defs>
+                <linearGradient id="route" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#005EB8" stop-opacity=".15"/>
+                  <stop offset=".55" stop-color="#005EB8" stop-opacity=".85"/>
+                  <stop offset="1" stop-color="#00B140" stop-opacity=".24"/>
+                </linearGradient>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <g class="grid-lines">
+                <path d="M40 80H680M40 160H680M40 240H680M40 320H680M40 400H680M120 30V490M240 30V490M360 30V490M480 30V490M600 30V490"/>
+              </g>
+              <g class="world-lines">
+                <path d="M93 291C155 214 207 205 269 229C330 253 367 185 434 174C495 163 546 195 631 157"/>
+                <path d="M99 304C202 356 280 365 365 321C450 277 504 305 625 268"/>
+                <path d="M129 169C208 167 259 119 330 132C403 145 451 238 565 224"/>
+              </g>
+              <g class="routes" fill="none" stroke="url(#route)" stroke-width="2.4">
+                <path d="M114 302C232 128 378 118 590 198"/>
+                <path d="M114 302C256 412 424 394 610 286"/>
+                <path d="M264 208C362 252 449 270 548 246"/>
+                <path d="M264 208C356 126 479 125 590 198"/>
+                <path d="M362 345C430 307 492 273 548 246"/>
+              </g>
+              <g class="nodes">
+                <g transform="translate(114 302)"><circle r="15" class="node-halo"/><circle r="5" class="node-blue"/></g>
+                <g transform="translate(264 208)"><circle r="13" class="node-halo"/><circle r="5" class="node-red"/></g>
+                <g transform="translate(362 345)"><circle r="13" class="node-halo"/><circle r="5" class="node-green"/></g>
+                <g transform="translate(420 166)"><circle r="12" class="node-halo"/><circle r="4" class="node-blue"/></g>
+                <g transform="translate(548 246)"><circle r="14" class="node-halo"/><circle r="5" class="node-blue"/></g>
+                <g transform="translate(590 198)"><circle r="12" class="node-halo"/><circle r="4" class="node-green"/></g>
+                <g transform="translate(610 286)"><circle r="12" class="node-halo"/><circle r="4" class="node-red"/></g>
+              </g>
+              <g class="node-labels">
+                <text x="84" y="336">RUS</text><text x="236" y="188">BLR</text><text x="334" y="378">KAZ</text>
+                <text x="392" y="145">UZB</text><text x="520" y="277">CHN</text><text x="568" y="175">IRN</text><text x="622" y="316">EGY</text>
+              </g>
+            </svg>
+
+            <div class="network-caption">
+              <span>01</span>
+              <p>Единый цифровой контур для торговых связей, индикаторов и доступа к рынкам.</p>
+            </div>
+          </div>
+
+          <div class="network-panel__bottom">
+            <div><span class="micro">FOUNDING FRAMEWORK</span><strong>ПМЭФ—2025</strong></div>
+            <div><span class="micro">MEMBER MARKETS</span><strong>7 countries / 8 exchanges</strong></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="ticker" aria-label="Страны-участницы">
+      <div class="shell ticker-track">
+        <span>Россия</span><i></i><span>Беларусь</span><i></i><span>Казахстан</span><i></i><span>Узбекистан</span><i></i><span>Китай</span><i></i><span>Иран</span><i></i><span>Египет</span>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="shell">
+        <div class="section-head">
+          <div class="eyebrow"><span class="eyebrow-mark"></span> О МЕЖДУНАРОДНОЙ АССОЦИАЦИИ</div>
+          <div class="section-index">01 / 03</div>
+        </div>
+
+        <div class="about-intro">
+          <h2>Не представительский сайт.<br/>Цифровой слой рынка.</h2>
+          <div class="about-copy">
+            <p>Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ—2025. Ассоциация становится площадкой взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p>
+            <a href="#" class="text-link">Читать полностью <span>↗</span></a>
+          </div>
+        </div>
+
+        <div class="infrastructure-grid">
+          <article class="infra-card">
+            <div class="infra-card__number">01</div>
+            <div class="infra-card__icon link-icon" aria-hidden="true">↗</div>
+            <h3>Межбиржевые<br/>линки</h3>
+            <p>Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p>
+            <div class="infra-card__meta">CONNECTIVITY</div>
+          </article>
+
+          <article class="infra-card">
+            <div class="infra-card__number">02</div>
+            <div class="infra-card__icon bars-icon" aria-hidden="true"><i></i><i></i><i></i></div>
+            <h3>Ценовое<br/>агентство</h3>
+            <p>Независимая система ценовых индикаторов по ключевым товарным группам.</p>
+            <div class="infra-card__meta">PRICE DISCOVERY</div>
+          </article>
+
+          <article class="infra-card">
+            <div class="infra-card__number">03</div>
+            <div class="infra-card__icon globe-icon" aria-hidden="true">◎</div>
+            <h3>Торговая<br/>платформа</h3>
+            <p>Единая цифровая платформа для проведения сделок и учёта контрагентов.</p>
+            <div class="infra-card__meta">EXECUTION</div>
+          </article>
+
+          <aside class="document-card">
+            <div class="document-card__top">
+              <span class="micro">FOUNDING DOCUMENT</span>
+              <span class="pdf-badge">PDF</span>
+            </div>
+            <h3>Декларация<br/>о создании<br/>Ассоциации</h3>
+            <a href="#" class="document-link">Открыть документ <span>↗</span></a>
+            <div class="document-card__lines"><i></i><i></i><i></i><i></i></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="concept-footer">
+    <div class="shell">
+      <span>ACE — design concept v1</span>
+      <span>Institutional × infrastructure × fintech</span>
+    </div>
+  </footer>
+</body>
+</html>
