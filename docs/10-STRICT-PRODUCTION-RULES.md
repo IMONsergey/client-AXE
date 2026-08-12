@@ -156,35 +156,53 @@ Required qualities:
 
 The goal is not to imitate a person's mistakes. The goal is professional, maintainable frontend code with no obvious AI-generated patterns.
 
-## 10. Current concept direction
+## 10. Design-system reading order
 
-For the next concept:
+Before changing any public-site visual/frontend implementation, read and follow:
 
-- make **one** primary direction rather than another set of five shallow variants;
-- use Stripe as the dominant visual benchmark;
+1. `design-system/DESIGN-INTELLIGENCE.md`;
+2. `design-system/decisions/ace-design-system-v1.md`;
+3. `design-system/patterns/public-site.md`;
+4. `design-system/patterns/components.md`;
+5. `design-system/patterns/anti-patterns.md`;
+6. relevant donor notes under `design-system/donors/`.
+
+Trade Requests work additionally requires `design-system/patterns/trade-requests.md`.
+
+## 11. Component-first implementation rule
+
+The physical component layer in `design-system/runtime/` is mandatory for new static concepts and production-facing templates.
+
+Required order:
+
+1. use the existing foundation tokens;
+2. use an existing runtime primitive;
+3. use an existing runtime composition or add a justified modifier;
+4. create a new reusable component only when the actual content/interaction cannot be represented by the existing system;
+5. one-off page CSS is the last resort, not the default.
+
+Forbidden:
+
+- rebuilding buttons, navigation, metrics, document records, capability rows, country registers, headers or hero scaffolding from scratch inside a page stylesheet when an ACE runtime component already exists;
+- copying donor component skins wholesale into a page;
+- bypassing tokens with repeated hard-coded spacing/radius/color values;
+- creating five unrelated CSS implementations for five concept variants.
+
+Concept variants must be assembled from shared primitives/compositions with explicit modifiers. The design can change substantially between variants, but the underlying component language must remain coherent.
+
+## 12. Current concept direction
+
+For the current concept lab:
+
+- build five genuinely different compositions for comparison;
+- use Stripe as the dominant art-direction benchmark;
+- use Primer Brand for public-site composition/grid/hero anatomy;
+- use Reshaped/Coss for component proportions and surface discipline;
+- use Base UI behaviour as the accessibility/interaction reference;
+- reserve ReUI for the real Trade Requests form/table layer;
 - retain ACE institutional seriousness;
 - retain the prototype's content only;
 - use the official ACE logo;
 - do not reuse the visual design of the supplied gray wireframe;
-- treat that wireframe only as information architecture and content source.
-
-## 11. Design-system intelligence — mandatory reading
-
-Before any new visual design or frontend redesign, read and follow:
-
-1. `design-system/DESIGN-INTELLIGENCE.md`;
-2. `design-system/decisions/ace-design-system-v1.md`;
-3. the relevant file under `design-system/patterns/`;
-4. donor notes under `design-system/donors/` only for the problem being solved.
-
-The donor stack is intentionally layered:
-
-- Stripe + Primer Brand — public composition;
-- Reshaped + Coss — visual component discipline;
-- Base UI — interaction/accessibility behaviour;
-- ReUI — Trade Requests forms/tables;
-- Figma SDS + SEED — design-system architecture.
-
-Do not adopt any donor as a complete ACE skin. Do not pull a component into the design simply because it exists in a donor library.
-
-`design-system/patterns/anti-patterns.md` is a hard visual blacklist for the current project. A future design must pass that audit before it is shown for review.
+- do not inherit the failed v3/v4 visual layer;
+- treat the prototype only as information architecture and content source.
