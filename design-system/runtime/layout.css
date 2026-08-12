@@ -1,0 +1,129 @@
+/* ACE Design System — layout primitives */
+
+.ace-container {
+  width: min(calc(100% - (var(--ace-gutter-desktop) * 2)), var(--ace-layout-max));
+  margin-inline: auto;
+}
+
+.ace-container--wide {
+  width: min(calc(100% - (var(--ace-gutter-desktop) * 2)), var(--ace-layout-wide));
+}
+
+.ace-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+.ace-grid--ruled {
+  column-gap: 0;
+}
+
+.ace-section {
+  padding-block: var(--ace-space-32);
+}
+
+.ace-section--compact {
+  padding-block: var(--ace-space-24);
+}
+
+.ace-section--spacious {
+  padding-block: var(--ace-space-40);
+}
+
+.ace-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ace-space-6);
+}
+
+.ace-stack--tight {
+  gap: var(--ace-space-3);
+}
+
+.ace-stack--loose {
+  gap: var(--ace-space-10);
+}
+
+.ace-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ace-space-3);
+}
+
+.ace-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--ace-space-16);
+  align-items: start;
+}
+
+.ace-rule {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--ace-border-default);
+}
+
+.ace-rule--inverse {
+  background: var(--ace-border-inverse);
+}
+
+.ace-surface-subtle {
+  background: var(--ace-surface-subtle);
+}
+
+.ace-surface-muted {
+  background: var(--ace-surface-muted);
+}
+
+.ace-surface-strong {
+  color: var(--ace-text-on-strong);
+  background: var(--ace-surface-strong);
+}
+
+@media (max-width: 899px) {
+  .ace-container,
+  .ace-container--wide {
+    width: min(calc(100% - (var(--ace-gutter-tablet) * 2)), var(--ace-layout-max));
+  }
+
+  .ace-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    column-gap: 20px;
+  }
+
+  .ace-section,
+  .ace-section--spacious {
+    padding-block: var(--ace-space-28);
+  }
+
+  .ace-split {
+    grid-template-columns: 1fr;
+    gap: var(--ace-space-12);
+  }
+}
+
+@media (max-width: 659px) {
+  .ace-container,
+  .ace-container--wide {
+    width: calc(100% - (var(--ace-gutter-mobile) * 2));
+  }
+
+  .ace-grid {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .ace-section,
+  .ace-section--compact,
+  .ace-section--spacious {
+    padding-block: var(--ace-space-20);
+  }
+
+  .ace-stack--loose {
+    gap: var(--ace-space-8);
+  }
+}

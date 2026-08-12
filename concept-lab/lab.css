@@ -1,0 +1,132 @@
+/* ACE concept lab — preview-only controls */
+
+html {
+  background: #090b0e;
+}
+
+body {
+  background: #090b0e;
+}
+
+.concept-control {
+  position: fixed;
+  left: -9999px;
+}
+
+.concept-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding-inline: 18px;
+  color: #fff;
+  background: #090b0e;
+  border-bottom: 1px solid #252a31;
+}
+
+.concept-toolbar__brand {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.concept-toolbar__switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.concept-toolbar__option {
+  min-width: 42px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #89919b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.concept-toolbar__option:hover {
+  color: #fff;
+  background: #171b20;
+}
+
+#concept-1:checked ~ .concept-toolbar label[for="concept-1"],
+#concept-2:checked ~ .concept-toolbar label[for="concept-2"],
+#concept-3:checked ~ .concept-toolbar label[for="concept-3"],
+#concept-4:checked ~ .concept-toolbar label[for="concept-4"],
+#concept-5:checked ~ .concept-toolbar label[for="concept-5"] {
+  color: #101317;
+  background: #fff;
+  border-color: #fff;
+}
+
+.concept-stage {
+  min-height: calc(100vh - 54px);
+}
+
+.concept-page {
+  display: none;
+}
+
+#concept-1:checked ~ .concept-stage .concept-page--1,
+#concept-2:checked ~ .concept-stage .concept-page--2,
+#concept-3:checked ~ .concept-stage .concept-page--3,
+#concept-4:checked ~ .concept-stage .concept-page--4,
+#concept-5:checked ~ .concept-stage .concept-page--5 {
+  display: block;
+}
+
+/* Variant 05 keeps the approved full-colour logo on a light header. */
+.concept-page--5 .ace-header--inverse {
+  color: var(--ace-text-primary);
+  border-color: var(--ace-border-subtle);
+  background: var(--ace-surface-page);
+}
+
+.concept-page--5 .ace-header--inverse .ace-nav__link,
+.concept-page--5 .ace-header--inverse .ace-language {
+  color: var(--ace-text-secondary);
+}
+
+.concept-page--5 .ace-header--inverse .ace-language__active {
+  color: var(--ace-text-primary);
+}
+
+.concept-page--5 .ace-header .ace-button--light {
+  color: var(--ace-text-on-strong);
+  background: var(--ace-surface-strong);
+}
+
+.concept-page--5 .ace-header .ace-button--light:hover {
+  background: var(--ace-neutral-850);
+}
+
+@media (max-width: 659px) {
+  .concept-toolbar {
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    padding-inline: 12px;
+  }
+
+  .concept-toolbar__switcher {
+    justify-content: flex-end;
+  }
+
+  .concept-toolbar__option {
+    min-width: 36px;
+    height: 30px;
+  }
+}
