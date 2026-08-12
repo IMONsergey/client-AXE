@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "capturedAt": "2026-08-12",
+  "productionImportByDefault": false,
+  "donors": [
+    {
+      "repo": "primer/brand",
+      "ref": "424cc8441487033d21dbb4a3e47064c73caed7d7",
+      "role": "public-site-composition",
+      "license": "MIT",
+      "priority": "primary",
+      "sourcePaths": [
+        "packages/react/src/Grid/",
+        "packages/react/src/Hero/",
+        "packages/react/src/River/",
+        "packages/react/src/CTABanner/"
+      ]
+    },
+    {
+      "repo": "reshaped-ui/reshaped",
+      "ref": "1bb445b6f442071694f7aae5e1d3f0bb8eda2feb",
+      "role": "tokens-and-component-proportions",
+      "license": "MIT",
+      "priority": "primary",
+      "sourcePaths": [
+        "packages/reshaped/src/themes/slate/theme.css",
+        "packages/reshaped/src/components/",
+        "packages/theming/"
+      ]
+    },
+    {
+      "repo": "cosscom/coss",
+      "ref": "main",
+      "role": "compact-modern-controls",
+      "license": "mixed",
+      "priority": "primary",
+      "allowedDirectCopyPaths": ["apps/origin/", "apps/ui/"],
+      "forbiddenDirectCopyDefault": "all other paths are AGPLv3 unless separately approved"
+    },
+    {
+      "repo": "mui/base-ui",
+      "ref": "master",
+      "role": "interaction-and-accessibility",
+      "license": "MIT",
+      "priority": "primary"
+    },
+    {
+      "repo": "keenthemes/reui",
+      "ref": "main",
+      "role": "trade-requests-forms-and-data-grid",
+      "license": "MIT",
+      "priority": "primary"
+    },
+    {
+      "repo": "figma/sds",
+      "ref": "main",
+      "role": "figma-code-system-architecture",
+      "license": "MIT",
+      "priority": "primary",
+      "sourcePaths": ["src/ui/", "src/figma/", "src/stories/", "src/theme.css", "figma.config.json", "scripts/tokens/"]
+    },
+    {
+      "repo": "daangn/seed-design",
+      "ref": "dev",
+      "role": "token-recipe-headless-architecture",
+      "license": "verify-per-file-before-copy",
+      "priority": "primary-reference",
+      "sourcePaths": ["packages/design-token/", "packages/css/", "packages/react-headless/", "packages/react/", "packages/figma/"]
+    },
+    {
+      "repo": "shadcn-ui/ui",
+      "ref": "main",
+      "role": "copy-and-own-architecture-only",
+      "priority": "secondary",
+      "visualSkinAllowed": false
+    },
+    {
+      "repo": "tremorlabs/tremor",
+      "ref": "main",
+      "role": "data-visualization-only",
+      "priority": "secondary"
+    },
+    {
+      "repo": "cloudscape-design/components",
+      "ref": "main",
+      "role": "enterprise-form-table-cross-check",
+      "priority": "secondary"
+    },
+    {
+      "repo": "elastic/eui",
+      "ref": "main",
+      "role": "enterprise-data-ui-cross-check",
+      "priority": "secondary"
+    },
+    {
+      "repo": "ibelick/motion-primitives",
+      "ref": "main",
+      "role": "motion-reference-only",
+      "priority": "secondary",
+      "decorativeEffectsAllowed": false
+    }
+  ]
+}
