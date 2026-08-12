@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACE — 5 Design Concepts</title>
+<meta name="description" content="ACE design concept switcher — five pure HTML directions.">
+<style>
+:root{--bg:#0d0f12;--panel:#15181c;--line:#2a2e34;--text:#f4f5f6;--muted:#8e959d;--accent:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+body{overflow:hidden}
+input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+.toolbar{height:76px;display:grid;grid-template-columns:240px 1fr auto;align-items:center;gap:24px;padding:0 22px;background:rgba(13,15,18,.98);border-bottom:1px solid var(--line);position:relative;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.brand-mark{display:flex;align-items:flex-end;gap:2px;width:28px;height:25px}
+.brand-mark i{display:block;width:7px;border-radius:1px}.brand-mark i:nth-child(1){height:13px;background:#005EB8}.brand-mark i:nth-child(2){height:19px;background:#AF272F}.brand-mark i:nth-child(3){height:25px;background:#00B140}
+.brand-copy strong{display:block;font-size:14px;letter-spacing:.01em}.brand-copy span{display:block;color:var(--muted);font-size:10px;margin-top:2px;letter-spacing:.08em;text-transform:uppercase}
+.switcher{display:flex;justify-content:center;gap:6px;min-width:0}
+.switcher label{display:flex;align-items:center;gap:8px;height:40px;padding:0 13px;border:1px solid transparent;border-radius:8px;color:#aeb4bb;font-size:12px;cursor:pointer;transition:.15s ease;white-space:nowrap}
+.switcher label:hover{background:#1b1e23;color:#fff}
+.switcher b{font-size:10px;color:#676e77;font-weight:700}
+.meta{font-size:10px;color:#737a83;text-transform:uppercase;letter-spacing:.11em;white-space:nowrap}
+.stage{height:calc(100vh - 76px);position:relative;background:#fff}
+.frame{display:none;width:100%;height:100%;border:0;background:#fff}
+#c1:checked ~ .toolbar label[for=c1],#c2:checked ~ .toolbar label[for=c2],#c3:checked ~ .toolbar label[for=c3],#c4:checked ~ .toolbar label[for=c4],#c5:checked ~ .toolbar label[for=c5]{background:#f4f5f6;color:#111;border-color:#f4f5f6}
+#c1:checked ~ .toolbar label[for=c1] b,#c2:checked ~ .toolbar label[for=c2] b,#c3:checked ~ .toolbar label[for=c3] b,#c4:checked ~ .toolbar label[for=c4] b,#c5:checked ~ .toolbar label[for=c5] b{color:#777}
+#c1:checked ~ .stage .f1,#c2:checked ~ .stage .f2,#c3:checked ~ .stage .f3,#c4:checked ~ .stage .f4,#c5:checked ~ .stage .f5{display:block}
+@media(max-width:1180px){.toolbar{grid-template-columns:190px 1fr}.meta{display:none}.switcher{justify-content:flex-end;overflow-x:auto}.switcher label{padding:0 10px}.switcher span{display:none}}
+@media(max-width:720px){.toolbar{height:64px;grid-template-columns:auto 1fr;padding:0 12px;gap:10px}.brand-copy{display:none}.switcher{gap:3px}.switcher label{height:36px;padding:0 11px}.stage{height:calc(100vh - 64px)}}
+</style>
+</head>
+<body>
+<input type="radio" name="concept" id="c1" checked>
+<input type="radio" name="concept" id="c2">
+<input type="radio" name="concept" id="c3">
+<input type="radio" name="concept" id="c4">
+<input type="radio" name="concept" id="c5">
+<div class="toolbar">
+  <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span class="brand-copy"><strong>ACE Design Concepts</strong><span>Pure HTML / Desktop</span></span></div>
+  <div class="switcher" role="tablist" aria-label="Переключатель дизайн-концепций">
+    <label for="c1"><b>01</b><span>Institutional Grid</span></label>
+    <label for="c2"><b>02</b><span>Market Network</span></label>
+    <label for="c3"><b>03</b><span>Editorial Protocol</span></label>
+    <label for="c4"><b>04</b><span>Infrastructure OS</span></label>
+    <label for="c5"><b>05</b><span>Global Ledger</span></label>
+  </div>
+  <div class="meta">WFE · CME · GAFTA · STRIPE · RAMP · PAYSTAND</div>
+</div>
+<div class="stage">
+  <iframe class="frame f1" title="Concept 01 — Institutional Grid" src="./concepts/01-institutional-grid.html"></iframe>
+  <iframe class="frame f2" title="Concept 02 — Market Network" src="./concepts/02-market-network.html"></iframe>
+  <iframe class="frame f3" title="Concept 03 — Editorial Protocol" src="./concepts/03-editorial-protocol.html"></iframe>
+  <iframe class="frame f4" title="Concept 04 — Infrastructure OS" src="./concepts/04-infrastructure-os.html"></iframe>
+  <iframe class="frame f5" title="Concept 05 — Global Ledger" src="./concepts/05-global-ledger.html"></iframe>
+</div>
+</body>
+</html>
