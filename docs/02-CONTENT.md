@@ -1,10 +1,10 @@
-# 02 — Content captured from supplied concept source
+# 02 — Approved content source
 
-This document normalizes the copy and facts visible in the supplied “Контент для дизайн-концепта” screenshot. It is a content source, not a final approved information architecture.
+This document normalizes the copy and facts visible in the supplied content prototype. Until the client supplies an update, it is the **only approved source of visible website copy** for design and implementation.
 
 ## Header
 
-Primary navigation shown in the source:
+Primary navigation:
 
 - Об ассоциации
 - Медиа
@@ -20,15 +20,15 @@ Utilities:
 - RU / EN
 - Trade Requests
 
-The yellow “Черновой прототип…” strip in the source is treated as a prototype/dev note and **must not become part of the production design**.
+The yellow “Черновой прототип…” strip in the supplied screenshot is a prototype/dev note and **must not become part of the website**.
 
-## Hero content
+## Hero
 
-Source heading:
+Heading:
 
 > Международная ассоциация товарных и фьючерсных бирж
 
-Source supporting copy:
+Supporting copy:
 
 > Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.
 
@@ -36,7 +36,7 @@ Primary CTA:
 
 - Войти в Trade Requests
 
-Key facts supplied:
+Facts supplied:
 
 - **8** бирж
 - **7** стран-участниц
@@ -52,7 +52,7 @@ Heading:
 
 - Об ассоциации
 
-Source paragraph:
+Paragraph:
 
 > Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.
 
@@ -88,9 +88,15 @@ Action:
 
 - Декларация о создании ассоциации — PDF
 
-## Content constraints for design
+## Content lock
 
-- Do not invent exchange names, transaction volume, turnover, capitalization or market-share figures that were not supplied.
-- `8 / 7 / ~15` are the only scale metrics currently safe to foreground.
-- PMEF-2025 / EAEU+ / BRICS+ / SCO wording is preserved from the supplied source and should be fact-checked with the client before final production copy.
-- The concept may improve hierarchy and headline framing, but factual meaning must remain intact.
+Without explicit client approval, do **not** add, rewrite or invent:
+
+- headlines or explanatory copy;
+- English microcopy not already listed above;
+- exchange names;
+- transaction volume, turnover, capitalization, market share or other statistics;
+- product/dashboard labels;
+- marketing slogans.
+
+`8 / 7 / ~15` are the only scale metrics currently supplied. PMEF-2025 / EAEU+ / BRICS+ / SCO wording should be fact-checked with the client before final production publication, but must not be silently rewritten during design or frontend work.

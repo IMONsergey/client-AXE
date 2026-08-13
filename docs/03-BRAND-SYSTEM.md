@@ -22,7 +22,7 @@ Compositions include:
 
 The guide explicitly prohibits unauthorized distortion, recoloring, recomposition, effects and unsafe placement.
 
-For the web concept, the repository includes a web-optimized derivative of the supplied **Horizontal-2 Color** RGB PNG. The underlying logo geometry is not modified.
+The repository keeps one web-ready derivative of the supplied official horizontal color logo at `assets/brand/ace-logo.svg`. The underlying logo geometry is not intentionally modified.
 
 ## Corporate colors
 
@@ -32,18 +32,6 @@ For the web concept, the repository includes a web-optimized derivative of the s
 | ACE Red | `#AF272F` | 175 / 39 / 47 | 1805 C | 5 / 96 / 80 / 22 |
 | ACE Green | `#00B140` | 0 / 177 / 64 | 354 C | 81 / 0 / 92 / 0 |
 | Cool Gray | `#5B5B5B` | 91 / 91 / 91 | Cool Gray 10 C | 0 / 0 / 0 / 80 |
-
-### Web-use decision for concept v1
-
-The brand guide gives us four strong colors, but using all of them as large fills would make the site look dated and promotional. For the web concept:
-
-- white / near-white is the dominant canvas;
-- near-black is the primary text and infrastructure panel color;
-- blue is the main functional accent / CTA color;
-- red and green appear as micro-signals, data nodes and brand markers;
-- corporate gray is used for secondary type, not as a large hero slab.
-
-This preserves the brand while moving it toward the requested premium financial-infrastructure positioning.
 
 ## Typography
 
@@ -61,12 +49,14 @@ Guide role: headings and accent communication.
 
 Guide role: body copy and supporting text.
 
-The guide permits Arial in limited cases (for example office presentation software).
+The guide permits Arial in limited office/software contexts.
 
-### Availability
+## Font availability
 
-The supplied archives contain logo and brand-guide files but **no font binaries**. The coded concept declares the official family names and uses Arial/Helvetica fallback. Licensed webfont files must be supplied or licensed before production implementation.
+The supplied logo and brand-guide archives did not include the licensed font binaries. Do not commit or distribute font files unless the client supplies them with appropriate usage rights.
 
-## Clear-space / integrity rule
+Frontend implementation must use the typefaces specified in the approved Figma design once licensed webfont files are available. Any temporary fallback used during development is temporary and must not be treated as a design decision.
 
-The supplied guide includes explicit logo clear-space rules. Production layouts must treat the logo as a protected asset and avoid placing navigation, borders, masks or decorative graphics inside its clear zone.
+## Logo integrity
+
+The supplied guide includes clear-space and integrity rules. Production layouts must preserve the logo proportions and clear zone and must not place navigation, borders, masks or decorative graphics inside that protected area.

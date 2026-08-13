@@ -1,35 +1,28 @@
 # ACE — client web project
 
-Client website project for **International Association of Commodity & Futures Exchanges (ACE)**.
+Repository for the client project **International Association of Commodity & Futures Exchanges (ACE)**.
 
-> Repository name is `client-AXE`, but the supplied public brand, logo and all source materials use **ACE**. Treat `AXE` as the internal repository codename unless the client explicitly changes the brand naming.
+> The repository name is `client-AXE`, but all public-facing source materials use **ACE**. Treat `AXE` only as an internal repository codename unless the client explicitly changes the brand naming.
 
-## Current stage
+## Current use of the repository
 
-**Design concept / desktop first blocks.** The goal is to establish and approve the visual system before full-page design, responsive adaptation and implementation.
+The visual design is being developed separately in **Figma**. This repository intentionally contains only project source information, brand data, the approved content source and frontend implementation requirements.
 
-## Product direction
+Previous HTML concepts, design experiments, donor design systems, cloned external repositories and preview deployments have been removed from the active project tree.
 
-The website must present ACE not as a conventional non-profit association site, but as an international market-infrastructure platform: institutional, credible, data-led and technologically ambitious.
+## Structure
 
-Core reference spectrum:
-- World Federation of Exchanges — institutional authority, market-scale proof
-- CME Group — marketplace/infrastructure language
-- GAFTA — association and international trade credibility
-- Stripe / Ramp / Paystand — modern fintech product language
-- Betterment / Acorns — selective use only for clarity and approachable spacing, not as the primary tone
-
-## Repository structure
-
-- `docs/` — brief, content, brand system, reference audit, decisions
-- `concept/` — current coded design concept and previewable static prototype
-- `concept/assets/` — production-safe assets used in the concept
+- `docs/01-BRIEF.md` — project context, references and delivery scope from the supplied materials;
+- `docs/02-CONTENT.md` — normalized content from the supplied prototype;
+- `docs/03-BRAND-SYSTEM.md` — supplied ACE brand rules, colors, typography and logo information;
+- `docs/04-FRONTEND-REQUIREMENTS.md` — mandatory implementation requirements;
+- `assets/brand/ace-logo.svg` — web-ready derivative of the supplied official ACE logo.
 
 ## Source materials received
 
-- design-concept content screenshot
-- project timing screenshot
-- 12-page corporate identity guide
-- logo archive with EPS / PNG / SVG variants
+- design-concept content prototype screenshot;
+- project timing screenshot;
+- 12-page ACE corporate identity guide;
+- ACE logo archive with EPS / PNG / SVG variants.
 
-The raw uploaded archives were analyzed; normalized requirements and the production SVG used by the concept are versioned here.
+The approved Figma design will become the visual source of truth when implementation begins.
