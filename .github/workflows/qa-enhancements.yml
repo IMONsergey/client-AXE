@@ -63,6 +63,7 @@ jobs:
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => document.getElementById('site-preloader')?.hidden === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true);
             await page.waitForFunction(() => window.__AXE_DIRECTION_PATTERNS__?.getState().ready === true);
 
