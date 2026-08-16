@@ -87,17 +87,14 @@
 }
 
 @media (max-width: 680px) {
-  /* Exactly 3 x 3 equal visual cells. At this breakpoint layout padding is 16px on both sides. */
-  /* Equivalent target: --metric-cell-size: calc((100vw - 32px) / 3); division spelling is avoided at runtime for cross-browser parsing. */
+  /* Exactly 3 x 3 equal visual cells. Cards are positioned against the square itself, not intrinsic row sizing. */
   .metrics {
-    --metric-cell-size: calc(33.333333vw - 10.666667px);
     position: relative;
-    display: flex;
-    flex-direction: column;
+    display: block;
     width: 100%;
     height: calc(100vw - 32px) !important;
-    min-height: calc(100vw - 32px) !important;
-    max-height: calc(100vw - 32px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
     aspect-ratio: auto;
     gap: 0;
     border: 0;
@@ -124,13 +121,15 @@
   }
 
   .metric-row {
-    position: relative;
-    display: block;
-    flex: 0 0 var(--metric-cell-size);
+    position: static !important;
+    display: block !important;
     width: 100%;
-    height: var(--metric-cell-size) !important;
-    min-height: var(--metric-cell-size) !important;
-    max-height: var(--metric-cell-size) !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
   }
 
   .metric-cell:not(.metric-card) {
@@ -138,14 +137,13 @@
   }
 
   .metric-card {
-    position: absolute;
-    top: 0;
+    position: absolute !important;
     display: flex !important;
-    width: 33.333333%;
-    height: var(--metric-cell-size) !important;
+    width: 33.333333% !important;
+    height: 33.333333% !important;
     min-width: 0;
-    min-height: var(--metric-cell-size) !important;
-    max-height: var(--metric-cell-size) !important;
+    min-height: 0 !important;
+    max-height: none !important;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -158,14 +156,18 @@
   }
 
   .metric-card--dark {
+    top: 0;
     left: 0;
   }
 
   .metric-card--teal {
+    top: 33.333333%;
     right: 0;
+    left: auto;
   }
 
   .metric-card--blue {
+    top: 66.666666%;
     left: 33.333333%;
   }
 
