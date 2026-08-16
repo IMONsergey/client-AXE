@@ -1,118 +1,181 @@
 import createGlobe from '../vendor/cobe.js';
 
 const canvas = document.getElementById('axe-globe');
+const globeShell = document.querySelector('.hero__globe-shell');
+const heroContent = document.querySelector('.hero__content');
+const heroVisual = document.querySelector('.hero__visual');
 
-if (canvas) {
+if (canvas && globeShell && heroContent && heroVisual) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const desktopQuery = window.matchMedia('(min-width: 1200px)');
 
-  const connections = [
-    { from: [37.7749, -122.4194], to: [51.5074, -0.1278], phase: 0.00 },
-    { from: [40.7128, -74.0060],  to: [52.5200, 13.4050], phase: 0.17 },
-    { from: [48.8566, 2.3522],    to: [25.2048, 55.2708], phase: 0.34 },
-    { from: [25.2048, 55.2708],   to: [1.3521, 103.8198], phase: 0.51 },
-    { from: [1.3521, 103.8198],   to: [35.6762, 139.6503], phase: 0.68 },
-    { from: [35.6762, 139.6503],  to: [-33.8688, 151.2093], phase: 0.85 },
-    { from: [-23.5505, -46.6333], to: [40.7128, -74.0060], phase: 0.25 },
-    { from: [34.0522, -118.2437], to: [35.6762, 139.6503], phase: 0.59 }
-  ];
-
-  // Recolor the prepared COBE fragment to the Figma hero palette.
-  const ARC_ON = [0.02, 0.70, 0.79];
-  const ARC_OFF = [0.01, 0.20, 0.24];
-
-  const clamp01 = (value) => Math.max(0, Math.min(1, value));
-  const smoothstep = (a, b, value) => {
-    const t = clamp01((value - a) / (b - a));
-    return t * t * (3 - 2 * t);
-  };
-  const mix = (a, b, t) => a + (b - a) * t;
-  const mix3 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)];
-
-  // The reference frames Europe/Africa on the left and Asia through the center.
   let phi = 3.08;
-  const theta = 0.52;
+  let theta = 0.50;
+  let targetPhi = phi;
+  let targetTheta = theta;
+  let velocityPhi = 0;
+  let velocityTheta = 0;
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+  let resumeAt = performance.now() + 1200;
+  let lastFrame = performance.now();
   let globe;
 
-  const resize = () => {
-    const size = Math.max(1, Math.round(canvas.parentElement.getBoundingClientRect().width));
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-    return size;
-  };
+  const DRAG_SENSITIVITY = 0.00235;
+  const DRAG_INERTIA_FACTOR = 0.34;
+  const ROTATION_SMOOTHING = 0.17;
+  const INERTIA = 0.88;
+  const AUTO_RESUME_DELAY = 1350;
+  const AUTO_SPEED = reducedMotion ? 0 : 0.052;
+  const VERTICAL_LIMIT = 1.03;
 
-  const cssSize = resize();
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  function syncGlobeToHero() {
+    if (!desktopQuery.matches) {
+      globeShell.style.removeProperty('width');
+      globeShell.style.removeProperty('height');
+      return;
+    }
+
+    const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
+    const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
+    const size = Math.min(contentHeight, visualWidth);
+
+    if (size > 0) {
+      globeShell.style.width = `${size}px`;
+      globeShell.style.height = `${size}px`;
+    }
+  }
+
+  function canvasSize() {
+    const rect = canvas.getBoundingClientRect();
+    return Math.max(1, Math.round(Math.min(rect.width, rect.height)));
+  }
+
+  syncGlobeToHero();
+  const initialSize = canvasSize();
 
   globe = createGlobe(canvas, {
     devicePixelRatio: dpr,
-    width: cssSize,
-    height: cssSize,
+    width: initialSize,
+    height: initialSize,
     phi,
     theta,
-    dark: 0.70,
-    diffuse: 1.05,
-    mapSamples: 50000,
-    mapBrightness: 4.8,
+    dark: 0.72,
+    diffuse: 1.04,
+    mapSamples: 52000,
+    mapBrightness: 4.65,
     mapBaseBrightness: 0,
-    baseColor: [0.02, 0.64, 0.72],
-    glowColor: [0.00, 0.24, 0.28],
-    markerColor: [0.05, 0.74, 0.84],
+    baseColor: [0.018, 0.61, 0.69],
+    glowColor: [0.00, 0.21, 0.25],
+    markerColor: [0.04, 0.74, 0.84],
     markers: [],
     arcs: [],
-    arcColor: ARC_ON,
-    arcWidth: 0.28,
-    arcHeight: 0.20,
-    markerElevation: 0.012,
-    scale: 1.23,
-    opacity: 0.98
+    scale: 1.14,
+    opacity: 0.99
   });
 
-  let start = performance.now();
-  let last = start;
-
-  const envelope = (t) => {
-    if (t < 0.18) return smoothstep(0.00, 0.18, t);
-    if (t < 0.66) return 1;
-    if (t < 0.88) return 1 - smoothstep(0.66, 0.88, t);
-    return 0;
-  };
-
-  const frame = (now) => {
-    const dt = Math.min(50, now - last);
-    last = now;
-    phi += dt * 0.000055;
-
-    const seconds = (now - start) / 1000;
-    const cycle = 6.4;
-
-    const arcs = connections.map((connection, index) => {
-      const local = ((seconds / cycle + connection.phase) % 1 + 1) % 1;
-      let visibility = envelope(local);
-      visibility = Math.pow(visibility, 1.35) * 0.58;
-
-      return {
-        id: `arc-${index}`,
-        from: connection.from,
-        to: connection.to,
-        color: mix3(ARC_OFF, ARC_ON, visibility)
-      };
+  function updateDimensions() {
+    syncGlobeToHero();
+    requestAnimationFrame(() => {
+      const size = canvasSize();
+      globe.update({ width: size, height: size });
     });
+  }
 
-    const size = canvas.parentElement.clientWidth;
+  const resizeObserver = new ResizeObserver(updateDimensions);
+  resizeObserver.observe(heroContent);
+  resizeObserver.observe(heroVisual);
+
+  desktopQuery.addEventListener?.('change', updateDimensions);
+  window.addEventListener('resize', updateDimensions, { passive: true });
+  document.fonts?.ready?.then(updateDimensions);
+
+  canvas.addEventListener('pointerdown', (event) => {
+    dragging = true;
+    lastX = event.clientX;
+    lastY = event.clientY;
+    targetPhi = phi;
+    targetTheta = theta;
+    velocityPhi = 0;
+    velocityTheta = 0;
+    resumeAt = Infinity;
+    canvas.setPointerCapture?.(event.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+
+    const dx = event.clientX - lastX;
+    const dy = event.clientY - lastY;
+    lastX = event.clientX;
+    lastY = event.clientY;
+
+    const dragScale = 420 / Math.max(340, canvas.clientWidth);
+    const deltaPhi = dx * DRAG_SENSITIVITY * dragScale;
+    const deltaTheta = dy * DRAG_SENSITIVITY * dragScale;
+
+    targetPhi += deltaPhi;
+    targetTheta = clamp(targetTheta + deltaTheta, -VERTICAL_LIMIT, VERTICAL_LIMIT);
+    velocityPhi = deltaPhi * DRAG_INERTIA_FACTOR;
+    velocityTheta = deltaTheta * DRAG_INERTIA_FACTOR;
+  });
+
+  function finishDrag(event) {
+    if (!dragging) return;
+    dragging = false;
+    resumeAt = performance.now() + AUTO_RESUME_DELAY;
+    canvas.releasePointerCapture?.(event.pointerId);
+  }
+
+  canvas.addEventListener('pointerup', finishDrag);
+  canvas.addEventListener('pointercancel', finishDrag);
+  canvas.addEventListener('lostpointercapture', () => {
+    if (!dragging) return;
+    dragging = false;
+    resumeAt = performance.now() + AUTO_RESUME_DELAY;
+  });
+
+  function frame(now) {
+    const dt = Math.min(50, now - lastFrame);
+    lastFrame = now;
+
+    if (!dragging) {
+      targetPhi += velocityPhi;
+      targetTheta = clamp(targetTheta + velocityTheta, -VERTICAL_LIMIT, VERTICAL_LIMIT);
+
+      velocityPhi *= Math.pow(INERTIA, dt / 16.67);
+      velocityTheta *= Math.pow(INERTIA, dt / 16.67);
+
+      if (Math.abs(velocityPhi) < 0.00001) velocityPhi = 0;
+      if (Math.abs(velocityTheta) < 0.00001) velocityTheta = 0;
+
+      if (now > resumeAt && Math.abs(velocityPhi) < 0.00035 && Math.abs(velocityTheta) < 0.00035) {
+        targetPhi += AUTO_SPEED * dt / 1000;
+      }
+    }
+
+    const follow = 1 - Math.pow(1 - ROTATION_SMOOTHING, dt / 16.67);
+    phi += (targetPhi - phi) * follow;
+    theta += (targetTheta - theta) * follow;
+
+    const idleTilt = !dragging && !reducedMotion && now > resumeAt
+      ? Math.sin(now * 0.00022) * 0.016
+      : 0;
+
+    const size = canvasSize();
     globe.update({
       phi,
-      theta,
+      theta: theta + idleTilt,
       width: size,
-      height: size,
-      arcs
+      height: size
     });
 
     requestAnimationFrame(frame);
-  };
+  }
 
   requestAnimationFrame(frame);
-
-  window.addEventListener('resize', () => {
-    const size = resize();
-    globe.update({ width: size, height: size });
-  });
 }
