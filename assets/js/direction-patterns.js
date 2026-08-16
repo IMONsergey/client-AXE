@@ -5,7 +5,6 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const instances = [];
   const TWO_PI = Math.PI * 2;
-  const WHITE = '#ffffff';
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -59,7 +58,7 @@
       const driftX = reducedMotion.matches ? 0 : Math.sin(t * 2.0) * 2.3;
       const driftY = reducedMotion.matches ? 0 : Math.cos(t * 1.55) * 1.8;
 
-      context.fillStyle = WHITE;
+      context.fillStyle = '#ffffff';
 
       for (let row = -2; row < rows; row += 1) {
         for (let col = -2; col < cols; col += 1) {
@@ -91,7 +90,7 @@
       const bandCenter = width * (0.48 + (reducedMotion.matches ? 0 : Math.sin(t * 1.4) * 0.025));
       const bandWidth = width * 0.19;
 
-      context.strokeStyle = WHITE;
+      context.strokeStyle = '#ffffff';
       context.lineCap = 'round';
       context.lineJoin = 'round';
 
@@ -146,7 +145,7 @@
         }
       ];
 
-      context.fillStyle = WHITE;
+      context.fillStyle = '#ffffff';
 
       for (let row = -2; row < rows; row += 1) {
         for (let col = -2; col < cols; col += 1) {
