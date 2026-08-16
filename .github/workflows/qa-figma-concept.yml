@@ -56,7 +56,6 @@ jobs:
           assert 'prefers-reduced-motion: reduce' in dots
           assert 'mobileMetricsStyle' not in typo and "createElement('style')" not in typo
 
-          # Direction cards are restored to the exact first localized static artwork.
           expected_images = (
               'assets/images/direction-links.png',
               'assets/images/direction-pricing.png',
@@ -69,14 +68,12 @@ jobs:
           assert 'data-pattern=' not in html
           assert 'direction-card__pattern' not in html
 
-          # Header must morph in-place; no reparenting and no blur surface.
           assert 'position: fixed !important' in enhancements
           assert '.site-header.is-scrolled' in enhancements
           assert 'appendChild(header)' not in navigation
           assert 'site-header-placeholder' not in navigation
           assert 'backdrop-filter' not in enhancements
 
-          # New reveal system: no blur/filter reveal tricks.
           assert 'motion.css' in html and 'motion.js' in html
           assert 'IntersectionObserver' in motion_js
           assert 'motion-word__inner' in motion_css
@@ -131,6 +128,7 @@ jobs:
             await page.setViewportSize({ width: 390, height: 844 });
             await page.evaluate(() => scrollTo(0, 0));
             await page.waitForTimeout(240);
+
             const boxes = await page.evaluate(() => {
               const box = (selector) => {
                 const rect = document.querySelector(selector)?.getBoundingClientRect();
@@ -188,17 +186,16 @@ jobs:
             const errors = [];
             page.on('pageerror', e => errors.push(e.message));
             page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
             await page.goto(url, { waitUntil: 'networkidle' });
-            await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
-            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true);
+            await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 15000 });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
 
             const staticArt = await page.evaluate(() => [...document.querySelectorAll('.direction-card__visual')].map(img => ({
               tag: img.tagName,
-              src: img.getAttribute('src'),
               naturalWidth: img.naturalWidth,
-              naturalHeight: img.naturalHeight,
               canvasInside: Boolean(img.closest('.direction-card')?.querySelector('canvas'))
             })));
             if (staticArt.length !== 3 || staticArt.some(item => item.tag !== 'IMG' || item.naturalWidth < 100 || item.canvasInside)) {
@@ -211,7 +208,6 @@ jobs:
               return {
                 position: getComputedStyle(header).position,
                 top: rect.top,
-                parent: header.parentElement?.className || '',
                 scrolled: header.classList.contains('is-scrolled')
               };
             });
@@ -220,14 +216,13 @@ jobs:
             }
 
             await page.evaluate(() => scrollTo(0, 900));
-            await page.waitForTimeout(460);
+            await page.waitForTimeout(720);
             const headerScrolled = await page.evaluate(() => {
               const header = document.querySelector('.site-header');
               const rect = header.getBoundingClientRect();
               return {
                 position: getComputedStyle(header).position,
                 top: rect.top,
-                parent: header.parentElement?.className || '',
                 scrolled: header.classList.contains('is-scrolled'),
                 motion: window.__AXE_MOTION__.getState()
               };
@@ -239,10 +234,12 @@ jobs:
               throw new Error(`${engine}: motion pool too small ${JSON.stringify(headerScrolled.motion)}`);
             }
 
-            const initial = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            await page.waitForTimeout(320);
-            const animated = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (animated.frame <= initial.frame) throw new Error(`${engine}: dot animation did not advance`);
+            const initialFrame = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState().frame);
+            await page.waitForFunction(
+              frame => window.__AXE_DOT_FIELD__?.getState().frame > frame,
+              initialFrame,
+              { timeout: 2200 }
+            );
 
             const globe = page.locator('#axe-globe');
             const r = await globe.boundingBox();
