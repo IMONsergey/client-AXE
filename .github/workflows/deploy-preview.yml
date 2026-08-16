@@ -1,5 +1,5 @@
 name: Deploy AXE preview
-# Preview source: feat/figma-concept-1 @ 8480df6398b255e363b2ff55b080921f7dd44c80
+# Preview source: feat/figma-concept-1 @ fb7912b7ea0b648ec07ac1821c7765ea95d0735d
 
 on:
   push:
@@ -45,7 +45,7 @@ jobs:
           cp -R assets _site/assets
 
           # Cache-isolated fallback for this exact build.
-          ALT_PATH="fresh-8480df63"
+          ALT_PATH="fresh-fb7912b7"
           mkdir -p "_site/${ALT_PATH}"
           cp index.html "_site/${ALT_PATH}/index.html"
           cp -R assets "_site/${ALT_PATH}/assets"
