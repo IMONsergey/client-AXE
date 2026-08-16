@@ -127,7 +127,7 @@ html.menu-open {
   transform: rotate(-45deg);
 }
 
-@media (min-width: 1181px) {
+@media (min-width: 1321px) {
   .site-nav {
     position: absolute;
     top: 50%;
@@ -138,7 +138,7 @@ html.menu-open {
   }
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1320px) {
   .site-header {
     z-index: 100;
   }
