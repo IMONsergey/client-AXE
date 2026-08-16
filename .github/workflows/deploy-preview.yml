@@ -1,5 +1,5 @@
 name: Deploy AXE preview
-# Preview source: feat/figma-concept-1 @ 1fc3e5f2c672b3673e38c8905cec13f4acf40b57
+# Preview source: feat/figma-concept-1 @ 7ade49d62a98ba8c84ec64d866cce563b9d4b4ab
 
 on:
   push:
