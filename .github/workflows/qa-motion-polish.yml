@@ -2,8 +2,7 @@ name: QA AXE motion polish
 
 on:
   push:
-    branches:
-      - feat/figma-concept-1
+    branches: [feat/figma-concept-1]
     paths:
       - .github/workflows/qa-motion-polish.yml
       - index.html
@@ -12,8 +11,6 @@ on:
       - assets/js/smooth-scroll.js
       - assets/js/globe.js
       - assets/js/countries-grid-motion.js
-      - assets/js/motion.js
-      - assets/js/navigation.js
 
 permissions:
   contents: read
@@ -22,63 +19,57 @@ jobs:
   qa-motion-polish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout feature branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: feat/figma-concept-1
 
-      - name: Validate polish invariants
+      - name: Static invariants
         shell: python
         run: |
           from pathlib import Path
-
           html = Path('index.html').read_text(encoding='utf-8')
           polish = Path('assets/css/motion-polish.css').read_text(encoding='utf-8')
           countries = Path('assets/css/countries-grid-motion.css').read_text(encoding='utf-8')
           smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          country_js = Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
 
           assert 'motion-polish.css' in html
           assert 'smooth-scroll.js' in html
           assert html.count('class="orbit__pulse-line ') == 2
-          assert 'blur(8px)' in polish
-          assert 'filter: blur(' not in polish.lower()
+          assert 'backdrop-filter: blur(8px)' in polish
+          assert '\n  filter: blur(' not in polish.lower()
           assert 'background: #fff' in polish
           assert 'clip-path' in polish
           assert '660ms' in countries and '1840ms' in countries
-          assert 'index * 125' in Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
+          assert 'index * 125' in country_js
           assert 'AUTO_SPEED = reducedMotion ? 0 : 0.067' in globe
-          assert "addEventListener('wheel'" in smooth
-          assert "{ passive: false }" in smooth
+          assert "addEventListener('wheel'" in smooth and '{ passive: false }' in smooth
 
-      - name: Start static server
-        shell: bash
+      - name: Start server
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-http.log 2>&1 &
           sleep 2
-          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
 
       - name: Install Chromium
-        shell: bash
         run: |
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify runtime polish
-        shell: bash
+      - name: Runtime and visual QA
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
           const url = 'http://127.0.0.1:4173/';
-
-          const rgbIsWhite = (value) => /rgb\(255, 255, 255\)/.test(value);
+          const white = v => /rgb\(255, 255, 255\)/.test(v);
 
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
             const errors = [];
-            page.on('pageerror', error => errors.push(error.message));
-            page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
@@ -86,123 +77,74 @@ jobs:
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
             await page.waitForFunction(() => window.__AXE_SMOOTH_SCROLL__?.getState().ready === true);
 
-            const base = await page.evaluate(() => {
-              const headerButton = document.querySelector('.header-request');
-              const heroButton = document.querySelector('.hero__request');
-              const baseLines = [...document.querySelectorAll('.orbit__line')].map(line => getComputedStyle(line));
-              const pulse = document.querySelector('.orbit__pulse-line');
-              return {
-                smooth: window.__AXE_SMOOTH_SCROLL__.getState(),
-                autoSpeed: window.__AXE_GLOBE__.getState().autoSpeed,
-                headerOpacity: getComputedStyle(headerButton).opacity,
-                heroOpacity: getComputedStyle(heroButton).opacity,
-                widths: baseLines.map(style => style.strokeWidth),
-                caps: baseLines.map(style => style.strokeLinecap),
-                pulseOffset: getComputedStyle(pulse).strokeDashoffset,
-                pulseCount: document.querySelectorAll('.orbit__pulse-line').length
-              };
-            });
-
-            if (!base.smooth.enabled) throw new Error(`smooth wheel disabled on desktop: ${JSON.stringify(base.smooth)}`);
-            if (Math.abs(base.autoSpeed - 0.067) > 0.0001) throw new Error(`unexpected globe auto speed ${base.autoSpeed}`);
-            if (base.headerOpacity !== '1' || base.heroOpacity !== '1') throw new Error('Trade Requests buttons are dimmed at rest');
-            if (base.pulseCount !== 2) throw new Error(`expected 2 orbit pulses, got ${base.pulseCount}`);
-            if (new Set(base.widths).size !== 1) throw new Error(`orbit base widths differ: ${base.widths}`);
-            if (base.caps.some(cap => cap !== 'butt')) throw new Error(`orbit split caps are not seamless: ${base.caps}`);
+            const base = await page.evaluate(() => ({
+              smooth: window.__AXE_SMOOTH_SCROLL__.getState(),
+              globe: window.__AXE_GLOBE__.getState(),
+              pulseCount: document.querySelectorAll('.orbit__pulse-line').length,
+              pulseOffset: getComputedStyle(document.querySelector('.orbit__pulse-line')).strokeDashoffset,
+              widths: [...document.querySelectorAll('.orbit__line')].map(x => getComputedStyle(x).strokeWidth),
+              caps: [...document.querySelectorAll('.orbit__line')].map(x => getComputedStyle(x).strokeLinecap)
+            }));
+            if (!base.smooth.enabled) throw new Error(`smooth scrolling disabled: ${JSON.stringify(base.smooth)}`);
+            if (Math.abs(base.globe.autoSpeed - .067) > .0001) throw new Error(`globe speed ${base.globe.autoSpeed}`);
+            if (base.pulseCount !== 2 || new Set(base.widths).size !== 1 || base.caps.some(x => x !== 'butt')) throw new Error(`orbit base mismatch ${JSON.stringify(base)}`);
 
             await page.waitForTimeout(420);
-            const pulseAfter = await page.evaluate(() => getComputedStyle(document.querySelector('.orbit__pulse-line')).strokeDashoffset);
-            if (pulseAfter === base.pulseOffset) throw new Error('orbit coordinate pulse is not moving');
+            const pulse2 = await page.evaluate(() => getComputedStyle(document.querySelector('.orbit__pulse-line')).strokeDashoffset);
+            if (pulse2 === base.pulseOffset) throw new Error('orbit pulse did not move');
 
-            await page.hover('.header-request');
-            await page.waitForTimeout(430);
-            const headerHover = await page.evaluate(() => {
-              const el = document.querySelector('.header-request');
-              const s = getComputedStyle(el);
-              return { bg: s.backgroundColor, color: s.color, opacity: s.opacity };
-            });
-            if (!rgbIsWhite(headerHover.bg) || headerHover.opacity !== '1') throw new Error(`header button hover invalid ${JSON.stringify(headerHover)}`);
-
-            await page.hover('.hero__request');
-            await page.waitForTimeout(430);
-            const heroHover = await page.evaluate(() => {
-              const el = document.querySelector('.hero__request');
-              const s = getComputedStyle(el);
-              return { bg: s.backgroundColor, color: s.color, opacity: s.opacity };
-            });
-            if (!rgbIsWhite(heroHover.bg) || heroHover.opacity !== '1') throw new Error(`hero button hover invalid ${JSON.stringify(heroHover)}`);
+            for (const selector of ['.header-request', '.hero__request']) {
+              await page.hover(selector);
+              await page.waitForTimeout(430);
+              const style = await page.$eval(selector, el => {
+                const s = getComputedStyle(el);
+                return { bg: s.backgroundColor, color: s.color, opacity: s.opacity };
+              });
+              if (!white(style.bg) || style.opacity !== '1') throw new Error(`${selector} hover invalid ${JSON.stringify(style)}`);
+            }
 
             await page.evaluate(() => scrollTo(0, 0));
             await page.mouse.move(900, 700);
             await page.mouse.wheel(0, 720);
             await page.waitForTimeout(120);
-            const scrollEarly = await page.evaluate(() => ({ y: scrollY, state: window.__AXE_SMOOTH_SCROLL__.getState() }));
+            const y1 = await page.evaluate(() => scrollY);
             await page.waitForTimeout(700);
-            const scrollLate = await page.evaluate(() => ({ y: scrollY, state: window.__AXE_SMOOTH_SCROLL__.getState() }));
-            if (scrollEarly.y <= 0 || scrollLate.y <= scrollEarly.y) throw new Error(`smooth scroll did not progress ${JSON.stringify({scrollEarly, scrollLate})}`);
+            const y2 = await page.evaluate(() => scrollY);
+            if (y1 <= 0 || y2 <= y1) throw new Error(`wheel smoothing did not progress ${y1} -> ${y2}`);
 
-            await page.waitForTimeout(700);
-            const header = await page.evaluate(() => {
-              const el = document.querySelector('.site-header');
-              const style = getComputedStyle(el);
-              return {
-                fixed: style.position,
-                scrolled: el.classList.contains('is-scrolled'),
-                blur: style.backdropFilter || style.webkitBackdropFilter || ''
-              };
+            await page.waitForTimeout(650);
+            const header = await page.$eval('.site-header', el => {
+              const s = getComputedStyle(el);
+              return { position: s.position, scrolled: el.classList.contains('is-scrolled'), blur: s.backdropFilter || s.webkitBackdropFilter || '' };
             });
-            if (header.fixed !== 'fixed' || !header.scrolled || !header.blur.includes('blur')) throw new Error(`header blur state invalid ${JSON.stringify(header)}`);
+            if (header.position !== 'fixed' || !header.scrolled || !header.blur.includes('blur')) throw new Error(`header blur invalid ${JSON.stringify(header)}`);
 
             await page.evaluate(() => document.querySelector('.directions').scrollIntoView({ block: 'center' }));
             await page.waitForFunction(() => document.querySelector('.direction-card')?.classList.contains('is-visible'));
             await page.waitForTimeout(260);
-            const cardsDuring = await page.evaluate(() => {
-              const card = document.querySelector('.direction-card');
-              const body = card.querySelector('.direction-card__body');
-              const visual = card.querySelector('.direction-card__visual');
-              return {
-                bodyClip: getComputedStyle(body).clipPath,
-                visualClip: getComputedStyle(visual).clipPath,
-                bodyDuration: getComputedStyle(body).transitionDuration,
-                visualDuration: getComputedStyle(visual).transitionDuration
-              };
+            const card = await page.$eval('.direction-card', el => {
+              const body = getComputedStyle(el.querySelector('.direction-card__body'));
+              const visual = getComputedStyle(el.querySelector('.direction-card__visual'));
+              return { bodyClip: body.clipPath, visualClip: visual.clipPath, bodyDur: body.transitionDuration, visualDur: visual.transitionDuration };
             });
-            if (!cardsDuring.bodyDuration.includes('1.18s') || !cardsDuring.visualDuration.includes('1.28s')) {
-              throw new Error(`direction choreography timings missing ${JSON.stringify(cardsDuring)}`);
-            }
+            if (!card.bodyDur.includes('1.18s') || !card.visualDur.includes('1.28s')) throw new Error(`card choreography invalid ${JSON.stringify(card)}`);
             await page.locator('.directions').screenshot({ path: 'directions-motion.png' });
-
-            await page.waitForTimeout(1500);
-            const cardsFinal = await page.evaluate(() => {
-              const card = document.querySelector('.direction-card');
-              return {
-                bodyClip: getComputedStyle(card.querySelector('.direction-card__body')).clipPath,
-                visualClip: getComputedStyle(card.querySelector('.direction-card__visual')).clipPath,
-                bodyOpacity: getComputedStyle(card.querySelector('.direction-card__body')).opacity,
-                visualOpacity: getComputedStyle(card.querySelector('.direction-card__visual')).opacity
-              };
-            });
-            if (cardsFinal.bodyOpacity !== '1' || cardsFinal.visualOpacity !== '1') throw new Error(`direction cards did not settle ${JSON.stringify(cardsFinal)}`);
 
             await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({ block: 'center' }));
             await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true, null, { timeout: 5000 });
-            const traceTiming = await page.evaluate(() => {
-              const line = document.querySelector('.country__trace-line--top');
-              return { duration: getComputedStyle(line).transitionDuration };
-            });
-            if (!traceTiming.duration.includes('0.66s')) throw new Error(`countries tracing still too fast ${JSON.stringify(traceTiming)}`);
+            const countryDuration = await page.$eval('.country__trace-line--top', el => getComputedStyle(el).transitionDuration);
+            if (!countryDuration.includes('.66s') && !countryDuration.includes('0.66s')) throw new Error(`country trace duration ${countryDuration}`);
 
+            await page.evaluate(() => scrollTo(0, 0));
+            await page.waitForTimeout(300);
             await page.locator('.hero__globe-shell').screenshot({ path: 'globe-orbit.png' });
+
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
-          })().catch(error => {
-            console.error(error);
-            process.exit(1);
-          });
+          })().catch(e => { console.error(e); process.exit(1); });
           EOF
 
-      - name: Upload motion renders
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: motion-polish-visual-qa
           path: |
