@@ -9,7 +9,9 @@ on:
       - index.html
       - assets/css/styles.css
       - assets/css/motion.css
+      - assets/css/countries-grid-motion.css
       - assets/js/motion.js
+      - assets/js/countries-grid-motion.js
 
 permissions:
   contents: read
@@ -36,7 +38,7 @@ jobs:
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify closed cells and line drawing
+      - name: Verify closed cells and visible tracing
         shell: bash
         run: |
           node <<'EOF'
@@ -53,6 +55,7 @@ jobs:
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().ready === true, null, { timeout: 5000 });
           }
 
           async function verifyDesktop(page) {
@@ -60,23 +63,40 @@ jobs:
 
             const initial = await page.evaluate(() => {
               const cell = document.querySelector('.country');
-              const pseudo = getComputedStyle(cell, '::before');
+              const top = cell.querySelector('.country__trace-line--top');
               return {
                 visible: cell.classList.contains('is-visible'),
                 transform: getComputedStyle(cell).transform,
-                backgroundSize: pseudo.backgroundSize
+                traceTransform: getComputedStyle(top).transform,
+                traceCount: document.querySelectorAll('.country__trace').length,
+                permanentOpacity: getComputedStyle(cell, '::before').opacity
               };
             });
 
             if (initial.visible) throw new Error('countries should not reveal before entering the viewport');
             if (initial.transform !== 'none') throw new Error(`country geometry moves before reveal: ${initial.transform}`);
+            if (initial.traceCount !== 7) throw new Error(`expected 7 trace frames, got ${initial.traceCount}`);
+            if (Number(initial.permanentOpacity) > 0.05) throw new Error(`permanent grid should wait for trace: ${initial.permanentOpacity}`);
 
             await page.locator('.countries').scrollIntoViewIfNeeded();
             await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'));
-            await page.waitForTimeout(90);
+            await page.waitForTimeout(170);
 
-            const during = await page.evaluate(() => getComputedStyle(document.querySelector('.country'), '::before').backgroundSize);
-            await page.waitForTimeout(1150);
+            const during = await page.evaluate(() => {
+              const cell = document.querySelector('.country');
+              return {
+                top: getComputedStyle(cell.querySelector('.country__trace-line--top')).transform,
+                right: getComputedStyle(cell.querySelector('.country__trace-line--right')).transform,
+                traceOpacity: Number(getComputedStyle(cell.querySelector('.country__trace')).opacity)
+              };
+            });
+
+            if (during.top === initial.traceTransform) throw new Error(`top trace did not animate: ${during.top}`);
+            if (during.traceOpacity < 0.8) throw new Error(`trace vanished too early: ${during.traceOpacity}`);
+
+            await page.waitForTimeout(360);
+            await page.locator('.countries').screenshot({ path: 'countries-grid-drawing-1440.png' });
+            await page.waitForTimeout(1450);
 
             const final = await page.evaluate(() => {
               const grid = document.querySelector('.countries__grid').getBoundingClientRect();
@@ -90,14 +110,16 @@ jobs:
                   width: rect.width,
                   height: rect.height,
                   transform: getComputedStyle(cell).transform,
-                  frame: getComputedStyle(cell, '::before').backgroundSize
+                  permanentOpacity: Number(getComputedStyle(cell, '::before').opacity),
+                  traceOpacity: Number(getComputedStyle(cell.querySelector('.country__trace')).opacity)
                 };
               });
               return { grid, cells };
             });
 
-            if (during === initial.backgroundSize) throw new Error(`country frame did not begin drawing: ${during}`);
             if (final.cells.some(cell => cell.transform !== 'none')) throw new Error('country cells move while lines draw');
+            if (final.cells.some(cell => cell.permanentOpacity < 0.95)) throw new Error('permanent closed grid did not resolve');
+            if (final.cells.some(cell => cell.traceOpacity > 0.05)) throw new Error('temporary tracing did not hand off to final grid');
 
             closeTo(final.cells[0].left, final.grid.left, 1, 'grid left closes');
             closeTo(final.cells[0].top, final.grid.top, 1, 'grid top closes');
@@ -115,11 +137,10 @@ jobs:
 
           async function verifyMobile(page) {
             await page.setViewportSize({ width: 390, height: 844 });
-            await page.goto(url, { waitUntil: 'networkidle' });
-            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await waitReady(page);
             await page.locator('.countries').scrollIntoViewIfNeeded();
             await page.waitForFunction(() => document.querySelectorAll('.country.is-visible').length === 7);
-            await page.waitForTimeout(1250);
+            await page.waitForTimeout(2000);
 
             const geometry = await page.evaluate(() => [...document.querySelectorAll('.country')].map((cell) => {
               const rect = cell.getBoundingClientRect();
@@ -129,11 +150,13 @@ jobs:
                 top: rect.top,
                 bottom: rect.bottom,
                 leftRule: getComputedStyle(cell, '::after').display,
-                transform: getComputedStyle(cell).transform
+                transform: getComputedStyle(cell).transform,
+                traceOpacity: Number(getComputedStyle(cell.querySelector('.country__trace')).opacity)
               };
             }));
 
             if (geometry.some(cell => cell.transform !== 'none')) throw new Error('mobile country cells move during frame animation');
+            if (geometry.some(cell => cell.traceOpacity > 0.05)) throw new Error('mobile tracing did not finish');
             closeTo(geometry[0].right, geometry[1].left, 1, 'mobile first-row seam');
             closeTo(geometry[0].bottom, geometry[2].top, 1, 'mobile horizontal seam');
             closeTo(geometry[2].right, geometry[3].left, 1, 'mobile second-row seam');
@@ -168,6 +191,7 @@ jobs:
         with:
           name: countries-grid-visual-qa
           path: |
+            countries-grid-drawing-1440.png
             countries-grid-1440.png
             countries-grid-390.png
           if-no-files-found: error
