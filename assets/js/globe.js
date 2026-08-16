@@ -29,7 +29,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const ROTATION_SMOOTHING = 0.17;
   const INERTIA = 0.88;
   const AUTO_RESUME_DELAY = 1350;
-  const AUTO_SPEED = reducedMotion ? 0 : 0.052;
+  const AUTO_SPEED = reducedMotion ? 0 : 0.067;
   const VERTICAL_LIMIT = 1.03;
   // COBE's current dot shader encodes sample indices in 15 bits. Keep this below 32768
   // so rotated views do not wrap high sample indices into thin streaks on some GPUs/WebKit.
@@ -203,7 +203,8 @@ if (canvas && globeShell && heroContent && heroVisual) {
           theta,
           dragging,
           size: canvasSize(),
-          samples: MAP_SAMPLES
+          samples: MAP_SAMPLES,
+          autoSpeed: AUTO_SPEED
         };
       }
     }
