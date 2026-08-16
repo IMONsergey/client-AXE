@@ -40,7 +40,7 @@ jobs:
 
           assert 'motion-polish.css' in html
           assert 'smooth-scroll.js' in html
-          assert html.count('orbit__pulse-line') == 2
+          assert html.count('class="orbit__pulse-line ') == 2
           assert 'blur(8px)' in polish
           assert 'filter: blur(' not in polish.lower()
           assert 'background: #fff' in polish
