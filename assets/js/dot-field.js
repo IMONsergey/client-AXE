@@ -280,7 +280,7 @@ if (stage && canvas) {
     resizeObserver.observe(stage);
 
     window.addEventListener('resize', scheduleResize, { passive: true });
-    window.addEventListener('scroll', updatePointerFromClient, { passive: true });
+    window.addEventListener('scroll', resetPointer, { passive: true });
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
     window.addEventListener('blur', resetPointer);
     document.addEventListener('mouseleave', resetPointer);
