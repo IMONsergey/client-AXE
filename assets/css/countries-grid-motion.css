@@ -1,6 +1,5 @@
-/* Countries grid motion — visible geometric tracing, no blur. */
+/* Countries grid motion — visible geometric tracing, deliberately slow and soft. */
 
-/* Keep the temporary trace out of the generic `.country > span` content rules. */
 .country > .country__trace {
   position: absolute;
   z-index: 4;
@@ -9,8 +8,8 @@
   pointer-events: none;
   opacity: 1;
   transform: none;
-  transition: opacity 260ms var(--motion-ease);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1240ms);
+  transition: opacity 360ms var(--motion-ease);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1840ms);
 }
 
 .motion-ready .country > .country__trace {
@@ -21,13 +20,12 @@
 .country__trace-line {
   position: absolute;
   display: block;
-  background: rgba(0, 143, 158, 0.88);
+  background: rgba(0, 143, 158, 0.84);
   will-change: transform;
 }
 
-/* The active drawing stroke is intentionally 2px while it moves. It settles
-   into the normal 1px country grid afterwards, so the action is readable but
-   the final interface remains light. */
+/* The moving contour is slightly stronger than the final 1px matrix, but its
+   slower circuit and overlap between sides keep it elegant rather than mechanical. */
 .country__trace-line--top,
 .country__trace-line--bottom {
   width: 100%;
@@ -46,7 +44,7 @@
   top: 0;
   left: 0;
   transform-origin: left center;
-  transition: transform 440ms cubic-bezier(.16,.84,.24,1);
+  transition: transform 660ms cubic-bezier(.20,.74,.18,1);
   transition-delay: var(--country-trace-delay, 0ms);
 }
 
@@ -54,28 +52,26 @@
   top: 0;
   right: 0;
   transform-origin: center top;
-  transition: transform 420ms cubic-bezier(.16,.84,.24,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 310ms);
+  transition: transform 640ms cubic-bezier(.20,.74,.18,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 390ms);
 }
 
 .country__trace-line--bottom {
   right: 0;
   bottom: 0;
   transform-origin: right center;
-  transition: transform 450ms cubic-bezier(.16,.84,.24,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 620ms);
+  transition: transform 680ms cubic-bezier(.20,.74,.18,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 790ms);
 }
 
 .country__trace-line--left {
   bottom: 0;
   left: 0;
   transform-origin: center bottom;
-  transition: transform 420ms cubic-bezier(.16,.84,.24,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 930ms);
+  transition: transform 650ms cubic-bezier(.20,.74,.18,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1200ms);
 }
 
-/* A dedicated grid observer starts this only when the matrix reaches the reading
-   zone, so the user sees the drawing rather than arriving after it has finished. */
 .motion-ready .countries__grid.is-tracing .country__trace-line--top,
 .motion-ready .countries__grid.is-tracing .country__trace-line--bottom {
   transform: scaleX(1);
@@ -90,22 +86,22 @@
   opacity: 0;
 }
 
-/* Permanent 1px rules resolve under the stronger tracer at the end. */
+/* Permanent 1px rules resolve beneath the tracer only near the end. */
 .motion-ready .countries__grid .country::before {
   opacity: 0;
   background-size:
     var(--country-top-size) 1px,
     1px 100%,
     100% 1px;
-  transition: opacity 210ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1120ms) !important;
+  transition: opacity 320ms var(--motion-ease) !important;
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1660ms) !important;
 }
 
 .motion-ready .countries__grid .country::after {
   opacity: 0;
   transform: scaleY(1);
-  transition: opacity 210ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1120ms) !important;
+  transition: opacity 320ms var(--motion-ease) !important;
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1660ms) !important;
 }
 
 .motion-ready .countries__grid.is-tracing .country::before,
@@ -113,15 +109,15 @@
   opacity: 1;
 }
 
-/* Flags and labels arrive after the contour is already visibly underway. */
+/* Flags and labels arrive during the latter half of the contour build. */
 .motion-ready .countries__grid .country > img,
 .motion-ready .countries__grid .country > span:not(.country__trace) {
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  transform: translate3d(0, 6px, 0);
   transition:
-    opacity 720ms var(--motion-ease),
-    transform 980ms var(--motion-ease-soft);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 700ms) !important;
+    opacity 900ms var(--motion-ease),
+    transform 1180ms var(--motion-ease-soft);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 980ms) !important;
 }
 
 .motion-ready .countries__grid.is-tracing .country > img,
