@@ -14,6 +14,7 @@
     nav.classList.toggle('is-open', open);
     document.documentElement.classList.toggle('menu-open', open);
     toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
     nav.setAttribute('aria-hidden', mobileQuery.matches ? String(!open) : 'false');
 
     if (open) {
@@ -70,7 +71,7 @@
     }
   });
 
-  nav.setAttribute('aria-hidden', mobileQuery.matches ? 'true' : 'false');
+  syncState(false);
 
   Object.defineProperty(window, '__AXE_NAVIGATION__', {
     configurable: true,
