@@ -108,7 +108,7 @@ if (stage && canvas) {
           const radius = prominent
             ? 1.65 + random() * 0.85
             : 0.72 + random() * 0.68;
-          const alpha = (0.052 + random() * 0.088 + (prominent ? 0.018 : 0)) * envelope;
+          const alpha = (0.074 + random() * 0.106 + (prominent ? 0.026 : 0)) * envelope;
 
           nextDots.push({
             x,
@@ -182,15 +182,15 @@ if (stage && canvas) {
               let influence = 1 - distance / POINTER_RADIUS;
               influence = influence * influence * pointer.strength;
               pointerInfluence = influence;
-              radius += influence * 0.82;
-              alpha += influence * 0.14 * dot.envelope;
+              radius += influence * 0.86;
+              alpha += influence * 0.17 * dot.envelope;
             }
           }
         }
 
         if (alpha <= 0.003 || radius <= 0) continue;
 
-        context.globalAlpha = Math.min(0.34 + pointerInfluence * 0.09, alpha);
+        context.globalAlpha = Math.min(0.42 + pointerInfluence * 0.11, alpha);
         context.beginPath();
         context.arc(dot.x, dot.y, radius, 0, TWO_PI);
         context.fill();
@@ -314,5 +314,7 @@ if (stage && canvas) {
         }
       }
     });
+
+    window.dispatchEvent(new Event('axe:dot-field-ready'));
   }
 }
