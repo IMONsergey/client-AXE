@@ -107,21 +107,7 @@
   transform: translate3d(0, 18px, 0);
 }
 
-/* Static direction artwork can reveal once, but remains completely static afterwards. */
-.direction-card__visual.motion-media {
-  clip-path: inset(0 0 100% 0);
-  transform: scale(1.025);
-  transform-origin: 50% 50%;
-  transition:
-    clip-path 900ms var(--motion-ease-out),
-    transform 1100ms var(--motion-ease-out);
-  transition-delay: var(--motion-delay, 0ms);
-}
-
-.direction-card__visual.motion-media.is-visible {
-  clip-path: inset(0 0 0 0);
-  transform: scale(1);
-}
+/* Original direction-card images are deliberately left untouched and static. */
 
 /* Small interaction polish. */
 .header-request .icon-arrow,
@@ -144,11 +130,9 @@
   .motion-ready .site-header .brand,
   .motion-ready .site-header .site-nav a,
   .motion-ready .site-header .header-request,
-  .motion-ready .site-header .menu-toggle,
-  .direction-card__visual.motion-media {
+  .motion-ready .site-header .menu-toggle {
     opacity: 1 !important;
     transform: none !important;
-    clip-path: none !important;
     transition: none !important;
   }
 }
