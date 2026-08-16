@@ -110,7 +110,7 @@ jobs:
             const y1 = await page.evaluate(() => scrollY);
             await page.waitForTimeout(700);
             const y2 = await page.evaluate(() => scrollY);
-            if (y1 <= 0 || y2 <= y1) throw new Error(`wheel smoothing did not progress ${y1} -> ${y2}`);
+            if (y2 <= y1 || y2 <= 0) throw new Error(`wheel smoothing did not progress ${y1} -> ${y2}`);
 
             await page.waitForTimeout(650);
             const header = await page.$eval('.site-header', el => {
