@@ -6,6 +6,8 @@ on:
       - feat/figma-concept-1
     paths:
       - .github/workflows/qa-figma-concept.yml
+      - index.html
+      - assets/css/**
 
 permissions:
   contents: read
@@ -47,6 +49,14 @@ jobs:
           assert html.count('class="direction-card"') == 3
           assert html.count('metric-card metric-card--') == 3
 
+      - name: Download Figma reference
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://www.figma.com/api/mcp/asset/71a3a872-16fa-4479-b5df-b28a3ae2f79d.png" \
+            --output figma-reference-1440.png
+          test -s figma-reference-1440.png
+
       - name: Start static server
         shell: bash
         run: |
@@ -72,6 +82,7 @@ jobs:
         with:
           name: visual-qa
           path: |
+            figma-reference-1440.png
             preview-1440.png
             preview-390.png
           if-no-files-found: error
