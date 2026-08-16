@@ -72,13 +72,10 @@
     registerReveal(document.querySelector('.about__link'), { delay: 210, short: true });
     registerReveal(document.querySelector('.about-grid'), { delay: 80, scale: true });
 
+    /* Direction-card images intentionally receive no motion class: the original
+       artwork stays completely static. Only the card container assembles in. */
     document.querySelectorAll('.direction-card').forEach((element, index) => {
       registerReveal(element, { delay: index * 90 });
-      const image = element.querySelector('.direction-card__visual');
-      if (image) {
-        image.classList.add('motion-media');
-        image.style.setProperty('--motion-delay', `${140 + index * 80}ms`);
-      }
     });
 
     document.querySelectorAll('.country').forEach((element, index) => {
@@ -105,7 +102,7 @@
     root.classList.add('motion-intro-visible');
 
     if (reducedMotion.matches || !('IntersectionObserver' in window)) {
-      [...wordTargets, ...revealTargets, ...document.querySelectorAll('.motion-media')].forEach(reveal);
+      [...wordTargets, ...revealTargets].forEach(reveal);
       ready = true;
       return;
     }
@@ -121,7 +118,7 @@
       rootMargin: '0px 0px -8% 0px'
     });
 
-    [...wordTargets, ...revealTargets, ...document.querySelectorAll('.motion-media')].forEach((element) => observer.observe(element));
+    [...wordTargets, ...revealTargets].forEach((element) => observer.observe(element));
     ready = true;
   }
 
@@ -132,7 +129,7 @@
   reducedMotion.addEventListener?.('change', () => {
     if (!reducedMotion.matches) return;
     root.classList.add('motion-intro-visible');
-    [...wordTargets, ...revealTargets, ...document.querySelectorAll('.motion-media')].forEach(reveal);
+    [...wordTargets, ...revealTargets].forEach(reveal);
   });
 
   Object.defineProperty(window, '__AXE_MOTION__', {
