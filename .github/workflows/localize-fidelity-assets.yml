@@ -1,0 +1,53 @@
+name: Localize layered Figma assets
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/localize-fidelity-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  localize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Download layered assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/images
+          fetch() {
+            curl --fail --location --retry 3 --retry-delay 2 --silent --show-error "$1" --output "$2"
+            test -s "$2"
+          }
+
+          fetch "https://www.figma.com/api/mcp/asset/4311777d-7d03-4508-97d1-30fb029493e4.svg" "assets/images/logo-ace.svg"
+          fetch "https://www.figma.com/api/mcp/asset/0fd100d5-b5d2-4676-9402-fbe4c2df58e5.svg" "assets/images/logo-caption.svg"
+
+          fetch "https://www.figma.com/api/mcp/asset/196b9c5d-3d09-491b-8de7-1bee7258a777.svg" "assets/images/globe-base.svg"
+          fetch "https://www.figma.com/api/mcp/asset/8784a659-e327-401a-9998-e31531b504f2.png" "assets/images/globe-mask.png"
+
+          fetch "https://www.figma.com/api/mcp/asset/acfa424b-1b9d-4128-abc0-e6c536d180da.svg" "assets/images/texture-top-mask.svg"
+          fetch "https://www.figma.com/api/mcp/asset/cc17e9f1-22c6-4522-ae60-198c9bcf314e.png" "assets/images/texture-top-mask-detail.png"
+          fetch "https://www.figma.com/api/mcp/asset/bf83a8f8-ef6e-432a-a451-e5e34abcbea9.svg" "assets/images/texture-middle-mask.svg"
+          fetch "https://www.figma.com/api/mcp/asset/0d50b7f2-119e-4208-b79a-62903deac2fb.png" "assets/images/texture-middle-mask-detail.png"
+
+      - name: Commit assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/images
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "chore: add layered Figma assets"
+          git push origin HEAD:feat/figma-concept-1
