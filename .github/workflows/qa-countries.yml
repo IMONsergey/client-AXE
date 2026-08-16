@@ -76,13 +76,15 @@ jobs:
             if (result.cells.some(c => c.traceOpacity > .05)) throw new Error('trace did not hand off to final grid');
 
             closeTo(result.cells[0].left, result.grid.left, 1, 'left edge');
-            closeTo(result.cells[result.cells.length - 1].right, result.grid.right, 1, 'right edge');
 
             if (!mobile) {
+              closeTo(result.cells[result.cells.length - 1].right, result.grid.right, 1, 'desktop right edge');
               for (let i = 0; i < result.cells.length - 1; i++) {
                 closeTo(result.cells[i].right, result.cells[i + 1].left, 1, `desktop seam ${i}`);
               }
             } else {
+              /* Seven countries in a two-column grid leave the last right-hand slot empty. */
+              closeTo(result.cells[1].right, result.grid.right, 1, 'mobile full-row right edge');
               closeTo(result.cells[0].right, result.cells[1].left, 1, 'mobile vertical seam');
               closeTo(result.cells[0].bottom, result.cells[2].top, 1, 'mobile horizontal seam');
               for (const i of [0,2,4,6]) {
