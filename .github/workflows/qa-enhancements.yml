@@ -1,0 +1,168 @@
+name: QA AXE enhancements
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/qa-enhancements.yml
+      - index.html
+      - assets/css/enhancements.css
+      - assets/js/navigation.js
+      - assets/js/preloader.js
+      - assets/js/direction-patterns.js
+      - assets/js/dot-field.js
+      - assets/js/globe.js
+
+permissions:
+  contents: read
+
+jobs:
+  qa-enhancements:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Start static server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify enhancements and capture renders
+        shell: bash
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
+
+          const closeTo = (actual, expected, tolerance, label) => {
+            if (Math.abs(actual - expected) > tolerance) {
+              throw new Error(`${label}: expected ${expected.toFixed(2)}, got ${actual.toFixed(2)}`);
+            }
+          };
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', error => errors.push(error.message));
+            page.on('console', message => {
+              if (message.type() === 'error') errors.push(message.text());
+            });
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true);
+            await page.waitForFunction(() => window.__AXE_DIRECTION_PATTERNS__?.getState().ready === true);
+
+            const desktop = await page.evaluate(() => {
+              const rect = selector => document.querySelector(selector).getBoundingClientRect();
+              const header = rect('.site-header__inner');
+              const nav = rect('.site-nav');
+              const toggleStyle = getComputedStyle(document.querySelector('.menu-toggle'));
+              return {
+                headerCenter: header.left + header.width / 2,
+                navCenter: nav.left + nav.width / 2,
+                toggleDisplay: toggleStyle.display,
+                loaderHidden: document.getElementById('site-preloader').hidden,
+                globeReady: window.__AXE_GLOBE__.getState().ready
+              };
+            });
+
+            closeTo(desktop.navCenter, desktop.headerCenter, 2.5, 'desktop navigation center');
+            if (desktop.toggleDisplay !== 'none') throw new Error(`desktop burger visible: ${desktop.toggleDisplay}`);
+            if (!desktop.loaderHidden || !desktop.globeReady) throw new Error(`loader/globe readiness mismatch ${JSON.stringify(desktop)}`);
+
+            await page.screenshot({ path: 'enhancement-desktop-1440.png', fullPage: true });
+
+            await page.locator('.directions').scrollIntoViewIfNeeded();
+            await page.waitForTimeout(320);
+            const patternsBefore = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
+            await page.waitForTimeout(360);
+            const patternsAfter = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
+
+            if (patternsAfter.instances.length !== 3) throw new Error(`expected 3 patterns, got ${patternsAfter.instances.length}`);
+            if (!patternsAfter.instances.every(item => item.ready && item.width > 100 && item.height > 100)) {
+              throw new Error(`pattern canvas geometry invalid ${JSON.stringify(patternsAfter)}`);
+            }
+            if (!patternsAfter.instances.some((item, index) => item.frame > patternsBefore.instances[index].frame)) {
+              throw new Error('direction patterns did not animate');
+            }
+            await page.locator('.directions').screenshot({ path: 'enhancement-directions.png' });
+
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.evaluate(() => scrollTo(0, 0));
+            await page.waitForTimeout(180);
+
+            const mobileClosed = await page.evaluate(() => {
+              const toggle = document.querySelector('.menu-toggle');
+              const nav = document.querySelector('.site-nav');
+              return {
+                toggleDisplay: getComputedStyle(toggle).display,
+                navVisibility: getComputedStyle(nav).visibility,
+                state: window.__AXE_NAVIGATION__.getState()
+              };
+            });
+
+            if (mobileClosed.toggleDisplay === 'none') throw new Error('mobile burger is hidden');
+            if (mobileClosed.state.open || mobileClosed.state.expanded) throw new Error(`mobile menu starts open ${JSON.stringify(mobileClosed)}`);
+
+            await page.locator('.menu-toggle').click();
+            await page.waitForTimeout(300);
+
+            const mobileOpen = await page.evaluate(() => {
+              const toggle = document.querySelector('.menu-toggle');
+              const nav = document.querySelector('.site-nav');
+              const style = getComputedStyle(nav);
+              return {
+                state: window.__AXE_NAVIGATION__.getState(),
+                label: toggle.getAttribute('aria-label'),
+                visibility: style.visibility,
+                opacity: Number(style.opacity),
+                position: style.position
+              };
+            });
+
+            if (!mobileOpen.state.open || !mobileOpen.state.expanded) throw new Error(`burger did not open ${JSON.stringify(mobileOpen)}`);
+            if (mobileOpen.label !== 'Закрыть меню') throw new Error(`burger label not synchronized: ${mobileOpen.label}`);
+            if (mobileOpen.visibility !== 'visible' || mobileOpen.opacity < 0.9 || mobileOpen.position !== 'fixed') {
+              throw new Error(`mobile menu presentation invalid ${JSON.stringify(mobileOpen)}`);
+            }
+            await page.screenshot({ path: 'enhancement-mobile-menu-390.png' });
+
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(280);
+            const mobileAfterEscape = await page.evaluate(() => window.__AXE_NAVIGATION__.getState());
+            if (mobileAfterEscape.open || mobileAfterEscape.expanded) throw new Error('Escape did not close mobile menu');
+            await page.screenshot({ path: 'enhancement-mobile-390.png', fullPage: true });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Upload enhancement renders
+        uses: actions/upload-artifact@v4
+        with:
+          name: enhancement-visual-qa
+          path: |
+            enhancement-desktop-1440.png
+            enhancement-directions.png
+            enhancement-mobile-menu-390.png
+            enhancement-mobile-390.png
+          if-no-files-found: error
+          retention-days: 1
