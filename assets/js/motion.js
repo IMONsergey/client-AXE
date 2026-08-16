@@ -6,7 +6,7 @@
   let ready = false;
   let visibleCount = 0;
 
-  function splitWords(element, step = 42, base = 0) {
+  function splitWords(element, step = 32, base = 0) {
     if (!element || element.dataset.motionSplit === 'true') return;
 
     const original = element.textContent.replace(/\s+/g, ' ').trim();
@@ -55,31 +55,32 @@
 
   function setupContent() {
     if (!reducedMotion.matches) {
-      splitWords(document.querySelector('.hero__title'), 54, 70);
-      splitWords(document.querySelector('.about__copy h2'), 74, 0);
-      splitWords(document.querySelector('.countries h2'), 70, 0);
-      document.querySelectorAll('.direction-card h3').forEach((element) => splitWords(element, 58, 0));
+      /* Compact stagger values keep text reading as one sentence rather than a
+         sequence of individual effects. */
+      splitWords(document.querySelector('.hero__title'), 32, 90);
+      splitWords(document.querySelector('.about__copy h2'), 38, 0);
+      splitWords(document.querySelector('.countries h2'), 36, 0);
+      document.querySelectorAll('.direction-card h3').forEach((element) => splitWords(element, 30, 0));
     }
 
-    registerReveal(document.querySelector('.hero__copy'), { delay: 220 });
-    registerReveal(document.querySelector('.hero__visual'), { delay: 120, scale: true });
+    registerReveal(document.querySelector('.hero__copy'), { delay: 150 });
+    registerReveal(document.querySelector('.hero__visual'), { delay: 90, scale: true });
 
     document.querySelectorAll('.metric-card').forEach((element, index) => {
-      registerReveal(element, { delay: index * 90, scale: true });
+      registerReveal(element, { delay: index * 58, scale: true });
     });
 
-    registerReveal(document.querySelector('.about__copy p'), { delay: 110 });
-    registerReveal(document.querySelector('.about__link'), { delay: 210, short: true });
-    registerReveal(document.querySelector('.about-grid'), { delay: 80, scale: true });
+    registerReveal(document.querySelector('.about__copy p'), { delay: 80 });
+    registerReveal(document.querySelector('.about__link'), { delay: 145, short: true });
+    registerReveal(document.querySelector('.about-grid'), { delay: 55, scale: true });
 
-    /* Direction-card images intentionally receive no motion class: the original
-       artwork stays completely static. Only the card container assembles in. */
+    /* Direction-card images intentionally receive no motion class. */
     document.querySelectorAll('.direction-card').forEach((element, index) => {
-      registerReveal(element, { delay: index * 90 });
+      registerReveal(element, { delay: index * 64 });
     });
 
     document.querySelectorAll('.country').forEach((element, index) => {
-      registerReveal(element, { delay: Math.min(index * 55, 330), short: true });
+      registerReveal(element, { delay: Math.min(index * 38, 228), short: true });
     });
   }
 
@@ -114,8 +115,10 @@
         observer.unobserve(entry.target);
       });
     }, {
-      threshold: 0.16,
-      rootMargin: '0px 0px -8% 0px'
+      /* Trigger a little earlier, while the next section is approaching the
+         reading zone. This removes the stop-start feeling during slow scroll. */
+      threshold: 0.1,
+      rootMargin: '0px 0px -4% 0px'
     });
 
     [...wordTargets, ...revealTargets].forEach((element) => observer.observe(element));
