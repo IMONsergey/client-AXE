@@ -34,12 +34,14 @@ jobs:
           html = Path('index.html').read_text(encoding='utf-8')
           styles = Path('assets/css/styles.css').read_text(encoding='utf-8')
           refinements = Path('assets/css/refinements.css').read_text(encoding='utf-8')
-          fonts = Path('assets/css/fonts.css').read_text(encoding='utf-8')
+          enhancements = Path('assets/css/enhancements.css').read_text(encoding='utf-8')
+          motion_css = Path('assets/css/motion.css').read_text(encoding='utf-8')
+          motion_js = Path('assets/js/motion.js').read_text(encoding='utf-8')
+          navigation = Path('assets/js/navigation.js').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
           dots = Path('assets/js/dot-field.js').read_text(encoding='utf-8')
           typo = Path('assets/js/typograph.js').read_text(encoding='utf-8')
-          patterns = Path('assets/js/direction-patterns.js').read_text(encoding='utf-8')
-          combined = '\n'.join((html, styles, refinements, fonts, globe, dots, typo, patterns))
+          combined = '\n'.join((html, styles, refinements, enhancements, motion_css, motion_js, navigation, globe, dots, typo))
 
           for forbidden in ('www.figma.com/api/mcp/asset', 'fonts.googleapis.com', 'fonts.gstatic.com', 'assets/images/arrow.png'):
               assert forbidden not in combined, f'forbidden runtime dependency remains: {forbidden}'
@@ -53,8 +55,33 @@ jobs:
           assert 'requestAnimationFrame' in dots and 'ResizeObserver' in dots
           assert 'prefers-reduced-motion: reduce' in dots
           assert 'mobileMetricsStyle' not in typo and "createElement('style')" not in typo
-          assert "pointermove" not in patterns and "pointerleave" not in patterns, 'card patterns must not react to hover'
-          assert "fillStyle = '#ffffff'" in patterns and "strokeStyle = '#ffffff'" in patterns
+
+          # Direction cards are restored to the exact first localized static artwork.
+          expected_images = (
+              'assets/images/direction-links.png',
+              'assets/images/direction-pricing.png',
+              'assets/images/direction-platform.png',
+          )
+          for image in expected_images:
+              assert f'src="{image}"' in html, f'missing original direction image: {image}'
+              assert Path(image).exists(), f'original direction image file missing: {image}'
+          assert 'direction-patterns.js' not in html
+          assert 'data-pattern=' not in html
+          assert 'direction-card__pattern' not in html
+
+          # Header must morph in-place; no reparenting and no blur surface.
+          assert 'position: fixed !important' in enhancements
+          assert '.site-header.is-scrolled' in enhancements
+          assert 'appendChild(header)' not in navigation
+          assert 'site-header-placeholder' not in navigation
+          assert 'backdrop-filter' not in enhancements
+
+          # New reveal system: no blur/filter reveal tricks.
+          assert 'motion.css' in html and 'motion.js' in html
+          assert 'IntersectionObserver' in motion_js
+          assert 'motion-word__inner' in motion_css
+          assert 'blur(' not in motion_css.lower()
+          assert 'filter:' not in motion_css.lower()
 
           match = re.search(r'const MAP_SAMPLES\s*=\s*([\d_]+)', globe)
           assert match and int(match.group(1).replace('_', '')) <= 32767
@@ -67,8 +94,6 @@ jobs:
           assert '.document-card {\n    grid-column: 1;' in refinements
 
           refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
-          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', fonts)]
-          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', styles)]
           missing = sorted({ref for ref in refs if not (root / ref).exists()})
           assert not missing, f'missing local files: {missing}'
           assert html.count('class="country"') == 7
@@ -104,7 +129,8 @@ jobs:
 
           async function verifyMobile(page, engine) {
             await page.setViewportSize({ width: 390, height: 844 });
-            await page.waitForTimeout(250);
+            await page.evaluate(() => scrollTo(0, 0));
+            await page.waitForTimeout(240);
             const boxes = await page.evaluate(() => {
               const box = (selector) => {
                 const rect = document.querySelector(selector)?.getBoundingClientRect();
@@ -165,9 +191,56 @@ jobs:
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true);
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
+
+            const staticArt = await page.evaluate(() => [...document.querySelectorAll('.direction-card__visual')].map(img => ({
+              tag: img.tagName,
+              src: img.getAttribute('src'),
+              naturalWidth: img.naturalWidth,
+              naturalHeight: img.naturalHeight,
+              canvasInside: Boolean(img.closest('.direction-card')?.querySelector('canvas'))
+            })));
+            if (staticArt.length !== 3 || staticArt.some(item => item.tag !== 'IMG' || item.naturalWidth < 100 || item.canvasInside)) {
+              throw new Error(`${engine}: direction artwork is not static ${JSON.stringify(staticArt)}`);
+            }
+
+            const headerAtTop = await page.evaluate(() => {
+              const header = document.querySelector('.site-header');
+              const rect = header.getBoundingClientRect();
+              return {
+                position: getComputedStyle(header).position,
+                top: rect.top,
+                parent: header.parentElement?.className || '',
+                scrolled: header.classList.contains('is-scrolled')
+              };
+            });
+            if (headerAtTop.position !== 'fixed' || Math.abs(headerAtTop.top) > 1 || headerAtTop.scrolled) {
+              throw new Error(`${engine}: header initial state invalid ${JSON.stringify(headerAtTop)}`);
+            }
+
+            await page.evaluate(() => scrollTo(0, 900));
+            await page.waitForTimeout(460);
+            const headerScrolled = await page.evaluate(() => {
+              const header = document.querySelector('.site-header');
+              const rect = header.getBoundingClientRect();
+              return {
+                position: getComputedStyle(header).position,
+                top: rect.top,
+                parent: header.parentElement?.className || '',
+                scrolled: header.classList.contains('is-scrolled'),
+                motion: window.__AXE_MOTION__.getState()
+              };
+            });
+            if (headerScrolled.position !== 'fixed' || Math.abs(headerScrolled.top) > 1 || !headerScrolled.scrolled) {
+              throw new Error(`${engine}: header scrolled state invalid ${JSON.stringify(headerScrolled)}`);
+            }
+            if (headerScrolled.motion.revealTargets < 10 || headerScrolled.motion.wordTargets < 4) {
+              throw new Error(`${engine}: motion pool too small ${JSON.stringify(headerScrolled.motion)}`);
+            }
 
             const initial = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            await page.waitForTimeout(360);
+            await page.waitForTimeout(320);
             const animated = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
             if (animated.frame <= initial.frame) throw new Error(`${engine}: dot animation did not advance`);
 
