@@ -1,4 +1,5 @@
 name: QA AXE implementation
+# QA source: live implementation; Figma is not part of this workflow.
 
 on:
   push:
