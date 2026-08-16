@@ -30,6 +30,9 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const AUTO_RESUME_DELAY = 1350;
   const AUTO_SPEED = reducedMotion ? 0 : 0.052;
   const VERTICAL_LIMIT = 1.03;
+  // COBE's current dot shader encodes sample indices in 15 bits. Keep this below 32768
+  // so rotated views do not wrap high sample indices into thin streaks on some GPUs/WebKit.
+  const MAP_SAMPLES = 30000;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -66,7 +69,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
     theta,
     dark: 0.72,
     diffuse: 1.04,
-    mapSamples: 52000,
+    mapSamples: MAP_SAMPLES,
     mapBrightness: 4.65,
     mapBaseBrightness: 0,
     baseColor: [0.018, 0.61, 0.69],

@@ -169,6 +169,7 @@ if (stage && canvas) {
           : Math.sin(now * 0.00055 * dot.speed + dot.phase);
         let radius = dot.radius * (1 + wave * dot.breath);
         let alpha = dot.alpha * (1 + wave * 0.13);
+        let pointerInfluence = 0;
 
         if (pointer.strength > 0.002) {
           const dx = dot.x - pointer.x;
@@ -180,15 +181,16 @@ if (stage && canvas) {
               const distance = Math.sqrt(distanceSquared);
               let influence = 1 - distance / POINTER_RADIUS;
               influence = influence * influence * pointer.strength;
-              radius += influence * 0.72;
-              alpha += influence * 0.095 * dot.envelope;
+              pointerInfluence = influence;
+              radius += influence * 0.82;
+              alpha += influence * 0.14 * dot.envelope;
             }
           }
         }
 
         if (alpha <= 0.003 || radius <= 0) continue;
 
-        context.globalAlpha = Math.min(0.34, alpha);
+        context.globalAlpha = Math.min(0.34 + pointerInfluence * 0.09, alpha);
         context.beginPath();
         context.arc(dot.x, dot.y, radius, 0, TWO_PI);
         context.fill();
@@ -256,6 +258,10 @@ if (stage && canvas) {
       pointer.target = 0;
     }
 
+    function handleScroll() {
+      pointer.target = 0;
+    }
+
     function handleMotionPreference() {
       pointer.target = 0;
       pointer.strength = 0;
@@ -280,7 +286,7 @@ if (stage && canvas) {
     resizeObserver.observe(stage);
 
     window.addEventListener('resize', scheduleResize, { passive: true });
-    window.addEventListener('scroll', resetPointer, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
     window.addEventListener('blur', resetPointer);
     document.addEventListener('mouseleave', resetPointer);

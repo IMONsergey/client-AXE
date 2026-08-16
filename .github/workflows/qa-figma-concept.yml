@@ -57,6 +57,11 @@ jobs:
           assert 'ResizeObserver' in globe, 'hero/globe synchronization is missing'
           assert 'arcs: []' in globe, 'COBE internal arcs must stay disabled'
 
+          map_samples_match = re.search(r'const MAP_SAMPLES\s*=\s*([\d_]+)', globe)
+          assert map_samples_match, 'globe MAP_SAMPLES safety constant is missing'
+          map_samples = int(map_samples_match.group(1).replace('_', ''))
+          assert map_samples <= 32767, f'COBE map samples exceed 15-bit shader-safe range: {map_samples}'
+
           assert html.count('hero__globe-orbits hero__globe-orbits--') == 2, 'orbit must be exactly two visual halves of one logical orbit'
           assert 'orbit--one' not in html and 'orbit--two' not in html and 'orbit--three' not in html and 'orbit--four' not in html, 'legacy orbit groups remain'
           assert 'orbit__pulse' not in html, 'travelling orbit pulse remains in markup'
@@ -93,17 +98,82 @@ jobs:
           sleep 2
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
 
-      - name: Install Chromium
+      - name: Install Chromium and WebKit
         shell: bash
         run: |
-          npx --yes playwright@1.55.0 install --with-deps chromium
+          npx --yes playwright@1.55.0 install --with-deps chromium webkit
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify dot field runtime and globe pointer compatibility
+      - name: Verify animation, globe and mobile layout in Chromium and WebKit
         shell: bash
         run: |
           node <<'EOF'
-          const { chromium } = require('playwright');
+          const { chromium, webkit } = require('playwright');
+
+          const closeTo = (actual, expected, tolerance, label) => {
+            if (Math.abs(actual - expected) > tolerance) {
+              throw new Error(`${label}: expected ${expected.toFixed(2)}, got ${actual.toFixed(2)}`);
+            }
+          };
+
+          async function verifyMobileLayout(page, engine) {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.waitForTimeout(220);
+
+            const layout = await page.evaluate(() => {
+              const rect = (selector) => {
+                const node = document.querySelector(selector);
+                const box = node?.getBoundingClientRect();
+                if (!box) return null;
+                return {
+                  left: box.left,
+                  top: box.top,
+                  width: box.width,
+                  height: box.height,
+                  cx: box.left + box.width / 2,
+                  cy: box.top + box.height / 2
+                };
+              };
+
+              return {
+                metrics: rect('.metrics'),
+                dark: rect('.metric-card--dark'),
+                teal: rect('.metric-card--teal'),
+                blue: rect('.metric-card--blue'),
+                aboutGrid: rect('.about-grid'),
+                documentCard: rect('.document-card'),
+                emptyCell: rect('.about-grid__cell:first-child')
+              };
+            });
+
+            for (const [name, box] of Object.entries(layout)) {
+              if (!box) throw new Error(`${engine}: missing mobile layout box ${name}`);
+            }
+
+            const { metrics, dark, teal, blue, aboutGrid, documentCard, emptyCell } = layout;
+            closeTo(metrics.height, metrics.width, 2.5, `${engine}: metrics must be square`);
+
+            const cellW = metrics.width / 3;
+            const cellH = metrics.height / 3;
+            const checks = [
+              ['8', dark, 1 / 6, 1 / 6],
+              ['7', teal, 5 / 6, 1 / 2],
+              ['~15', blue, 1 / 2, 5 / 6]
+            ];
+
+            for (const [label, box, xRatio, yRatio] of checks) {
+              closeTo(box.width, cellW, 2.5, `${engine}: ${label} cell width`);
+              closeTo(box.height, cellH, 2.5, `${engine}: ${label} cell height`);
+              closeTo(box.cx, metrics.left + metrics.width * xRatio, 2.5, `${engine}: ${label} horizontal center`);
+              closeTo(box.cy, metrics.top + metrics.height * yRatio, 2.5, `${engine}: ${label} vertical center`);
+            }
+
+            closeTo(aboutGrid.width, aboutGrid.height * 2, 2.5, `${engine}: document grid must be 2:1`);
+            closeTo(documentCard.left, aboutGrid.left, 2.5, `${engine}: document card must be the left cell`);
+            closeTo(documentCard.width, aboutGrid.width / 2, 2.5, `${engine}: document card width`);
+            closeTo(documentCard.height, aboutGrid.height, 2.5, `${engine}: document card height`);
+            closeTo(emptyCell.left, aboutGrid.left + aboutGrid.width / 2, 2.5, `${engine}: empty document cell must be on the right`);
+          }
 
           (async () => {
             const browser = await chromium.launch({ headless: true });
@@ -166,17 +236,53 @@ jobs:
             await reducedPage.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
             const reduced = await reducedPage.evaluate(() => window.__AXE_DOT_FIELD__.getState());
             if (!reduced.reducedMotion) throw new Error('prefers-reduced-motion was not respected');
+            await verifyMobileLayout(reducedPage, 'Chromium');
             await reducedContext.close();
 
             if (runtimeErrors.length) throw new Error(runtimeErrors.join('\n'));
             await browser.close();
+
+            const webkitBrowser = await webkit.launch({ headless: true });
+            const webkitPage = await webkitBrowser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const webkitErrors = [];
+
+            webkitPage.on('pageerror', (error) => webkitErrors.push(`pageerror: ${error.message}`));
+            webkitPage.on('console', (message) => {
+              if (message.type() === 'error') webkitErrors.push(`console: ${message.text()}`);
+            });
+
+            await webkitPage.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            await webkitPage.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
+
+            const webkitGlobe = webkitPage.locator('#axe-globe');
+            const webkitGlobeBox = await webkitGlobe.boundingBox();
+            if (!webkitGlobeBox) throw new Error('WebKit: globe canvas has no bounding box');
+
+            const startX = webkitGlobeBox.x + webkitGlobeBox.width * 0.66;
+            const startY = webkitGlobeBox.y + webkitGlobeBox.height * 0.52;
+            const endX = webkitGlobeBox.x + webkitGlobeBox.width * 0.16;
+
+            for (let pass = 0; pass < 4; pass += 1) {
+              await webkitPage.mouse.move(startX, startY);
+              await webkitPage.mouse.down();
+              await webkitPage.mouse.move(endX, startY, { steps: 10 });
+              await webkitPage.mouse.up();
+              await webkitPage.waitForTimeout(130);
+            }
+
+            await webkitPage.locator('.hero__visual').screenshot({ path: 'preview-webkit-globe-rotated.png' });
+            await verifyMobileLayout(webkitPage, 'WebKit');
+            await webkitPage.screenshot({ path: 'preview-390-webkit.png', fullPage: true });
+
+            if (webkitErrors.length) throw new Error(webkitErrors.join('\n'));
+            await webkitBrowser.close();
           })().catch((error) => {
             console.error(error);
             process.exit(1);
           });
           EOF
 
-      - name: Capture responsive renders
+      - name: Capture responsive Chromium renders
         shell: bash
         run: |
           npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,1000" --full-page http://127.0.0.1:4173/ preview-1440.png
@@ -187,6 +293,8 @@ jobs:
           test -s preview-1024.png
           test -s preview-768.png
           test -s preview-390.png
+          test -s preview-390-webkit.png
+          test -s preview-webkit-globe-rotated.png
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
@@ -197,5 +305,7 @@ jobs:
             preview-1024.png
             preview-768.png
             preview-390.png
+            preview-390-webkit.png
+            preview-webkit-globe-rotated.png
           if-no-files-found: error
           retention-days: 1
