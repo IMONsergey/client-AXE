@@ -5,7 +5,7 @@ html.menu-open {
   overflow: hidden;
 }
 
-/* Minimal loader. It covers rendering until the COBE globe has produced a frame. */
+/* Minimal loader. */
 .preloader {
   --loader-progress: 0;
   position: fixed;
@@ -24,14 +24,8 @@ html.menu-open {
   transition: opacity 460ms cubic-bezier(.22,.61,.36,1), visibility 0s linear 460ms;
 }
 
-.preloader[hidden] {
-  display: none;
-}
-
-.preloader.is-complete {
-  opacity: 0;
-  visibility: hidden;
-}
+.preloader[hidden] { display: none; }
+.preloader.is-complete { opacity: 0; visibility: hidden; }
 
 .preloader__mark {
   width: 88px;
@@ -46,12 +40,15 @@ html.menu-open {
 
 .preloader__percent {
   position: absolute;
-  right: clamp(16px, 3.3vw, 48px);
+  left: 50%;
   bottom: 22px;
+  width: max-content;
+  transform: translateX(-50%);
   font-size: 13px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+  text-align: center;
   color: rgba(255, 255, 255, 0.76);
 }
 
@@ -75,10 +72,8 @@ html.menu-open {
   will-change: transform;
 }
 
-/* Header navigation: desktop links are centered against the page, not the free flex space. */
-.site-header__inner {
-  position: relative;
-}
+/* Header navigation. */
+.site-header__inner { position: relative; }
 
 .menu-toggle {
   display: none;
@@ -116,16 +111,8 @@ html.menu-open {
 
 .menu-toggle__lines::before { top: 1px; }
 .menu-toggle__lines::after { top: 8px; }
-
-.menu-toggle.is-open .menu-toggle__lines::before {
-  top: 4px;
-  transform: rotate(45deg);
-}
-
-.menu-toggle.is-open .menu-toggle__lines::after {
-  top: 4px;
-  transform: rotate(-45deg);
-}
+.menu-toggle.is-open .menu-toggle__lines::before { top: 4px; transform: rotate(45deg); }
+.menu-toggle.is-open .menu-toggle__lines::after { top: 4px; transform: rotate(-45deg); }
 
 @media (min-width: 1321px) {
   .site-nav {
@@ -139,13 +126,8 @@ html.menu-open {
 }
 
 @media (max-width: 1320px) {
-  .site-header {
-    z-index: 100;
-  }
-
-  .site-header__inner {
-    z-index: 1002;
-  }
+  .site-header { z-index: 100; }
+  .site-header__inner { z-index: 1002; }
 
   .brand,
   .header-request,
@@ -154,21 +136,9 @@ html.menu-open {
     z-index: 1003;
   }
 
-  .brand {
-    order: 1;
-    margin-right: auto;
-  }
-
-  .header-request {
-    order: 2;
-    margin-left: 0;
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-    order: 3;
-    margin-left: 0;
-  }
+  .brand { order: 1; margin-right: auto; }
+  .header-request { order: 2; margin-left: 0; }
+  .menu-toggle { display: inline-flex; order: 3; margin-left: 0; }
 
   .site-nav {
     position: fixed;
@@ -197,10 +167,7 @@ html.menu-open {
     visibility: hidden;
     pointer-events: none;
     transform: translateY(-10px);
-    transition:
-      opacity 220ms ease,
-      transform 260ms cubic-bezier(.22,.61,.36,1),
-      visibility 0s linear 260ms;
+    transition: opacity 220ms ease, transform 260ms cubic-bezier(.22,.61,.36,1), visibility 0s linear 260ms;
   }
 
   .site-nav.is-open {
@@ -225,72 +192,104 @@ html.menu-open {
     transition: padding-right 180ms ease, color 180ms ease, opacity 180ms ease;
   }
 
-  .site-nav a:first-child {
-    border-top: 1px solid rgba(47, 224, 253, 0.15);
-  }
-
+  .site-nav a:first-child { border-top: 1px solid rgba(47, 224, 253, 0.15); }
   .site-nav a:hover,
-  .site-nav a:focus-visible {
-    padding-right: 8px;
-    color: var(--cyan-soft);
-    opacity: 1;
+  .site-nav a:focus-visible { padding-right: 8px; color: var(--cyan-soft); opacity: 1; }
+}
+
+/* Compact fixed header after scrolling. The element is moved to <body> by navigation.js,
+   so it is not trapped inside the dark-stage stacking context and remains readable everywhere. */
+.site-header-placeholder {
+  display: block;
+  height: 0;
+  pointer-events: none;
+}
+
+.site-header-placeholder.is-active {
+  height: var(--axe-header-flow-height, 72px);
+}
+
+.site-header.is-pinned {
+  position: fixed;
+  z-index: 2600;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 10px 0 0;
+  color: #fff;
+  pointer-events: none;
+}
+
+.site-header.is-pinned .site-header__inner {
+  min-height: 46px;
+  padding: 6px 10px;
+  border: 1px solid rgba(191, 243, 250, 0.16);
+  border-radius: 8px;
+  background: rgba(6, 20, 31, 0.88);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+  backdrop-filter: blur(16px) saturate(115%);
+  pointer-events: auto;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header.is-pinned .site-header__inner { background: rgba(6, 20, 31, 0.96); }
+}
+
+/* Slightly enlarge the globe itself on desktop, while leaving the orbit SVG unchanged. */
+@media (min-width: 1200px) {
+  .hero__globe-canvas {
+    transform: scale(1.065);
+    transform-origin: 50% 50%;
   }
 }
 
 @media (max-width: 680px) {
   .preloader__mark { width: 82px; }
-  .preloader__percent { right: 16px; bottom: 17px; font-size: 12px; }
+  .preloader__percent { bottom: 17px; font-size: 12px; }
 
-  .site-header__inner {
-    gap: 9px;
-  }
-
-  .menu-toggle {
-    width: 36px;
-    height: 34px;
-    flex-basis: 36px;
-  }
+  .site-header__inner { gap: 9px; }
+  .menu-toggle { width: 36px; height: 34px; flex-basis: 36px; }
 
   .site-nav {
     padding: 92px 16px 32px;
     font-size: clamp(23px, 7.2vw, 30px);
   }
 
-  .site-nav a {
-    min-height: 58px;
-    padding-block: 13px;
+  .site-nav a { min-height: 58px; padding-block: 13px; }
+
+  .site-header.is-pinned { padding-top: 8px; }
+  .site-header.is-pinned .site-header__inner {
+    min-height: 44px;
+    padding: 5px 7px;
+    border-radius: 7px;
   }
 }
 
-/* Direction-card visuals: clean gradients below, autonomous white patterns above. */
+/* Direction cards: the user's clean images are the only base layer.
+   No generated gradients, filters, tinting or blend effects. */
 .direction-card__visual {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-color: #83c2d1;
+  background-color: transparent !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }
 
 .direction-card__visual--links {
-  background:
-    radial-gradient(ellipse 55% 125% at 92% 58%, rgba(220, 226, 236, 0.98) 0 31%, rgba(220, 226, 236, 0) 70%),
-    radial-gradient(ellipse 46% 110% at 2% 88%, rgba(150, 229, 220, 0.96) 0 22%, rgba(150, 229, 220, 0) 72%),
-    radial-gradient(ellipse 50% 100% at 53% -4%, rgba(176, 207, 231, 0.92) 0 18%, rgba(176, 207, 231, 0) 66%),
-    linear-gradient(108deg, #82cad8 0%, #5ca6b8 47%, #5d8ca6 74%, #9aaabc 100%);
+  background-image: url("../images/direction-clean-1.jpg") !important;
 }
 
 .direction-card__visual--pricing {
-  background:
-    radial-gradient(ellipse 48% 130% at 56% 45%, rgba(184, 216, 238, 0.98) 0 24%, rgba(184, 216, 238, 0) 69%),
-    radial-gradient(ellipse 40% 110% at 100% 3%, rgba(104, 207, 211, 0.94) 0 20%, rgba(104, 207, 211, 0) 71%),
-    linear-gradient(108deg, #286f9a 0%, #4d98bd 32%, #78c4da 68%, #80c9df 100%);
+  background-image: url("../images/direction-clean-2.jpg") !important;
 }
 
 .direction-card__visual--platform {
-  background:
-    radial-gradient(ellipse 46% 116% at 8% 102%, rgba(198, 240, 235, 0.98) 0 24%, rgba(198, 240, 235, 0) 72%),
-    radial-gradient(ellipse 54% 118% at 96% -2%, rgba(219, 225, 235, 0.98) 0 24%, rgba(219, 225, 235, 0) 72%),
-    radial-gradient(ellipse 52% 112% at 50% 52%, rgba(111, 177, 190, 0.92) 0 20%, rgba(111, 177, 190, 0) 70%),
-    linear-gradient(110deg, #96ced3 0%, #72b3bf 48%, #4d859f 100%);
+  background-image: url("../images/direction-clean-3.jpg") !important;
 }
 
 .direction-card__pattern {
@@ -300,6 +299,8 @@ html.menu-open {
   display: block;
   width: 100%;
   height: 100%;
+  opacity: 1;
+  mix-blend-mode: normal;
   pointer-events: none;
 }
 
@@ -308,7 +309,9 @@ html.menu-open {
   .site-nav,
   .site-nav a,
   .menu-toggle__lines::before,
-  .menu-toggle__lines::after {
-    transition: none;
+  .menu-toggle__lines::after,
+  .site-header,
+  .site-header__inner {
+    transition: none !important;
   }
 }
