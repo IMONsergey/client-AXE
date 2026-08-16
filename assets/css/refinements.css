@@ -1,0 +1,86 @@
+/* Targeted refinements after responsive QA. */
+
+@media (min-width: 1181px) {
+  :root {
+    --layout-max: 1440px;
+    --layout-pad: 48px;
+  }
+}
+
+@media (max-width: 680px) {
+  .metrics {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, clamp(190px, 53vw, 220px));
+    gap: 0;
+    border: 0;
+    background:
+      linear-gradient(to right,
+        transparent calc(33.333% - 0.5px),
+        var(--grid-line) calc(33.333% - 0.5px),
+        var(--grid-line) calc(33.333% + 0.5px),
+        transparent calc(33.333% + 0.5px),
+        transparent calc(66.666% - 0.5px),
+        var(--grid-line) calc(66.666% - 0.5px),
+        var(--grid-line) calc(66.666% + 0.5px),
+        transparent calc(66.666% + 0.5px)),
+      linear-gradient(to bottom,
+        transparent calc(33.333% - 0.5px),
+        var(--grid-line) calc(33.333% - 0.5px),
+        var(--grid-line) calc(33.333% + 0.5px),
+        transparent calc(33.333% + 0.5px),
+        transparent calc(66.666% - 0.5px),
+        var(--grid-line) calc(66.666% - 0.5px),
+        var(--grid-line) calc(66.666% + 0.5px),
+        transparent calc(66.666% + 0.5px));
+    box-shadow: inset 0 0 0 1px var(--grid-line);
+  }
+
+  .metric-row {
+    display: contents;
+  }
+
+  .metric-cell:not(.metric-card) {
+    display: none !important;
+  }
+
+  .metric-card {
+    display: flex !important;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    padding: 18px 10px;
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--grid-line);
+  }
+
+  .metric-card--dark {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .metric-card--teal {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .metric-card--blue {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .metric-card strong {
+    font-size: clamp(64px, 17vw, 76px);
+  }
+
+  .metric-label {
+    font-size: 14px;
+    line-height: 1.18;
+  }
+
+  .metric-card--blue .metric-label {
+    max-width: 118px;
+  }
+}
