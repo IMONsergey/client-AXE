@@ -6,6 +6,16 @@
   let ready = false;
   let visibleCount = 0;
 
+  /* Load the dedicated countries-grid motion layer before scroll observers start. */
+  if (!document.querySelector('link[data-axe-countries-motion]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'assets/css/countries-grid-motion.css';
+    link.dataset.axeCountriesMotion = 'true';
+    document.head.appendChild(link);
+  }
+  import('./countries-grid-motion.js').catch((error) => console.error(error));
+
   function splitWords(element, step = 32, base = 0) {
     if (!element || element.dataset.motionSplit === 'true') return;
 
