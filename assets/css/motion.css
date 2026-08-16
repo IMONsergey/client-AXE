@@ -1,27 +1,31 @@
-/* AXE motion language — restrained, geometric, no blur-based reveals. */
+/* AXE motion language — quiet, editorial, no blur-based reveals. */
 
 :root {
-  --motion-ease: cubic-bezier(.22,.61,.36,1);
-  --motion-ease-out: cubic-bezier(.16,1,.3,1);
+  --motion-ease: cubic-bezier(.22,.72,.20,1);
+  --motion-ease-soft: cubic-bezier(.16,.84,.24,1);
+  --motion-ease-out: cubic-bezier(.18,.88,.22,1);
 }
 
+/* Base reveal: smaller travel, longer deceleration. The movement should be felt,
+   not read as an effect. */
 .motion-ready .motion-reveal {
   opacity: 0;
-  transform: translate3d(0, 26px, 0);
+  transform: translate3d(0, 14px, 0);
   transition:
-    opacity 700ms var(--motion-ease),
-    transform 820ms var(--motion-ease-out);
+    opacity 760ms var(--motion-ease),
+    transform 1040ms var(--motion-ease-soft);
   transition-delay: var(--motion-delay, 0ms);
   will-change: opacity, transform;
 }
 
 .motion-ready .motion-reveal.motion-reveal--short {
-  transform: translate3d(0, 16px, 0);
+  transform: translate3d(0, 8px, 0);
 }
 
-/* Structural grids translate but never scale, so their geometry stays exact while revealing. */
+/* Legacy class name retained because the JS and QA use it. Structural groups do
+   not scale: scaling the layout makes precise geometry look unstable. */
 .motion-ready .motion-reveal.motion-reveal--scale {
-  transform: translate3d(0, 20px, 0);
+  transform: translate3d(0, 11px, 0);
 }
 
 .motion-ready .motion-reveal.is-visible {
@@ -30,6 +34,7 @@
   will-change: auto;
 }
 
+/* Word reveals use a shallow masked lift instead of a full-height stomp. */
 .motion-word {
   display: inline-block;
   overflow: hidden;
@@ -38,11 +43,11 @@
 
 .motion-word__inner {
   display: inline-block;
-  transform: translate3d(0, 112%, 0);
+  transform: translate3d(0, .68em, 0);
   opacity: 0;
   transition:
-    transform 860ms var(--motion-ease-out),
-    opacity 520ms var(--motion-ease);
+    transform 980ms var(--motion-ease-soft),
+    opacity 660ms var(--motion-ease);
   transition-delay: var(--word-delay, 0ms);
   will-change: transform, opacity;
 }
@@ -53,16 +58,16 @@
   will-change: auto;
 }
 
-/* Intro header assembly. */
+/* Header intro assembles almost imperceptibly. */
 .motion-ready .site-header .brand,
 .motion-ready .site-header .site-nav a,
 .motion-ready .site-header .header-request,
 .motion-ready .site-header .menu-toggle {
   opacity: 0;
-  transform: translate3d(0, -10px, 0);
+  transform: translate3d(0, -6px, 0);
   transition:
-    opacity 520ms var(--motion-ease),
-    transform 620ms var(--motion-ease-out);
+    opacity 640ms var(--motion-ease),
+    transform 840ms var(--motion-ease-soft);
 }
 
 .motion-ready.motion-intro-visible .site-header .brand,
@@ -73,56 +78,59 @@
   transform: translate3d(0, 0, 0);
 }
 
-.motion-ready.motion-intro-visible .site-header .brand { transition-delay: 40ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(1) { transition-delay: 90ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(2) { transition-delay: 120ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(3) { transition-delay: 150ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(4) { transition-delay: 180ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(5) { transition-delay: 210ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(6) { transition-delay: 240ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(7) { transition-delay: 270ms; }
-.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(8) { transition-delay: 300ms; }
-.motion-ready.motion-intro-visible .site-header .header-request { transition-delay: 220ms; }
-.motion-ready.motion-intro-visible .site-header .menu-toggle { transition-delay: 250ms; }
+.motion-ready.motion-intro-visible .site-header .brand { transition-delay: 60ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(1) { transition-delay: 100ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(2) { transition-delay: 122ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(3) { transition-delay: 144ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(4) { transition-delay: 166ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(5) { transition-delay: 188ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(6) { transition-delay: 210ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(7) { transition-delay: 232ms; }
+.motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(8) { transition-delay: 254ms; }
+.motion-ready.motion-intro-visible .site-header .header-request { transition-delay: 210ms; }
+.motion-ready.motion-intro-visible .site-header .menu-toggle { transition-delay: 230ms; }
 
-/* Hero globe enters as one object; its own native animation remains untouched. */
+/* Hero globe enters as one calm object; its native globe motion remains untouched. */
 .motion-ready .hero__visual.motion-reveal {
-  transform: translate3d(24px, 18px, 0) scale(.965);
+  transform: translate3d(12px, 9px, 0) scale(.988);
+  transition:
+    opacity 820ms var(--motion-ease),
+    transform 1240ms var(--motion-ease-soft);
 }
 
 .motion-ready .hero__visual.motion-reveal.is-visible {
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* Metric cells fade in at their exact grid coordinates: moving them breaks the intentionally rigid matrix. */
+/* Metric cells fade exactly in place so the rigid matrix never wobbles. */
 .motion-ready .metric-card.motion-reveal,
 .motion-ready .metric-card.motion-reveal.is-visible {
   transform: none;
 }
 
 .motion-ready .direction-card.motion-reveal {
-  transform: translate3d(0, 30px, 0);
+  transform: translate3d(0, 16px, 0);
 }
 
 .motion-ready .country.motion-reveal {
-  transform: translate3d(0, 18px, 0);
+  transform: translate3d(0, 9px, 0);
 }
 
-/* Original direction-card images are deliberately left untouched and static. */
+/* Original direction-card images remain fully static. */
 
-/* Small interaction polish. */
+/* Micro-interactions: short distance, slow finish. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
 .about__link .icon-arrow,
 .document-card__arrow {
-  transition: transform 260ms var(--motion-ease-out);
+  transition: transform 340ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
 .hero__request:hover .icon-arrow,
 .about__link:hover .icon-arrow,
 .document-card:hover .document-card__arrow {
-  transform: translate3d(4px, 0, 0);
+  transform: translate3d(3px, 0, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
