@@ -6,14 +6,14 @@
   inset: 0;
   pointer-events: none;
   opacity: 1;
-  transition: opacity 220ms var(--motion-ease);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1080ms);
+  transition: opacity 240ms var(--motion-ease);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1180ms);
 }
 
 .country__trace-line {
   position: absolute;
   display: block;
-  background: rgba(89, 164, 181, 0.92);
+  background: rgba(76, 157, 176, 0.94);
   will-change: transform;
 }
 
@@ -35,7 +35,7 @@
   top: 0;
   left: 0;
   transform-origin: left center;
-  transition: transform 360ms cubic-bezier(.18,.88,.22,1);
+  transition: transform 420ms cubic-bezier(.16,.84,.24,1);
   transition-delay: var(--country-trace-delay, 0ms);
 }
 
@@ -43,77 +43,78 @@
   top: 0;
   right: 0;
   transform-origin: center top;
-  transition: transform 350ms cubic-bezier(.18,.88,.22,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 250ms);
+  transition: transform 400ms cubic-bezier(.16,.84,.24,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 300ms);
 }
 
 .country__trace-line--bottom {
   right: 0;
   bottom: 0;
   transform-origin: right center;
-  transition: transform 370ms cubic-bezier(.18,.88,.22,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 500ms);
+  transition: transform 430ms cubic-bezier(.16,.84,.24,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 600ms);
 }
 
 .country__trace-line--left {
   bottom: 0;
   left: 0;
   transform-origin: center bottom;
-  transition: transform 350ms cubic-bezier(.18,.88,.22,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 760ms);
+  transition: transform 400ms cubic-bezier(.16,.84,.24,1);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 900ms);
 }
 
-.motion-ready .country.is-visible .country__trace-line--top,
-.motion-ready .country.is-visible .country__trace-line--bottom {
+/* A dedicated grid observer starts this only when the matrix reaches the reading
+   zone, so the tracing cannot finish while the section is still approaching. */
+.motion-ready .countries__grid.is-tracing .country__trace-line--top,
+.motion-ready .countries__grid.is-tracing .country__trace-line--bottom {
   transform: scaleX(1);
 }
 
-.motion-ready .country.is-visible .country__trace-line--left,
-.motion-ready .country.is-visible .country__trace-line--right {
+.motion-ready .countries__grid.is-tracing .country__trace-line--left,
+.motion-ready .countries__grid.is-tracing .country__trace-line--right {
   transform: scaleY(1);
 }
 
-.motion-ready .country.is-visible .country__trace {
+.motion-ready .countries__grid.is-tracing .country__trace {
   opacity: 0;
 }
 
-/* The permanent 1px grid resolves underneath the tracer near the end of the
-   circuit. This keeps the final geometry perfectly closed without doubled seams. */
-.motion-ready .country::before {
+/* Permanent 1px rules resolve under the brighter tracer at the end. */
+.motion-ready .countries__grid .country::before {
   opacity: 0;
   background-size:
     var(--country-top-size) 1px,
     1px 100%,
     100% 1px;
-  transition: opacity 190ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 960ms) !important;
+  transition: opacity 200ms var(--motion-ease) !important;
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1080ms) !important;
 }
 
-.motion-ready .country::after {
+.motion-ready .countries__grid .country::after {
   opacity: 0;
   transform: scaleY(1);
-  transition: opacity 190ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 960ms) !important;
+  transition: opacity 200ms var(--motion-ease) !important;
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 1080ms) !important;
 }
 
-.motion-ready .country.is-visible::before,
-.motion-ready .country.is-visible::after {
+.motion-ready .countries__grid.is-tracing .country::before,
+.motion-ready .countries__grid.is-tracing .country::after {
   opacity: 1;
 }
 
-/* Content follows the frame instead of appearing at the same instant. */
-.motion-ready .country > img,
-.motion-ready .country > span {
+/* Flags and labels arrive after the frame has visibly started. */
+.motion-ready .countries__grid .country > img,
+.motion-ready .countries__grid .country > span:not(.country__trace) {
   opacity: 0;
-  transform: translate3d(0, 7px, 0);
+  transform: translate3d(0, 8px, 0);
   transition:
-    opacity 680ms var(--motion-ease),
-    transform 920ms var(--motion-ease-soft);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 560ms) !important;
+    opacity 720ms var(--motion-ease),
+    transform 980ms var(--motion-ease-soft);
+  transition-delay: calc(var(--country-trace-delay, 0ms) + 650ms) !important;
 }
 
-.motion-ready .country.is-visible > img,
-.motion-ready .country.is-visible > span {
+.motion-ready .countries__grid.is-tracing .country > img,
+.motion-ready .countries__grid.is-tracing .country > span:not(.country__trace) {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
@@ -121,10 +122,10 @@
 @media (prefers-reduced-motion: reduce) {
   .country__trace { display: none !important; }
 
-  .motion-ready .country::before,
-  .motion-ready .country::after,
-  .motion-ready .country > img,
-  .motion-ready .country > span {
+  .motion-ready .countries__grid .country::before,
+  .motion-ready .countries__grid .country::after,
+  .motion-ready .countries__grid .country > img,
+  .motion-ready .countries__grid .country > span:not(.country__trace) {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
