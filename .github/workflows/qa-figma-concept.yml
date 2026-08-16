@@ -8,6 +8,8 @@ on:
       - .github/workflows/qa-figma-concept.yml
       - index.html
       - assets/css/**
+      - assets/js/**
+      - assets/vendor/**
 
 permissions:
   contents: read
@@ -48,6 +50,8 @@ jobs:
           assert html.count('class="country"') == 7
           assert html.count('class="direction-card"') == 3
           assert html.count('metric-card metric-card--') == 3
+          assert Path('assets/js/globe.js').exists()
+          assert Path('assets/vendor/cobe.js').exists()
 
       - name: Download Figma reference
         shell: bash
