@@ -1,0 +1,678 @@
+name: Apply latest AXE refinements
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/apply-axe-refinements-20260816.yml
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+environment:
+  name: github-pages
+  url: ${{ steps.deployment.outputs.page_url }}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  apply-test-deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+          fetch-depth: 0
+
+      - name: Apply requested refinements
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          index = Path('index.html')
+          css_path = Path('assets/css/enhancements.css')
+          patterns_path = Path('assets/js/direction-patterns.js')
+          header_js_path = Path('assets/js/header-scroll.js')
+
+          html = index.read_text(encoding='utf-8')
+
+          # Resolve the three clean user-supplied JPEGs already stored in the repo.
+          image_dir = Path('assets/images')
+          preferred = [
+              image_dir / 'direction-clean-1.jpg',
+              image_dir / 'direction-clean-2.jpg',
+              image_dir / 'direction-clean-3.jpg',
+          ]
+          if not all(p.exists() for p in preferred):
+              jpgs = sorted([*image_dir.glob('*.jpg'), *image_dir.glob('*.jpeg')])
+              cleanish = [p for p in jpgs if any(k in p.name.lower() for k in ('clean', 'base', 'gradient'))]
+              pool = cleanish if len(cleanish) >= 3 else jpgs
+              if len(pool) < 3:
+                  raise RuntimeError(f'Expected three clean JPEG assets, found: {[p.name for p in jpgs]}')
+              preferred = pool[:3]
+
+          image_srcs = [p.as_posix() for p in preferred]
+          specs = [
+              ('links', 'dots', image_srcs[0]),
+              ('pricing', 'lines', image_srcs[1]),
+              ('platform', 'arcs', image_srcs[2]),
+          ]
+
+          for variant, pattern, src in specs:
+              block = (
+                  f'<div class="direction-card__visual direction-card__visual--{variant}" '
+                  f'data-pattern="{pattern}" aria-hidden="true">\n'
+                  f'              <img class="direction-card__visual-image" src="{src}" alt="">\n'
+                  f'              <canvas class="direction-card__pattern"></canvas>\n'
+                  f'            </div>'
+              )
+              rx = re.compile(
+                  rf'<div class="direction-card__visual direction-card__visual--{variant}"[^>]*>.*?</div>',
+                  re.S,
+              )
+              if rx.search(html):
+                  html = rx.sub(block, html, count=1)
+              else:
+                  raise RuntimeError(f'Missing direction visual block: {variant}')
+
+          if 'assets/js/header-scroll.js' not in html:
+              html = html.replace(
+                  '</body>',
+                  '  <script src="assets/js/header-scroll.js"></script>\n</body>'
+              )
+
+          index.write_text(html, encoding='utf-8')
+
+          # Add a single override section so no legacy reconstructed colour treatment can leak through.
+          css = css_path.read_text(encoding='utf-8')
+          css = re.sub(
+              r'\n?/\* AXE-LATEST-REFINEMENTS:START \*/.*?/\* AXE-LATEST-REFINEMENTS:END \*/\n?',
+              '\n',
+              css,
+              flags=re.S,
+          ).rstrip() + '\n\n' + r'''/* AXE-LATEST-REFINEMENTS:START */
+          /* Percent is intentionally centered over the progress line. */
+          .preloader__percent {
+            left: 50% !important;
+            right: auto !important;
+            width: max-content;
+            text-align: center;
+            transform: translateX(-50%);
+          }
+
+          /* The normal header keeps its original place in the flow. Once scrolling starts,
+             it becomes a compact dark glass capsule that is independent of page background. */
+          .site-header-placeholder {
+            display: block;
+            height: 0;
+            pointer-events: none;
+          }
+
+          .site-header-placeholder.is-active {
+            height: var(--axe-header-flow-height, 72px);
+          }
+
+          .site-header {
+            transition: padding 220ms ease;
+          }
+
+          .site-header.is-pinned {
+            position: fixed;
+            z-index: 2200;
+            top: 0;
+            right: 0;
+            left: 0;
+            padding: 10px 0 0;
+            pointer-events: none;
+          }
+
+          .site-header.is-pinned .site-header__inner {
+            min-height: 46px;
+            padding: 6px 10px;
+            border: 1px solid rgba(191, 243, 250, 0.16);
+            border-radius: 8px;
+            background: rgba(6, 20, 31, 0.88);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+            -webkit-backdrop-filter: blur(16px) saturate(115%);
+            backdrop-filter: blur(16px) saturate(115%);
+            pointer-events: auto;
+          }
+
+          @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .site-header.is-pinned .site-header__inner {
+              background: rgba(6, 20, 31, 0.96);
+            }
+          }
+
+          /* Slightly larger globe only on desktop; orbit geometry remains unchanged. */
+          @media (min-width: 1200px) {
+            .hero__globe-canvas {
+              inset: -7% !important;
+            }
+          }
+
+          /* Use the supplied clean artwork verbatim. No CSS colour effects, filters or blend modes. */
+          .direction-card__visual,
+          .direction-card__visual--links,
+          .direction-card__visual--pricing,
+          .direction-card__visual--platform {
+            background: none !important;
+            filter: none !important;
+            mix-blend-mode: normal !important;
+          }
+
+          .direction-card__visual-image {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            object-fit: cover;
+            opacity: 1;
+            filter: none;
+            transform: none;
+            pointer-events: none;
+          }
+
+          .direction-card__pattern {
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+            mix-blend-mode: normal;
+            pointer-events: none;
+          }
+
+          @media (max-width: 680px) {
+            .site-header.is-pinned {
+              padding-top: 8px;
+            }
+
+            .site-header.is-pinned .site-header__inner {
+              min-height: 44px;
+              padding: 5px 7px;
+              border-radius: 7px;
+            }
+
+            .preloader__percent {
+              left: 50% !important;
+              right: auto !important;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .site-header,
+            .site-header__inner {
+              transition: none !important;
+            }
+          }
+          /* AXE-LATEST-REFINEMENTS:END */
+          '''
+          css_path.write_text(css, encoding='utf-8')
+
+          header_js_path.write_text(r'''(() => {
+            const header = document.querySelector('.site-header');
+            if (!header) return;
+
+            const placeholder = document.createElement('div');
+            placeholder.className = 'site-header-placeholder';
+            placeholder.setAttribute('aria-hidden', 'true');
+            header.insertAdjacentElement('afterend', placeholder);
+
+            let flowHeight = 0;
+            let ticking = false;
+            let pinned = false;
+
+            function measure() {
+              if (pinned) return;
+              flowHeight = Math.max(1, Math.round(header.getBoundingClientRect().height));
+              document.documentElement.style.setProperty('--axe-header-flow-height', `${flowHeight}px`);
+            }
+
+            function sync() {
+              ticking = false;
+              const next = window.scrollY > 28;
+              if (next === pinned) return;
+              if (!pinned) measure();
+              pinned = next;
+              header.classList.toggle('is-pinned', pinned);
+              placeholder.classList.toggle('is-active', pinned);
+            }
+
+            function schedule() {
+              if (ticking) return;
+              ticking = true;
+              requestAnimationFrame(sync);
+            }
+
+            measure();
+            sync();
+            window.addEventListener('scroll', schedule, { passive: true });
+            window.addEventListener('resize', () => {
+              if (!pinned) measure();
+              schedule();
+            }, { passive: true });
+
+            Object.defineProperty(window, '__AXE_STICKY_HEADER__', {
+              configurable: true,
+              value: {
+                getState() {
+                  return { pinned, flowHeight };
+                }
+              }
+            });
+          })();
+          ''', encoding='utf-8')
+
+          patterns_path.write_text(r'''(() => {
+            const visuals = [...document.querySelectorAll('.direction-card__visual[data-pattern]')];
+            if (!visuals.length) return;
+
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const TWO_PI = Math.PI * 2;
+            const WHITE = 'rgb(255 255 255)';
+            const instances = [];
+
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+            function setup(visual, index) {
+              const canvas = visual.querySelector('.direction-card__pattern');
+              if (!canvas) return null;
+              const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+              if (!ctx) return null;
+
+              const state = {
+                visual,
+                canvas,
+                ctx,
+                index,
+                pattern: visual.dataset.pattern || 'dots',
+                width: 1,
+                height: 1,
+                dpr: 1,
+                frame: 0,
+                frameId: 0,
+                visible: true,
+                ready: false,
+                lastTime: performance.now()
+              };
+
+              function resize() {
+                const rect = visual.getBoundingClientRect();
+                state.width = Math.max(1, Math.round(rect.width));
+                state.height = Math.max(1, Math.round(rect.height));
+                state.dpr = Math.min(2, window.devicePixelRatio || 1);
+                canvas.width = Math.max(1, Math.round(state.width * state.dpr));
+                canvas.height = Math.max(1, Math.round(state.height * state.dpr));
+                canvas.style.width = `${state.width}px`;
+                canvas.style.height = `${state.height}px`;
+                ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+                draw(performance.now());
+                state.ready = true;
+                canvas.dataset.patternReady = 'true';
+              }
+
+              function drawDots(now) {
+                const { width, height } = state;
+                const t = reducedMotion.matches ? 0 : now * 0.00022;
+                const spacing = clamp(width / 48, 8.2, 11.5);
+                const driftX = reducedMotion.matches ? 0 : Math.sin(t * 2.1) * 2.6;
+                const driftY = reducedMotion.matches ? 0 : Math.cos(t * 1.7) * 1.8;
+                const cols = Math.ceil(width / spacing) + 4;
+                const rows = Math.ceil(height / spacing) + 4;
+
+                ctx.fillStyle = WHITE;
+                for (let row = -2; row < rows; row += 1) {
+                  for (let col = -2; col < cols; col += 1) {
+                    const phase = col * 0.23 + row * 0.17;
+                    const wave = reducedMotion.matches ? 0 : Math.sin(t * 3.4 + phase);
+                    const x = col * spacing + driftX;
+                    const y = row * spacing + driftY;
+                    const nx = width ? x / width : 0;
+                    const ny = height ? y / height : 0;
+                    const spatial = 0.5 + 0.5 * Math.sin(nx * 8.2 - ny * 4.1 + 0.7);
+                    const radius = 0.62 + spatial * 0.75 + wave * 0.12;
+                    const alpha = clamp(0.38 + spatial * 0.17 + wave * 0.035, 0.28, 0.60);
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.max(0.35, radius), 0, TWO_PI);
+                    ctx.fill();
+                  }
+                }
+              }
+
+              function strokeDiagonalField(alpha, spacing, lineWidth, angle, offset) {
+                const { width, height } = state;
+                ctx.save();
+                ctx.translate(width * 0.5, height * 0.5);
+                ctx.rotate(angle);
+                ctx.translate(-width * 0.5, -height * 0.5);
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = lineWidth;
+                ctx.lineCap = 'butt';
+                ctx.globalAlpha = alpha;
+                const span = width + height * 2.2;
+                for (let x = -height * 1.8 + offset; x <= span; x += spacing) {
+                  ctx.beginPath();
+                  ctx.moveTo(x, -height * 2);
+                  ctx.lineTo(x, height * 3);
+                  ctx.stroke();
+                }
+                ctx.restore();
+              }
+
+              function drawLines(now) {
+                const { width, height } = state;
+                const t = reducedMotion.matches ? 0 : now * 0.00012;
+                const drift = reducedMotion.matches ? 0 : Math.sin(t * 2.4) * 2.2;
+
+                // Fine full-frame diagonal field.
+                strokeDiagonalField(0.54, 5.4, 0.58, -0.70, drift);
+
+                // A broad curved corridor creates the same sweeping break seen in the original artwork.
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.globalAlpha = 0.92;
+                ctx.strokeStyle = '#000';
+                ctx.lineCap = 'round';
+                ctx.lineWidth = Math.max(34, width * 0.105);
+                ctx.beginPath();
+                ctx.moveTo(width * 0.20, height * 1.18);
+                ctx.bezierCurveTo(
+                  width * 0.30 + Math.sin(t) * 2.2, height * 0.72,
+                  width * 0.33 + Math.cos(t * 0.8) * 2.0, height * 0.25,
+                  width * 0.48, -height * 0.18
+                );
+                ctx.stroke();
+                ctx.restore();
+
+                // Secondary, slightly different field on the right of a curved boundary adds structure without heaviness.
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(width * 0.41, -12);
+                ctx.bezierCurveTo(width * 0.35, height * 0.34, width * 0.31, height * 0.70, width * 0.18, height + 12);
+                ctx.lineTo(width + 12, height + 12);
+                ctx.lineTo(width + 12, -12);
+                ctx.closePath();
+                ctx.clip();
+                strokeDiagonalField(0.23, 7.4, 0.48, -0.58, -drift * 0.7);
+                ctx.restore();
+              }
+
+              function drawArcFamily(cx, cy, minR, maxR, rings, phase, alphaScale = 1) {
+                const { width, height } = state;
+                for (let ring = 0; ring < rings; ring += 1) {
+                  const q = rings <= 1 ? 0 : ring / (rings - 1);
+                  const rx = minR + (maxR - minR) * q;
+                  const ry = rx * (0.62 + q * 0.12);
+                  const circumference = Math.PI * Math.sqrt((rx * rx + ry * ry) * 0.5);
+                  const count = Math.max(32, Math.round(circumference / 6.7));
+                  const ringPhase = phase * (ring % 2 ? -0.36 : 0.42) + ring * 0.008;
+                  for (let i = 0; i < count; i += 1) {
+                    const u = i / (count - 1);
+                    const angle = Math.PI * (1.02 + u * 0.96) + ringPhase;
+                    const x = cx + Math.cos(angle) * rx;
+                    const y = cy + Math.sin(angle) * ry;
+                    if (x < -5 || x > width + 5 || y < -5 || y > height + 5) continue;
+                    const pulse = reducedMotion.matches ? 0 : Math.sin(phase * 9 + i * 0.21 + ring * 0.6) * 0.03;
+                    ctx.globalAlpha = clamp((0.48 - q * 0.08 + pulse) * alphaScale, 0.24, 0.60);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 0.74 + (1 - q) * 0.26, 0, TWO_PI);
+                    ctx.fill();
+                  }
+                }
+              }
+
+              function drawArcs(now) {
+                const { width, height } = state;
+                const t = reducedMotion.matches ? 0 : now * 0.000075;
+                ctx.fillStyle = WHITE;
+
+                // Two overlapping families of nested dotted arcs fill the complete artwork area.
+                drawArcFamily(
+                  width * 0.34,
+                  height * 1.09,
+                  Math.max(34, width * 0.10),
+                  width * 0.72,
+                  13,
+                  t,
+                  1
+                );
+                drawArcFamily(
+                  width * 0.75,
+                  height * 1.12,
+                  Math.max(28, width * 0.08),
+                  width * 0.48,
+                  9,
+                  -t * 0.78,
+                  0.86
+                );
+              }
+
+              function draw(now) {
+                ctx.clearRect(0, 0, state.width, state.height);
+                if (state.pattern === 'lines') drawLines(now);
+                else if (state.pattern === 'arcs') drawArcs(now);
+                else drawDots(now);
+                ctx.globalAlpha = 1;
+                ctx.globalCompositeOperation = 'source-over';
+                state.frame += 1;
+              }
+
+              function animate(now) {
+                state.lastTime = now;
+                draw(now);
+                if (!reducedMotion.matches && state.visible) {
+                  state.frameId = requestAnimationFrame(animate);
+                } else {
+                  state.frameId = 0;
+                }
+              }
+
+              function start() {
+                if (reducedMotion.matches || !state.visible || state.frameId) return;
+                state.frameId = requestAnimationFrame(animate);
+              }
+
+              function stop() {
+                if (!state.frameId) return;
+                cancelAnimationFrame(state.frameId);
+                state.frameId = 0;
+              }
+
+              const resizeObserver = new ResizeObserver(resize);
+              resizeObserver.observe(visual);
+
+              const intersectionObserver = new IntersectionObserver((entries) => {
+                state.visible = entries[0]?.isIntersecting ?? true;
+                if (state.visible) start();
+                else stop();
+              }, { rootMargin: '180px 0px' });
+              intersectionObserver.observe(visual);
+
+              reducedMotion.addEventListener?.('change', () => {
+                if (reducedMotion.matches) {
+                  stop();
+                  draw(performance.now());
+                } else {
+                  start();
+                }
+              });
+
+              resize();
+              start();
+              return state;
+            }
+
+            visuals.forEach((visual, index) => {
+              const instance = setup(visual, index);
+              if (instance) instances.push(instance);
+            });
+
+            Object.defineProperty(window, '__AXE_DIRECTION_PATTERNS__', {
+              configurable: true,
+              value: {
+                getState() {
+                  return {
+                    ready: instances.length === visuals.length && instances.every((item) => item.ready),
+                    instances: instances.map((item) => ({
+                      pattern: item.pattern,
+                      frame: item.frame,
+                      width: item.width,
+                      height: item.height,
+                      visible: item.visible,
+                      ready: item.ready
+                    }))
+                  };
+                }
+              }
+            });
+          })();
+          ''', encoding='utf-8')
+
+          # Remove this one-shot workflow from the resulting commit.
+          Path('.github/workflows/apply-axe-refinements-20260816.yml').unlink()
+
+      - name: Verify no legacy colour treatment or hover pattern interaction
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'direction-card__visual-image' index.html
+          test "$(grep -c 'direction-card__visual-image' index.html)" -eq 3
+          ! grep -q "pointermove" assets/js/direction-patterns.js
+          ! grep -q "pointerleave" assets/js/direction-patterns.js
+          grep -q "AXE-LATEST-REFINEMENTS:START" assets/css/enhancements.css
+          test -f assets/js/header-scroll.js
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Runtime visual QA
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          sleep 2
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
+          const closeTo = (a,b,t,label) => { if (Math.abs(a-b)>t) throw new Error(`${label}: ${a} vs ${b}`); };
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+
+            // Loader centering is tested with JS disabled so it cannot disappear before measurement.
+            const noJs = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+            const lp = await noJs.newPage();
+            await lp.goto(url, { waitUntil: 'networkidle' });
+            const percent = await lp.locator('.preloader__percent').boundingBox();
+            if (!percent) throw new Error('preloader percent missing');
+            closeTo(percent.x + percent.width / 2, 720, 2, 'preloader percent center');
+            await noJs.close();
+
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type()==='error') errors.push(m.text()); });
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
+            await page.waitForFunction(() => window.__AXE_DIRECTION_PATTERNS__?.getState().ready === true);
+
+            const visuals = await page.evaluate(() => [...document.querySelectorAll('.direction-card__visual')].map(v => {
+              const r=v.getBoundingClientRect(); const img=v.querySelector('img'); const c=v.querySelector('canvas'); const cr=c.getBoundingClientRect();
+              return { bg:getComputedStyle(v).backgroundImage, w:r.width,h:r.height,cw:cr.width,ch:cr.height,complete:img.complete,nw:img.naturalWidth,src:img.getAttribute('src') };
+            }));
+            if (visuals.length !== 3) throw new Error(`visual count ${visuals.length}`);
+            for (const item of visuals) {
+              if (!item.complete || item.nw < 100) throw new Error(`clean image not loaded ${JSON.stringify(item)}`);
+              if (item.bg !== 'none') throw new Error(`legacy background effect remains ${item.bg}`);
+              closeTo(item.cw,item.w,2,'pattern width'); closeTo(item.ch,item.h,2,'pattern height');
+            }
+
+            const before = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
+            await page.locator('.directions').scrollIntoViewIfNeeded();
+            await page.waitForTimeout(420);
+            const after = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
+            if (!after.instances.every((x,i)=>x.frame>before.instances[i].frame)) throw new Error('patterns are not autonomously animating');
+            if (after.instances.map(x=>x.pattern).join(',') !== 'dots,lines,arcs') throw new Error(`unexpected patterns ${JSON.stringify(after)}`);
+            await page.locator('.directions').screenshot({ path: 'qa-directions-latest.png' });
+
+            await page.evaluate(() => scrollTo(0, 720));
+            await page.waitForTimeout(260);
+            const sticky = await page.evaluate(() => {
+              const h=document.querySelector('.site-header'); const inner=h.querySelector('.site-header__inner'); const r=h.getBoundingClientRect();
+              return { cls:h.classList.contains('is-pinned'),pos:getComputedStyle(h).position,top:r.top,bg:getComputedStyle(inner).backgroundColor,height:inner.getBoundingClientRect().height,state:window.__AXE_STICKY_HEADER__?.getState() };
+            });
+            if (!sticky.cls || sticky.pos !== 'fixed' || Math.abs(sticky.top) > 1.5) throw new Error(`sticky header inactive ${JSON.stringify(sticky)}`);
+            if (sticky.bg === 'rgba(0, 0, 0, 0)' || sticky.bg === 'transparent') throw new Error('sticky header not background-independent');
+            if (sticky.height > 62) throw new Error(`sticky header not compact ${sticky.height}`);
+            await page.screenshot({ path: 'qa-sticky-latest.png' });
+
+            await page.evaluate(() => scrollTo(0,0));
+            await page.waitForTimeout(180);
+            const globe = await page.evaluate(() => {
+              const shell=document.querySelector('.hero__globe-shell').getBoundingClientRect();
+              const canvas=document.querySelector('.hero__globe-canvas').getBoundingClientRect();
+              return { sw:shell.width, cw:canvas.width };
+            });
+            if (globe.cw < globe.sw * 1.10) throw new Error(`desktop globe did not enlarge enough ${JSON.stringify(globe)}`);
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - name: Commit applied refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/css/enhancements.css assets/js/direction-patterns.js assets/js/header-scroll.js .github/workflows/apply-axe-refinements-20260816.yml
+          git commit -m "refine: sticky header clean card art and original-style patterns"
+          git push origin HEAD:feat/figma-concept-1
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp index.html _site/index.html
+          cp -R assets _site/assets
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Upload visual QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: axe-latest-refinements-qa
+          path: |
+            qa-directions-latest.png
+            qa-sticky-latest.png
+          retention-days: 1
