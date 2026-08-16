@@ -42,4 +42,78 @@
   }
 
   document.querySelectorAll('.typo').forEach(processElement);
+
+  // Mobile keeps the visual language of the desktop metrics block: a real
+  // modular grid with empty cells around the three highlighted values.
+  // The desktop has seven columns; phones use three compact columns instead.
+  const mobileMetricsStyle = document.createElement('style');
+  mobileMetricsStyle.textContent = `
+    @media (max-width: 680px) {
+      .metrics {
+        display: block !important;
+        grid-template-columns: none !important;
+      }
+
+      .metric-row {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0 !important;
+      }
+
+      .metric-row .metric-cell {
+        display: none !important;
+        min-height: 138px !important;
+      }
+
+      .metric-row:nth-child(1) .metric-cell:nth-child(1),
+      .metric-row:nth-child(1) .metric-cell:nth-child(2),
+      .metric-row:nth-child(1) .metric-cell:nth-child(3),
+      .metric-row:nth-child(2) .metric-cell:nth-child(4),
+      .metric-row:nth-child(2) .metric-cell:nth-child(5),
+      .metric-row:nth-child(2) .metric-cell:nth-child(6),
+      .metric-row:nth-child(3) .metric-cell:nth-child(2),
+      .metric-row:nth-child(3) .metric-cell:nth-child(3),
+      .metric-row:nth-child(3) .metric-cell:nth-child(4) {
+        display: block !important;
+      }
+
+      .metric-row .metric-card {
+        display: flex !important;
+        min-height: 138px !important;
+        gap: 14px !important;
+        padding: 14px 8px !important;
+      }
+
+      .metric-row .metric-card strong {
+        font-size: clamp(48px, 14vw, 58px) !important;
+        line-height: .8 !important;
+      }
+
+      .metric-row .metric-label {
+        font-size: 12px !important;
+        line-height: 1.16 !important;
+        max-width: 104px !important;
+      }
+
+      .metric-row .metric-card--blue .metric-label {
+        max-width: 104px !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .metric-row .metric-cell,
+      .metric-row .metric-card {
+        min-height: 126px !important;
+      }
+
+      .metric-row .metric-card strong {
+        font-size: 46px !important;
+      }
+
+      .metric-row .metric-label {
+        font-size: 11px !important;
+      }
+    }
+  `;
+  document.head.appendChild(mobileMetricsStyle);
 })();
