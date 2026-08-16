@@ -1,4 +1,4 @@
-/* AXE — navigation, loading and card-motion refinements. */
+/* AXE — navigation, loading, sticky-header and card refinements. */
 
 html.is-loading,
 html.menu-open {
@@ -15,9 +15,7 @@ html.menu-open {
   place-items: center;
   overflow: hidden;
   color: #fff;
-  background:
-    radial-gradient(circle at 68% 34%, rgba(0, 127, 173, 0.10), transparent 38%),
-    #091827;
+  background: #091827;
   opacity: 1;
   visibility: visible;
   pointer-events: none;
@@ -72,8 +70,45 @@ html.menu-open {
   will-change: transform;
 }
 
-/* Header navigation. */
-.site-header__inner { position: relative; }
+/* Header is fixed from the very first frame. Only its surface changes on scroll,
+   so there is no DOM move, layout jump or abrupt mode switch. */
+.visual-stage {
+  padding-top: 72px;
+}
+
+.site-header {
+  position: fixed !important;
+  z-index: 2600 !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: 72px;
+  padding: 0 !important;
+  color: #fff;
+  background-color: rgba(9, 24, 39, 0);
+  border-bottom: 1px solid rgba(189, 248, 255, 0);
+  box-shadow: 0 10px 30px rgba(3, 14, 23, 0);
+  transition:
+    height 360ms cubic-bezier(.22,.61,.36,1),
+    background-color 360ms cubic-bezier(.22,.61,.36,1),
+    border-color 360ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 360ms cubic-bezier(.22,.61,.36,1);
+}
+
+.site-header.is-scrolled {
+  height: 60px;
+  background-color: rgba(7, 22, 34, 0.96);
+  border-bottom-color: rgba(189, 248, 255, 0.11);
+  box-shadow: 0 10px 30px rgba(3, 14, 23, 0.12);
+}
+
+.site-header__inner {
+  position: relative;
+  height: 100%;
+  transition: width 360ms cubic-bezier(.22,.61,.36,1);
+}
 
 .menu-toggle {
   display: none;
@@ -126,14 +161,13 @@ html.menu-open {
 }
 
 @media (max-width: 1320px) {
-  .site-header { z-index: 100; }
-  .site-header__inner { z-index: 1002; }
+  .site-header__inner { z-index: 2602; }
 
   .brand,
   .header-request,
   .menu-toggle {
     position: relative;
-    z-index: 1003;
+    z-index: 2603;
   }
 
   .brand { order: 1; margin-right: auto; }
@@ -142,23 +176,20 @@ html.menu-open {
 
   .site-nav {
     position: fixed;
-    z-index: 1001;
+    z-index: 2601;
     inset: 0;
     display: flex !important;
-    width: auto;
-    max-width: none;
+    width: 100vw;
     min-width: 0;
     flex-direction: column;
     align-items: flex-end;
     justify-content: flex-start;
     gap: 0;
     margin: 0;
-    padding: 112px max(var(--layout-pad), calc((100vw - 920px) / 2)) 44px;
+    padding: 100px 16px 32px;
     overflow-y: auto;
     color: #fff;
-    background:
-      radial-gradient(circle at 82% 22%, rgba(0, 147, 164, 0.17), transparent 34%),
-      linear-gradient(180deg, #091827 0%, #082535 100%);
+    background: #091827;
     font-size: clamp(25px, 3.4vw, 36px);
     line-height: 1.1;
     font-weight: 400;
@@ -167,8 +198,11 @@ html.menu-open {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-10px);
-    transition: opacity 220ms ease, transform 260ms cubic-bezier(.22,.61,.36,1), visibility 0s linear 260ms;
+    transform: translateY(-8px);
+    transition:
+      opacity 220ms ease,
+      transform 280ms cubic-bezier(.22,.61,.36,1),
+      visibility 0s linear 280ms;
   }
 
   .site-nav.is-open {
@@ -198,53 +232,7 @@ html.menu-open {
   .site-nav a:focus-visible { padding-right: 8px; color: var(--cyan-soft); opacity: 1; }
 }
 
-/* Compact fixed header after scrolling. The element is moved to <body> by navigation.js,
-   so it is not trapped inside the dark-stage stacking context and remains readable everywhere. */
-.site-header-placeholder {
-  display: block;
-  height: 0;
-  pointer-events: none;
-}
-
-.site-header-placeholder.is-active {
-  height: var(--axe-header-flow-height, 72px);
-}
-
-.site-header.is-pinned {
-  position: fixed;
-  z-index: 2600;
-  top: 0;
-  right: 0;
-  left: 0;
-  padding: 10px 0 0;
-  color: #fff;
-  pointer-events: none;
-}
-
-.site-header.is-pinned .site-header__inner {
-  min-height: 46px;
-  padding: 6px 10px;
-  border: 1px solid rgba(191, 243, 250, 0.16);
-  border-radius: 8px;
-  background: rgba(6, 20, 31, 0.88);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
-  -webkit-backdrop-filter: blur(16px) saturate(115%);
-  backdrop-filter: blur(16px) saturate(115%);
-  pointer-events: auto;
-}
-
-/* backdrop-filter establishes a fixed-position containing block in browsers.
-   Disable it while the full-screen mobile menu is open so the menu remains viewport-wide. */
-html.menu-open .site-header.is-pinned .site-header__inner {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header.is-pinned .site-header__inner { background: rgba(6, 20, 31, 0.96); }
-}
-
-/* Slightly enlarge the globe itself on desktop, while leaving the orbit SVG unchanged. */
+/* Slightly larger globe only on desktop. */
 @media (min-width: 1200px) {
   .hero__globe-canvas {
     transform: scale(1.065);
@@ -253,6 +241,11 @@ html.menu-open .site-header.is-pinned .site-header__inner {
 }
 
 @media (max-width: 680px) {
+  .visual-stage { padding-top: 66px; }
+
+  .site-header { height: 66px; }
+  .site-header.is-scrolled { height: 56px; }
+
   .preloader__mark { width: 82px; }
   .preloader__percent { bottom: 17px; font-size: 12px; }
 
@@ -260,66 +253,34 @@ html.menu-open .site-header.is-pinned .site-header__inner {
   .menu-toggle { width: 36px; height: 34px; flex-basis: 36px; }
 
   .site-nav {
-    padding: 92px 16px 32px;
+    padding: 88px 16px 32px;
     font-size: clamp(23px, 7.2vw, 30px);
   }
 
   .site-nav a { min-height: 58px; padding-block: 13px; }
-
-  .site-header.is-pinned { padding-top: 8px; }
-  .site-header.is-pinned .site-header__inner {
-    min-height: 44px;
-    padding: 5px 7px;
-    border-radius: 7px;
-  }
 }
 
-/* Direction cards: the user's clean images are the only base layer.
-   No generated gradients, filters, tinting or blend effects. */
+/* Restore the exact static direction artwork from the first localized Figma version. */
 .direction-card__visual {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background-color: transparent !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-.direction-card__visual--links {
-  background-image: url("../images/direction-clean-1.jpg") !important;
-}
-
-.direction-card__visual--pricing {
-  background-image: url("../images/direction-clean-2.jpg") !important;
-}
-
-.direction-card__visual--platform {
-  background-image: url("../images/direction-clean-3.jpg") !important;
-}
-
-.direction-card__pattern {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
   display: block;
   width: 100%;
-  height: 100%;
+  height: 150px;
+  object-fit: cover;
+  background: none !important;
   opacity: 1;
   mix-blend-mode: normal;
-  pointer-events: none;
 }
+
+.direction-card__pattern { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .preloader,
+  .site-header,
+  .site-header__inner,
   .site-nav,
   .site-nav a,
   .menu-toggle__lines::before,
-  .menu-toggle__lines::after,
-  .site-header,
-  .site-header__inner {
+  .menu-toggle__lines::after {
     transition: none !important;
   }
 }
