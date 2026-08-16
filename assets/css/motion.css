@@ -19,13 +19,14 @@
   transform: translate3d(0, 16px, 0);
 }
 
+/* Structural grids translate but never scale, so their geometry stays exact while revealing. */
 .motion-ready .motion-reveal.motion-reveal--scale {
-  transform: translate3d(0, 20px, 0) scale(.975);
+  transform: translate3d(0, 20px, 0);
 }
 
 .motion-ready .motion-reveal.is-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  transform: translate3d(0, 0, 0);
   will-change: auto;
 }
 
@@ -93,10 +94,9 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* Cards assemble from the existing grid instead of floating independently. */
+/* Cards assemble from the existing grid without changing cell dimensions. */
 .motion-ready .metric-card.motion-reveal {
-  transform: translate3d(0, 18px, 0) scale(.97);
-  transform-origin: 50% 50%;
+  transform: translate3d(0, 18px, 0);
 }
 
 .motion-ready .direction-card.motion-reveal {
