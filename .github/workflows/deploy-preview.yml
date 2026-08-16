@@ -1,5 +1,5 @@
 name: Deploy AXE preview
-# Preview source: feat/figma-concept-1
+# Preview source: feat/figma-concept-1 @ cd56d263cbb5f5b0e456c4635a8c53ec4c8390a9
 
 on:
   push:
@@ -40,14 +40,12 @@ jobs:
           rm -rf _site
           mkdir -p _site
 
-          # Keep the normal URL working.
+          # Normal preview URL.
           cp index.html _site/index.html
           cp -R assets _site/assets
 
-          # Also publish a cache-isolated path. Because both the HTML and assets
-          # live under a new URL prefix, browsers/CDNs cannot reuse the previous
-          # cached page or asset URLs.
-          ALT_PATH="fresh-f6f269ca"
+          # Cache-isolated fallback for this exact build.
+          ALT_PATH="fresh-cd56d263"
           mkdir -p "_site/${ALT_PATH}"
           cp index.html "_site/${ALT_PATH}/index.html"
           cp -R assets "_site/${ALT_PATH}/assets"
