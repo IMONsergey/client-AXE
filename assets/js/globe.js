@@ -17,7 +17,7 @@ if (canvas) {
   ];
 
   // Recolor the prepared COBE fragment to the Figma hero palette.
-  const ARC_ON = [0.02, 0.68, 0.77];
+  const ARC_ON = [0.02, 0.70, 0.79];
   const ARC_OFF = [0.01, 0.20, 0.24];
 
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
@@ -28,8 +28,8 @@ if (canvas) {
   const mix = (a, b, t) => a + (b - a) * t;
   const mix3 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)];
 
-  // Frame Africa, the Middle East and Asia together, matching the Figma composition.
-  let phi = 1.60;
+  // The reference frames Europe/Africa on the left and Asia through the center.
+  let phi = 3.08;
   const theta = 0.52;
   let globe;
 
@@ -48,14 +48,14 @@ if (canvas) {
     height: cssSize,
     phi,
     theta,
-    dark: 0.65,
+    dark: 0.70,
     diffuse: 1.05,
     mapSamples: 50000,
-    mapBrightness: 3.0,
+    mapBrightness: 4.8,
     mapBaseBrightness: 0,
-    baseColor: [0.02, 0.58, 0.66],
-    glowColor: [0.00, 0.22, 0.26],
-    markerColor: [0.05, 0.72, 0.82],
+    baseColor: [0.02, 0.64, 0.72],
+    glowColor: [0.00, 0.24, 0.28],
+    markerColor: [0.05, 0.74, 0.84],
     markers: [],
     arcs: [],
     arcColor: ARC_ON,
@@ -87,7 +87,7 @@ if (canvas) {
     const arcs = connections.map((connection, index) => {
       const local = ((seconds / cycle + connection.phase) % 1 + 1) % 1;
       let visibility = envelope(local);
-      visibility = Math.pow(visibility, 1.35) * 0.62;
+      visibility = Math.pow(visibility, 1.35) * 0.58;
 
       return {
         id: `arc-${index}`,
