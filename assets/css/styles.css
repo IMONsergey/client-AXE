@@ -74,13 +74,13 @@ img {
 .visual-stage__texture--top {
   top: -46px;
   left: -137px;
-  background-image: url("https://www.figma.com/api/mcp/asset/4ddd1a21-283c-4e3d-b0d7-a9d1ca78bcfd.png");
+  background-image: url("../images/texture-top.png");
 }
 
 .visual-stage__texture--middle {
   top: 849px;
   left: 38%;
-  background-image: url("https://www.figma.com/api/mcp/asset/98f6a082-a05f-47d6-bde5-762ae6bd4a2c.png");
+  background-image: url("../images/texture-middle.png");
 }
 
 .site-header {
