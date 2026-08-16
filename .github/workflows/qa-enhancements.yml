@@ -90,16 +90,30 @@ jobs:
             await page.locator('.directions').scrollIntoViewIfNeeded();
             await page.waitForTimeout(320);
             const patternsBefore = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
-            await page.waitForTimeout(360);
+            await page.waitForTimeout(420);
             const patternsAfter = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
 
             if (patternsAfter.instances.length !== 3) throw new Error(`expected 3 patterns, got ${patternsAfter.instances.length}`);
+            if (patternsAfter.instances.map(item => item.pattern).join(',') !== 'dots,lines,network') {
+              throw new Error(`unexpected pattern set ${JSON.stringify(patternsAfter)}`);
+            }
             if (!patternsAfter.instances.every(item => item.ready && item.width > 100 && item.height > 100)) {
               throw new Error(`pattern canvas geometry invalid ${JSON.stringify(patternsAfter)}`);
             }
-            if (!patternsAfter.instances.some((item, index) => item.frame > patternsBefore.instances[index].frame)) {
-              throw new Error('direction patterns did not animate');
+            if (!patternsAfter.instances.every((item, index) => item.frame > patternsBefore.instances[index].frame)) {
+              throw new Error('all direction patterns must animate autonomously');
             }
+
+            const firstPattern = await page.locator('.direction-card__visual').first().boundingBox();
+            if (firstPattern) {
+              await page.mouse.move(firstPattern.x + firstPattern.width / 2, firstPattern.y + firstPattern.height / 2);
+              await page.waitForTimeout(240);
+            }
+            const patternsAfterHover = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
+            if (!patternsAfterHover.instances.every(item => item.pointerStrength === 0)) {
+              throw new Error(`direction patterns react to hover ${JSON.stringify(patternsAfterHover)}`);
+            }
+
             await page.locator('.directions').screenshot({ path: 'enhancement-directions.png' });
 
             await page.setViewportSize({ width: 390, height: 844 });
@@ -108,16 +122,22 @@ jobs:
 
             const mobileClosed = await page.evaluate(() => {
               const toggle = document.querySelector('.menu-toggle');
+              const request = document.querySelector('.header-request');
               const nav = document.querySelector('.site-nav');
+              const toggleRect = toggle.getBoundingClientRect();
+              const requestRect = request.getBoundingClientRect();
               return {
                 toggleDisplay: getComputedStyle(toggle).display,
                 navVisibility: getComputedStyle(nav).visibility,
-                state: window.__AXE_NAVIGATION__.getState()
+                state: window.__AXE_NAVIGATION__.getState(),
+                toggleLeft: toggleRect.left,
+                requestRight: requestRect.right
               };
             });
 
             if (mobileClosed.toggleDisplay === 'none') throw new Error('mobile burger is hidden');
             if (mobileClosed.state.open || mobileClosed.state.expanded) throw new Error(`mobile menu starts open ${JSON.stringify(mobileClosed)}`);
+            if (mobileClosed.toggleLeft <= mobileClosed.requestRight) throw new Error(`burger must sit to the right of CTA ${JSON.stringify(mobileClosed)}`);
 
             await page.locator('.menu-toggle').click();
             await page.waitForTimeout(300);
@@ -125,13 +145,20 @@ jobs:
             const mobileOpen = await page.evaluate(() => {
               const toggle = document.querySelector('.menu-toggle');
               const nav = document.querySelector('.site-nav');
+              const firstLink = nav.querySelector('a');
               const style = getComputedStyle(nav);
+              const linkStyle = getComputedStyle(firstLink);
+              const linkRect = firstLink.getBoundingClientRect();
               return {
                 state: window.__AXE_NAVIGATION__.getState(),
                 label: toggle.getAttribute('aria-label'),
                 visibility: style.visibility,
                 opacity: Number(style.opacity),
-                position: style.position
+                position: style.position,
+                textAlign: style.textAlign,
+                alignItems: style.alignItems,
+                linkJustify: linkStyle.justifyContent,
+                linkRight: linkRect.right
               };
             });
 
@@ -140,6 +167,11 @@ jobs:
             if (mobileOpen.visibility !== 'visible' || mobileOpen.opacity < 0.9 || mobileOpen.position !== 'fixed') {
               throw new Error(`mobile menu presentation invalid ${JSON.stringify(mobileOpen)}`);
             }
+            if (mobileOpen.textAlign !== 'right' || mobileOpen.alignItems !== 'flex-end' || mobileOpen.linkJustify !== 'flex-end') {
+              throw new Error(`mobile menu is not right aligned ${JSON.stringify(mobileOpen)}`);
+            }
+            closeTo(mobileOpen.linkRight, 374, 3, 'mobile link right edge');
+
             await page.screenshot({ path: 'enhancement-mobile-menu-390.png' });
 
             await page.keyboard.press('Escape');
