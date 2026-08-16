@@ -87,12 +87,12 @@
 }
 
 @media (max-width: 680px) {
-  /* Exactly 3 x 3 equal visual cells. Cards are positioned against the square itself, not intrinsic row sizing. */
+  /* Exactly 3 x 3 equal visual cells, slightly taller than square for better mobile breathing room. */
   .metrics {
     position: relative;
     display: block;
     width: 100%;
-    height: calc(100vw - 32px) !important;
+    height: calc((100vw - 32px) * 1.08) !important;
     min-height: 0 !important;
     max-height: none !important;
     aspect-ratio: auto;
