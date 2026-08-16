@@ -7,6 +7,17 @@
   }
 }
 
+/* One continuous, non-interactive canvas replaces the legacy static dot masks. */
+.visual-stage__dot-field {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 /* Globe: one logical orbit split into a back and front half. */
 .hero__visual,
 .hero__globe-shell,
