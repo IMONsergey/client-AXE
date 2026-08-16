@@ -37,6 +37,7 @@ jobs:
           refinements = Path('assets/css/refinements.css').read_text(encoding='utf-8')
           fonts = Path('assets/css/fonts.css').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          dot_field = Path('assets/js/dot-field.js').read_text(encoding='utf-8')
           typo = Path('assets/js/typograph.js').read_text(encoding='utf-8')
 
           forbidden = (
@@ -45,7 +46,7 @@ jobs:
               'fonts.gstatic.com',
               'assets/images/arrow.png',
           )
-          combined = '\n'.join((html, css, refinements, fonts, globe, typo))
+          combined = '\n'.join((html, css, refinements, fonts, globe, dot_field, typo))
           for item in forbidden:
               assert item not in combined, f'forbidden runtime dependency remains: {item}'
 
@@ -60,6 +61,14 @@ jobs:
           assert 'orbit--one' not in html and 'orbit--two' not in html and 'orbit--three' not in html and 'orbit--four' not in html, 'legacy orbit groups remain'
           assert 'orbit__pulse' not in html, 'travelling orbit pulse remains in markup'
           assert 'stroke-dasharray' not in refinements, 'dash animation must not be used by the active orbit'
+
+          assert html.count('visual-stage__dot-field') == 1, 'dot field must use one continuous canvas'
+          assert 'visual-stage__texture' not in html, 'legacy static dot texture nodes remain in markup'
+          assert 'requestAnimationFrame' in dot_field, 'dot field animation loop is missing'
+          assert 'ResizeObserver' in dot_field, 'dot field resize handling is missing'
+          assert 'prefers-reduced-motion: reduce' in dot_field, 'dot field reduced-motion handling is missing'
+          assert 'pointermove' in dot_field, 'dot field pointer influence is missing'
+          assert 'pointer-events: none' in refinements, 'dot field must not intercept globe or CTA pointer input'
 
           assert 'aspect-ratio: 1 / 1' in refinements, 'mobile metrics must keep a square 3x3 visual grid'
           assert 'grid-template-rows: repeat(3, minmax(0, 1fr))' in refinements, 'mobile metrics rows must be equal'
@@ -88,6 +97,84 @@ jobs:
         shell: bash
         run: |
           npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify dot field runtime and globe pointer compatibility
+        shell: bash
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const runtimeErrors = [];
+
+            page.on('pageerror', (error) => runtimeErrors.push(`pageerror: ${error.message}`));
+            page.on('console', (message) => {
+              if (message.type() === 'error') runtimeErrors.push(`console: ${message.text()}`);
+            });
+
+            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
+
+            const initial = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (initial.dots < 100) throw new Error(`dot field too sparse: ${initial.dots}`);
+            if (initial.dpr > 2.001) throw new Error(`dot field DPR exceeds cap: ${initial.dpr}`);
+
+            await page.waitForTimeout(420);
+            const animated = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (animated.frame <= initial.frame) throw new Error('dot field requestAnimationFrame loop is not advancing');
+
+            const pointerEvents = await page.evaluate(() => getComputedStyle(document.querySelector('.visual-stage__dot-field')).pointerEvents);
+            if (pointerEvents !== 'none') throw new Error(`dot field pointer-events must be none, got ${pointerEvents}`);
+
+            const globe = page.locator('#axe-globe');
+            const globeBox = await globe.boundingBox();
+            if (!globeBox) throw new Error('globe canvas has no bounding box');
+
+            const globeX = globeBox.x + globeBox.width * 0.54;
+            const globeY = globeBox.y + globeBox.height * 0.52;
+            const hitTarget = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id || '', { x: globeX, y: globeY });
+            if (hitTarget !== 'axe-globe') throw new Error(`dot/orbit layer blocks globe pointer target: ${hitTarget}`);
+
+            await page.mouse.move(globeX, globeY);
+            await page.mouse.down();
+            await page.mouse.move(globeX + 58, globeY + 24, { steps: 6 });
+            await page.mouse.up();
+            await page.waitForTimeout(180);
+
+            const interactive = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (interactive.pointerStrength <= 0.01) throw new Error('dot field pointer influence did not activate over globe');
+
+            await page.evaluate(() => document.querySelector('.countries').scrollIntoView({ block: 'start' }));
+            await page.waitForTimeout(260);
+            const released = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (released.pointerStrength >= interactive.pointerStrength) throw new Error('dot field pointer influence did not decay after leaving stage');
+
+            await page.setViewportSize({ width: 768, height: 900 });
+            await page.waitForTimeout(180);
+            const resized = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (Math.abs(resized.width - 768) > 2) throw new Error(`dot field did not resize with viewport: ${resized.width}`);
+
+            const reducedContext = await browser.newContext({
+              viewport: { width: 390, height: 844 },
+              reducedMotion: 'reduce'
+            });
+            const reducedPage = await reducedContext.newPage();
+            await reducedPage.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            await reducedPage.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
+            const reduced = await reducedPage.evaluate(() => window.__AXE_DOT_FIELD__.getState());
+            if (!reduced.reducedMotion) throw new Error('prefers-reduced-motion was not respected');
+            await reducedContext.close();
+
+            if (runtimeErrors.length) throw new Error(runtimeErrors.join('\n'));
+            await browser.close();
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
 
       - name: Capture responsive renders
         shell: bash
