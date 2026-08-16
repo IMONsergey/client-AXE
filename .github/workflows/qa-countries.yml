@@ -119,7 +119,7 @@ jobs:
 
             await page.waitForTimeout(260);
             await page.locator('.countries').screenshot({ path:'countries-grid-drawing-1440.png' });
-            await page.waitForTimeout(1700);
+            await page.waitForTimeout(2600);
             await inspectFinal(page, false);
             await page.locator('.countries').screenshot({ path:'countries-grid-1440.png' });
 
@@ -127,7 +127,7 @@ jobs:
             await ready(page);
             await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto', block:'center'}));
             await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true);
-            await page.waitForTimeout(2200);
+            await page.waitForTimeout(3200);
             await inspectFinal(page, true);
             await page.locator('.countries').screenshot({ path:'countries-grid-390.png' });
 
