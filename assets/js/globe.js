@@ -22,6 +22,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
   let resumeAt = performance.now() + 1200;
   let lastFrame = performance.now();
   let globe;
+  let readyDispatched = false;
 
   const DRAG_SENSITIVITY = 0.00235;
   const DRAG_INERTIA_FACTOR = 0.34;
@@ -56,6 +57,17 @@ if (canvas && globeShell && heroContent && heroVisual) {
   function canvasSize() {
     const rect = canvas.getBoundingClientRect();
     return Math.max(1, Math.round(Math.min(rect.width, rect.height)));
+  }
+
+  function markReadyAfterPaint() {
+    if (readyDispatched) return;
+    readyDispatched = true;
+
+    requestAnimationFrame(() => {
+      canvas.dataset.globeReady = 'true';
+      window.__AXE_GLOBE_READY__ = true;
+      window.dispatchEvent(new Event('axe:globe-ready'));
+    });
   }
 
   syncGlobeToHero();
@@ -177,8 +189,25 @@ if (canvas && globeShell && heroContent && heroVisual) {
       height: size
     });
 
+    if (size > 24) markReadyAfterPaint();
     requestAnimationFrame(frame);
   }
+
+  Object.defineProperty(window, '__AXE_GLOBE__', {
+    configurable: true,
+    value: {
+      getState() {
+        return {
+          ready: canvas.dataset.globeReady === 'true',
+          phi,
+          theta,
+          dragging,
+          size: canvasSize(),
+          samples: MAP_SAMPLES
+        };
+      }
+    }
+  });
 
   requestAnimationFrame(frame);
 }
