@@ -94,9 +94,10 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* Cards assemble from the existing grid without changing cell dimensions. */
-.motion-ready .metric-card.motion-reveal {
-  transform: translate3d(0, 18px, 0);
+/* Metric cells fade in at their exact grid coordinates: moving them breaks the intentionally rigid matrix. */
+.motion-ready .metric-card.motion-reveal,
+.motion-ready .metric-card.motion-reveal.is-visible {
+  transform: none;
 }
 
 .motion-ready .direction-card.motion-reveal {
