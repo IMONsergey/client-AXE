@@ -8,11 +8,13 @@ on:
       - .github/workflows/qa-enhancements.yml
       - index.html
       - assets/css/enhancements.css
+      - assets/css/motion.css
       - assets/js/navigation.js
       - assets/js/preloader.js
-      - assets/js/direction-patterns.js
+      - assets/js/motion.js
       - assets/js/dot-field.js
       - assets/js/globe.js
+      - assets/images/direction-*.png
 
 permissions:
   contents: read
@@ -65,60 +67,65 @@ jobs:
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
             await page.waitForFunction(() => document.getElementById('site-preloader')?.hidden === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true);
-            await page.waitForFunction(() => window.__AXE_DIRECTION_PATTERNS__?.getState().ready === true);
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
 
             const desktop = await page.evaluate(() => {
               const rect = selector => document.querySelector(selector).getBoundingClientRect();
               const header = rect('.site-header__inner');
               const nav = rect('.site-nav');
+              const rootHeader = document.querySelector('.site-header');
               const toggleStyle = getComputedStyle(document.querySelector('.menu-toggle'));
+              const images = [...document.querySelectorAll('.direction-card__visual')];
               return {
                 headerCenter: header.left + header.width / 2,
                 navCenter: nav.left + nav.width / 2,
                 toggleDisplay: toggleStyle.display,
-                loaderHidden: document.getElementById('site-preloader').hidden,
-                globeReady: window.__AXE_GLOBE__.getState().ready
+                headerPosition: getComputedStyle(rootHeader).position,
+                headerParent: rootHeader.parentElement?.className || '',
+                headerScrolled: rootHeader.classList.contains('is-scrolled'),
+                directionSources: images.map(image => image.getAttribute('src')),
+                directionWidths: images.map(image => image.naturalWidth),
+                directionCanvasCount: document.querySelectorAll('.direction-card canvas').length,
+                motion: window.__AXE_MOTION__.getState()
               };
             });
 
             closeTo(desktop.navCenter, desktop.headerCenter, 2.5, 'desktop navigation center');
             if (desktop.toggleDisplay !== 'none') throw new Error(`desktop burger visible: ${desktop.toggleDisplay}`);
-            if (!desktop.loaderHidden || !desktop.globeReady) throw new Error(`loader/globe readiness mismatch ${JSON.stringify(desktop)}`);
+            if (desktop.headerPosition !== 'fixed' || desktop.headerScrolled) throw new Error(`header top state invalid ${JSON.stringify(desktop)}`);
+            if (desktop.directionCanvasCount !== 0) throw new Error('direction cards still contain canvases');
+            if (desktop.directionSources.join(',') !== 'assets/images/direction-links.png,assets/images/direction-pricing.png,assets/images/direction-platform.png') {
+              throw new Error(`wrong direction artwork ${JSON.stringify(desktop.directionSources)}`);
+            }
+            if (desktop.directionWidths.some(width => width < 100)) throw new Error(`direction images failed to load ${JSON.stringify(desktop.directionWidths)}`);
+            if (desktop.motion.revealTargets < 10 || desktop.motion.wordTargets < 4) throw new Error(`motion pool incomplete ${JSON.stringify(desktop.motion)}`);
 
-            await page.screenshot({ path: 'enhancement-desktop-1440.png', fullPage: true });
+            await page.evaluate(() => scrollTo(0, 820));
+            await page.waitForTimeout(500);
+            const scrolled = await page.evaluate(() => {
+              const header = document.querySelector('.site-header');
+              const rect = header.getBoundingClientRect();
+              const state = window.__AXE_STICKY_HEADER__.getState();
+              return {
+                top: rect.top,
+                position: getComputedStyle(header).position,
+                classState: header.classList.contains('is-scrolled'),
+                state
+              };
+            });
+            closeTo(scrolled.top, 0, 1.5, 'fixed header top');
+            if (scrolled.position !== 'fixed' || !scrolled.classState || !scrolled.state.scrolled || scrolled.state.inBody) {
+              throw new Error(`header morph/reparent state invalid ${JSON.stringify(scrolled)}`);
+            }
+            await page.screenshot({ path: 'enhancement-scrolled-header-1440.png', fullPage: false });
 
             await page.locator('.directions').scrollIntoViewIfNeeded();
-            await page.waitForTimeout(320);
-            const patternsBefore = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
-            await page.waitForTimeout(420);
-            const patternsAfter = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
-
-            if (patternsAfter.instances.length !== 3) throw new Error(`expected 3 patterns, got ${patternsAfter.instances.length}`);
-            if (patternsAfter.instances.map(item => item.pattern).join(',') !== 'dots,lines,network') {
-              throw new Error(`unexpected pattern set ${JSON.stringify(patternsAfter)}`);
-            }
-            if (!patternsAfter.instances.every(item => item.ready && item.width > 100 && item.height > 100)) {
-              throw new Error(`pattern canvas geometry invalid ${JSON.stringify(patternsAfter)}`);
-            }
-            if (!patternsAfter.instances.every((item, index) => item.frame > patternsBefore.instances[index].frame)) {
-              throw new Error('all direction patterns must animate autonomously');
-            }
-
-            const firstPattern = await page.locator('.direction-card__visual').first().boundingBox();
-            if (firstPattern) {
-              await page.mouse.move(firstPattern.x + firstPattern.width / 2, firstPattern.y + firstPattern.height / 2);
-              await page.waitForTimeout(240);
-            }
-            const patternsAfterHover = await page.evaluate(() => window.__AXE_DIRECTION_PATTERNS__.getState());
-            if (!patternsAfterHover.instances.every(item => item.pointerStrength === 0)) {
-              throw new Error(`direction patterns react to hover ${JSON.stringify(patternsAfterHover)}`);
-            }
-
+            await page.waitForTimeout(520);
             await page.locator('.directions').screenshot({ path: 'enhancement-directions.png' });
 
             await page.setViewportSize({ width: 390, height: 844 });
             await page.evaluate(() => scrollTo(0, 0));
-            await page.waitForTimeout(180);
+            await page.waitForTimeout(220);
 
             const mobileClosed = await page.evaluate(() => {
               const toggle = document.querySelector('.menu-toggle');
@@ -128,19 +135,20 @@ jobs:
               const requestRect = request.getBoundingClientRect();
               return {
                 toggleDisplay: getComputedStyle(toggle).display,
-                navVisibility: getComputedStyle(nav).visibility,
                 state: window.__AXE_NAVIGATION__.getState(),
                 toggleLeft: toggleRect.left,
-                requestRight: requestRect.right
+                requestRight: requestRect.right,
+                headerPosition: getComputedStyle(document.querySelector('.site-header')).position
               };
             });
 
             if (mobileClosed.toggleDisplay === 'none') throw new Error('mobile burger is hidden');
             if (mobileClosed.state.open || mobileClosed.state.expanded) throw new Error(`mobile menu starts open ${JSON.stringify(mobileClosed)}`);
             if (mobileClosed.toggleLeft <= mobileClosed.requestRight) throw new Error(`burger must sit to the right of CTA ${JSON.stringify(mobileClosed)}`);
+            if (mobileClosed.headerPosition !== 'fixed') throw new Error('mobile header is not fixed');
 
             await page.locator('.menu-toggle').click();
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(320);
 
             const mobileOpen = await page.evaluate(() => {
               const toggle = document.querySelector('.menu-toggle');
@@ -173,12 +181,10 @@ jobs:
             closeTo(mobileOpen.linkRight, 374, 3, 'mobile link right edge');
 
             await page.screenshot({ path: 'enhancement-mobile-menu-390.png' });
-
             await page.keyboard.press('Escape');
             await page.waitForTimeout(280);
             const mobileAfterEscape = await page.evaluate(() => window.__AXE_NAVIGATION__.getState());
             if (mobileAfterEscape.open || mobileAfterEscape.expanded) throw new Error('Escape did not close mobile menu');
-            await page.screenshot({ path: 'enhancement-mobile-390.png', fullPage: true });
 
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
@@ -193,9 +199,8 @@ jobs:
         with:
           name: enhancement-visual-qa
           path: |
-            enhancement-desktop-1440.png
+            enhancement-scrolled-header-1440.png
             enhancement-directions.png
             enhancement-mobile-menu-390.png
-            enhancement-mobile-390.png
           if-no-files-found: error
           retention-days: 1
