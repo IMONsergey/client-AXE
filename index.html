@@ -45,7 +45,7 @@
         <h1 class="hero__title" id="hero-title">Международная ассоциация товарных и фьючерсных бирж</h1>
 
         <div class="hero__copy">
-          <p>Формируем единую цифровую инфраструктуру<br>для межбиржевого сотрудничества, взаимного доступа<br>к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
+          <p>Формируем единую цифровую инфраструктуру<br>для межбиржевого сотрудничества, взаимного доступа<br>к торгам и справедливого ценообразования между<br>странами ЕАЭС+, БРИКС+ и ШОС.</p>
           <a class="hero__request" id="trade-requests" href="#">
             <span>Войти в Trade Requests</span>
             <img src="assets/images/arrow.png" alt="" width="13" height="13">
@@ -53,10 +53,7 @@
         </div>
 
         <div class="hero__globe" aria-hidden="true">
-          <img class="hero__globe-base" src="assets/images/globe-base.svg" alt="">
-          <span class="hero__globe-dots hero__globe-dots--one"></span>
-          <span class="hero__globe-dots hero__globe-dots--two"></span>
-          <span class="hero__globe-dots hero__globe-dots--three"></span>
+          <canvas id="axe-globe"></canvas>
         </div>
       </div>
 
@@ -167,36 +164,16 @@
     <section class="countries" id="members" aria-labelledby="countries-title">
       <h2 id="countries-title">Страны—участники</h2>
       <div class="countries__grid">
-        <div class="country">
-          <img src="assets/images/flag-russia.png" alt="" width="80" height="80">
-          <span>Россия</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-belarus.png" alt="" width="80" height="80">
-          <span>Беларусь</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-kazakhstan.png" alt="" width="80" height="80">
-          <span>Казахстан</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-uzbekistan.png" alt="" width="80" height="80">
-          <span>Узбекистан</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-china.png" alt="" width="80" height="80">
-          <span>Китай</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-iran.png" alt="" width="80" height="80">
-          <span>Иран</span>
-        </div>
-        <div class="country">
-          <img src="assets/images/flag-egypt.png" alt="" width="80" height="80">
-          <span>Египет</span>
-        </div>
+        <div class="country"><img src="assets/images/flag-russia.png" alt="" width="80" height="80"><span>Россия</span></div>
+        <div class="country"><img src="assets/images/flag-belarus.png" alt="" width="80" height="80"><span>Беларусь</span></div>
+        <div class="country"><img src="assets/images/flag-kazakhstan.png" alt="" width="80" height="80"><span>Казахстан</span></div>
+        <div class="country"><img src="assets/images/flag-uzbekistan.png" alt="" width="80" height="80"><span>Узбекистан</span></div>
+        <div class="country"><img src="assets/images/flag-china.png" alt="" width="80" height="80"><span>Китай</span></div>
+        <div class="country"><img src="assets/images/flag-iran.png" alt="" width="80" height="80"><span>Иран</span></div>
+        <div class="country"><img src="assets/images/flag-egypt.png" alt="" width="80" height="80"><span>Египет</span></div>
       </div>
     </section>
   </main>
+  <script type="module" src="assets/js/globe.js"></script>
 </body>
 </html>
