@@ -89,7 +89,7 @@
 @media (max-width: 680px) {
   /* Exactly 3 x 3 equal visual cells. At this breakpoint layout padding is 16px on both sides. */
   .metrics {
-    --metric-cell-size: calc((100vw - 32px) / 3);
+    --metric-cell-size: calc(33.333333vw - 10.666667px);
     position: relative;
     display: flex;
     flex-direction: column;
