@@ -1,0 +1,174 @@
+name: QA AXE countries grid
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/qa-countries.yml
+      - index.html
+      - assets/css/styles.css
+      - assets/css/motion.css
+      - assets/js/motion.js
+
+permissions:
+  contents: read
+
+jobs:
+  qa-countries:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Start static server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify closed cells and line drawing
+        shell: bash
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
+
+          const closeTo = (actual, expected, tolerance, label) => {
+            if (Math.abs(actual - expected) > tolerance) {
+              throw new Error(`${label}: expected ${expected.toFixed(2)}, got ${actual.toFixed(2)}`);
+            }
+          };
+
+          async function waitReady(page) {
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
+          }
+
+          async function verifyDesktop(page) {
+            await waitReady(page);
+
+            const initial = await page.evaluate(() => {
+              const cell = document.querySelector('.country');
+              const pseudo = getComputedStyle(cell, '::before');
+              return {
+                visible: cell.classList.contains('is-visible'),
+                transform: getComputedStyle(cell).transform,
+                backgroundSize: pseudo.backgroundSize
+              };
+            });
+
+            if (initial.visible) throw new Error('countries should not reveal before entering the viewport');
+            if (initial.transform !== 'none') throw new Error(`country geometry moves before reveal: ${initial.transform}`);
+
+            await page.locator('.countries').scrollIntoViewIfNeeded();
+            await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'));
+            await page.waitForTimeout(90);
+
+            const during = await page.evaluate(() => getComputedStyle(document.querySelector('.country'), '::before').backgroundSize);
+            await page.waitForTimeout(1150);
+
+            const final = await page.evaluate(() => {
+              const grid = document.querySelector('.countries__grid').getBoundingClientRect();
+              const cells = [...document.querySelectorAll('.country')].map((cell) => {
+                const rect = cell.getBoundingClientRect();
+                return {
+                  left: rect.left,
+                  right: rect.right,
+                  top: rect.top,
+                  bottom: rect.bottom,
+                  width: rect.width,
+                  height: rect.height,
+                  transform: getComputedStyle(cell).transform,
+                  frame: getComputedStyle(cell, '::before').backgroundSize
+                };
+              });
+              return { grid, cells };
+            });
+
+            if (during === initial.backgroundSize) throw new Error(`country frame did not begin drawing: ${during}`);
+            if (final.cells.some(cell => cell.transform !== 'none')) throw new Error('country cells move while lines draw');
+
+            closeTo(final.cells[0].left, final.grid.left, 1, 'grid left closes');
+            closeTo(final.cells[0].top, final.grid.top, 1, 'grid top closes');
+            closeTo(final.cells[6].right, final.grid.right, 1, 'grid right closes');
+            closeTo(final.cells[0].bottom, final.grid.bottom, 1, 'grid bottom closes');
+
+            for (let i = 0; i < final.cells.length - 1; i++) {
+              closeTo(final.cells[i].right, final.cells[i + 1].left, 1, `desktop seam ${i + 1}`);
+              closeTo(final.cells[i].top, final.cells[i + 1].top, 1, `desktop row top ${i + 1}`);
+              closeTo(final.cells[i].bottom, final.cells[i + 1].bottom, 1, `desktop row bottom ${i + 1}`);
+            }
+
+            await page.locator('.countries').screenshot({ path: 'countries-grid-1440.png' });
+          }
+
+          async function verifyMobile(page) {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.locator('.countries').scrollIntoViewIfNeeded();
+            await page.waitForFunction(() => document.querySelectorAll('.country.is-visible').length === 7);
+            await page.waitForTimeout(1250);
+
+            const geometry = await page.evaluate(() => [...document.querySelectorAll('.country')].map((cell) => {
+              const rect = cell.getBoundingClientRect();
+              return {
+                left: rect.left,
+                right: rect.right,
+                top: rect.top,
+                bottom: rect.bottom,
+                leftRule: getComputedStyle(cell, '::after').display,
+                transform: getComputedStyle(cell).transform
+              };
+            }));
+
+            if (geometry.some(cell => cell.transform !== 'none')) throw new Error('mobile country cells move during frame animation');
+            closeTo(geometry[0].right, geometry[1].left, 1, 'mobile first-row seam');
+            closeTo(geometry[0].bottom, geometry[2].top, 1, 'mobile horizontal seam');
+            closeTo(geometry[2].right, geometry[3].left, 1, 'mobile second-row seam');
+
+            for (const index of [0, 2, 4, 6]) {
+              if (geometry[index].leftRule === 'none') throw new Error(`missing mobile outer left rule on cell ${index + 1}`);
+            }
+
+            await page.locator('.countries').screenshot({ path: 'countries-grid-390.png' });
+          }
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', error => errors.push(error.message));
+            page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+
+            await verifyDesktop(page);
+            await verifyMobile(page);
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Upload countries renders
+        uses: actions/upload-artifact@v4
+        with:
+          name: countries-grid-visual-qa
+          path: |
+            countries-grid-1440.png
+            countries-grid-390.png
+          if-no-files-found: error
+          retention-days: 1
