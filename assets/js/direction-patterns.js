@@ -3,7 +3,6 @@
   if (!visuals.length) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const instances = [];
   const TWO_PI = Math.PI * 2;
 
@@ -35,8 +34,7 @@
       frameId: 0,
       lastTime: performance.now(),
       visible: true,
-      ready: false,
-      pointer: { x: 0, y: 0, strength: 0, target: 0, active: false }
+      ready: false
     };
 
     function resize() {
@@ -56,129 +54,137 @@
       canvas.dataset.patternReady = 'true';
     }
 
+    // Card 01: a clean white dot field that drifts and breathes continuously.
     function drawDots(now) {
-      const { width, height, pointer } = state;
+      const { width, height } = state;
       const spacing = clamp(width / 48, 8.5, 11.5);
-      const cols = Math.ceil(width * 0.62 / spacing) + 2;
-      const rows = Math.ceil(height / spacing) + 2;
-      const time = now * 0.00062;
-      const pointerRadius = 92;
+      const cols = Math.ceil(width * 0.64 / spacing) + 3;
+      const rows = Math.ceil(height / spacing) + 4;
+      const time = reducedMotion.matches ? 0 : now * 0.00034;
+      const driftX = reducedMotion.matches ? 0 : Math.sin(time * 1.25) * 2.2;
+      const driftY = reducedMotion.matches ? 0 : (time * 13) % spacing;
 
-      context.fillStyle = 'rgb(224 250 252)';
+      context.fillStyle = '#ffffff';
 
-      for (let row = -1; row < rows; row += 1) {
-        for (let col = -1; col < cols; col += 1) {
+      for (let row = -2; row < rows; row += 1) {
+        for (let col = -2; col < cols; col += 1) {
           const key = row * 97 + col * 17;
-          if (seeded(key, 2.3) < 0.08) continue;
+          if (seeded(key, 2.3) < 0.07) continue;
 
-          const x = col * spacing + (seeded(key, 4.7) - 0.5) * 1.2;
-          const y = row * spacing + (seeded(key, 8.1) - 0.5) * 1.2;
-          const edge = clamp(1 - Math.max(0, x - width * 0.42) / (width * 0.22), 0, 1);
+          const x = col * spacing + driftX + (seeded(key, 4.7) - 0.5) * 1.1;
+          const y = row * spacing + driftY + (seeded(key, 8.1) - 0.5) * 1.1;
+          const edge = clamp(1 - Math.max(0, x - width * 0.43) / (width * 0.23), 0, 1);
           if (edge <= 0.015) continue;
 
-          const wave = reducedMotion.matches ? 0 : Math.sin(time + col * 0.19 + row * 0.14);
-          let alpha = (0.34 + seeded(key, 1.2) * 0.18 + wave * 0.055) * edge;
-          let radius = 0.75 + seeded(key, 7.7) * 0.72;
+          const wave = reducedMotion.matches ? 0 : Math.sin(time * 5.2 + col * 0.20 + row * 0.15);
+          const alpha = clamp((0.43 + seeded(key, 1.2) * 0.12 + wave * 0.045) * edge, 0, 0.60);
+          const radius = 0.72 + seeded(key, 7.7) * 0.58 + wave * 0.055;
 
-          if (pointer.strength > 0.01) {
-            const dx = x - pointer.x;
-            const dy = y - pointer.y;
-            const distance = Math.hypot(dx, dy);
-            if (distance < pointerRadius) {
-              const influence = Math.pow(1 - distance / pointerRadius, 2) * pointer.strength;
-              alpha += influence * 0.28;
-              radius += influence * 0.58;
-            }
-          }
-
-          context.globalAlpha = clamp(alpha, 0, 0.74);
+          context.globalAlpha = alpha;
           context.beginPath();
-          context.arc(x, y, radius, 0, TWO_PI);
+          context.arc(x, y, Math.max(0.55, radius), 0, TWO_PI);
           context.fill();
         }
       }
     }
 
+    // Card 02: a finer, warped signal field instead of broad mechanical stripes.
     function drawLines(now) {
-      const { width, height, pointer } = state;
-      const time = reducedMotion.matches ? 0 : now * 0.00009;
-      const offset = Math.sin(time * 2.1) * 4;
-      const spacing = 6.1;
-      const diagonalSpan = width + height * 1.5;
+      const { width, height } = state;
+      const time = reducedMotion.matches ? 0 : now * 0.00028;
+      const spacing = 9.2;
+      const slope = 0.48;
+      const lineCount = Math.ceil((height + width * slope) / spacing) + 12;
 
-      context.save();
-      context.translate(width * 0.47, height * 0.5);
-      context.rotate(-0.68);
-      context.translate(-width * 0.47, -height * 0.5);
+      context.strokeStyle = '#ffffff';
       context.lineCap = 'round';
+      context.lineJoin = 'round';
 
-      for (let x = -height * 1.4; x < diagonalSpan; x += spacing) {
-        const pulse = reducedMotion.matches ? 0 : Math.sin(time * 5 + x * 0.025) * 0.07;
-        context.globalAlpha = 0.42 + pulse;
-        context.strokeStyle = 'rgb(24 104 145)';
-        context.lineWidth = 1.05;
+      for (let line = -6; line < lineCount; line += 1) {
+        const base = line * spacing - width * slope * 0.18;
+        const phase = time * 3.1 + line * 0.18;
+        const emphasis = line % 7 === 0;
+
+        context.globalAlpha = emphasis ? 0.58 : 0.38 + Math.sin(phase * 0.7) * 0.045;
+        context.lineWidth = emphasis ? 0.78 : 0.52;
         context.beginPath();
-        context.moveTo(x + offset, -height * 1.5);
-        context.lineTo(x + offset, height * 2.5);
+
+        for (let x = -28; x <= width + 28; x += 9) {
+          const warp = Math.sin(x * 0.021 + phase) * 3.8
+            + Math.sin(x * 0.008 - phase * 0.62) * 2.2;
+          const y = base + x * slope + warp;
+
+          if (x === -28) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+
         context.stroke();
       }
-
-      context.restore();
-
-      if (pointer.strength > 0.01) {
-        const gradient = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 105);
-        gradient.addColorStop(0, `rgba(213, 249, 255, ${0.20 * pointer.strength})`);
-        gradient.addColorStop(1, 'rgba(213, 249, 255, 0)');
-        context.globalAlpha = 1;
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, width, height);
-      }
     }
 
-    function drawOrbit(now) {
-      const { width, height, pointer } = state;
-      const time = reducedMotion.matches ? 0 : now * 0.00012;
-      const cx = width * 0.67;
-      const cy = height * 0.78;
-      const baseRx = Math.max(width * 0.19, 92);
-      const baseRy = Math.max(height * 0.42, 62);
-      const pointerRadius = 104;
+    // Card 03: an intentional network / transaction-flow diagram.
+    function drawNetwork(now) {
+      const { width, height } = state;
+      const time = reducedMotion.matches ? 0 : now * 0.00022;
+      const nodes = [
+        [0.08, 0.28], [0.26, 0.28], [0.44, 0.28], [0.62, 0.28], [0.84, 0.28],
+        [0.16, 0.52], [0.35, 0.52], [0.55, 0.52], [0.76, 0.52], [0.93, 0.52],
+        [0.08, 0.76], [0.28, 0.76], [0.48, 0.76], [0.68, 0.76], [0.88, 0.76]
+      ].map(([x, y]) => ({ x: x * width, y: y * height }));
 
-      context.fillStyle = 'rgb(38 125 148)';
+      const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 4],
+        [5, 6], [6, 7], [7, 8], [8, 9],
+        [10, 11], [11, 12], [12, 13], [13, 14],
+        [1, 5], [2, 6], [2, 7], [3, 7], [4, 8],
+        [5, 10], [6, 11], [7, 12], [8, 13], [9, 14]
+      ];
 
-      for (let ring = 0; ring < 6; ring += 1) {
-        const rx = baseRx + ring * 15;
-        const ry = baseRy + ring * 7.2;
-        const count = 82 + ring * 14;
-        const phase = ring * 0.15 + time * (ring % 2 ? -1 : 1);
+      context.strokeStyle = '#ffffff';
+      context.lineWidth = 0.68;
+      context.globalAlpha = 0.34;
+      context.beginPath();
 
-        for (let dot = 0; dot < count; dot += 1) {
-          const t = dot / count;
-          const angle = -Math.PI * 0.96 + t * Math.PI * 1.92 + phase;
-          if (Math.sin(angle) > 0.92 && ring > 3) continue;
+      edges.forEach(([from, to]) => {
+        const a = nodes[from];
+        const b = nodes[to];
+        context.moveTo(a.x, a.y);
+        context.lineTo(b.x, b.y);
+      });
+      context.stroke();
 
-          const x = cx + Math.cos(angle) * rx;
-          const y = cy + Math.sin(angle) * ry;
-          if (x < -4 || x > width + 4 || y < -4 || y > height + 4) continue;
+      context.fillStyle = '#ffffff';
+      nodes.forEach((node, index) => {
+        const pulse = reducedMotion.matches ? 0 : Math.sin(time * 7 + index * 0.72) * 0.05;
+        context.globalAlpha = clamp(0.48 + pulse, 0.40, 0.58);
+        context.beginPath();
+        context.arc(node.x, node.y, index % 4 === 0 ? 1.45 : 1.05, 0, TWO_PI);
+        context.fill();
+      });
 
-          const shimmer = reducedMotion.matches ? 0 : Math.sin(time * 7 + dot * 0.31 + ring) * 0.045;
-          let alpha = 0.42 + shimmer - ring * 0.018;
-          let radius = 0.78 + (ring % 3) * 0.12;
+      const routes = [
+        [0, 1, 2, 7, 8, 13, 14],
+        [10, 11, 6, 7, 3, 4],
+        [5, 6, 11, 12, 13, 8, 9]
+      ];
 
-          if (pointer.strength > 0.01) {
-            const distance = Math.hypot(x - pointer.x, y - pointer.y);
-            if (distance < pointerRadius) {
-              const influence = Math.pow(1 - distance / pointerRadius, 2) * pointer.strength;
-              alpha += influence * 0.24;
-              radius += influence * 0.48;
-            }
-          }
+      if (!reducedMotion.matches) {
+        routes.forEach((route, routeIndex) => {
+          const progress = (time * (0.52 + routeIndex * 0.08) + routeIndex * 0.31) % 1;
+          const segments = route.length - 1;
+          const scaled = progress * segments;
+          const segment = Math.min(segments - 1, Math.floor(scaled));
+          const local = scaled - segment;
+          const a = nodes[route[segment]];
+          const b = nodes[route[segment + 1]];
+          const x = a.x + (b.x - a.x) * local;
+          const y = a.y + (b.y - a.y) * local;
 
-          context.globalAlpha = clamp(alpha, 0.12, 0.68);
+          context.globalAlpha = 0.60;
           context.beginPath();
-          context.arc(x, y, radius, 0, TWO_PI);
+          context.arc(x, y, 1.75, 0, TWO_PI);
           context.fill();
-        }
+        });
       }
     }
 
@@ -186,7 +192,7 @@
       context.clearRect(0, 0, state.width, state.height);
 
       if (state.pattern === 'lines') drawLines(now);
-      else if (state.pattern === 'orbit') drawOrbit(now);
+      else if (state.pattern === 'network') drawNetwork(now);
       else drawDots(now);
 
       context.globalAlpha = 1;
@@ -194,11 +200,7 @@
     }
 
     function animate(now) {
-      const delta = Math.min(64, Math.max(1, now - state.lastTime));
       state.lastTime = now;
-      const follow = 1 - Math.exp(-delta / 140);
-      state.pointer.strength += (state.pointer.target - state.pointer.strength) * follow;
-
       draw(now);
 
       if (!reducedMotion.matches && state.visible) {
@@ -220,20 +222,6 @@
       state.frameId = 0;
     }
 
-    visual.addEventListener('pointermove', (event) => {
-      if (!finePointer.matches || reducedMotion.matches) return;
-      const rect = visual.getBoundingClientRect();
-      state.pointer.x = event.clientX - rect.left;
-      state.pointer.y = event.clientY - rect.top;
-      state.pointer.target = 1;
-      state.pointer.active = true;
-    }, { passive: true });
-
-    visual.addEventListener('pointerleave', () => {
-      state.pointer.target = 0;
-      state.pointer.active = false;
-    });
-
     const resizeObserver = new ResizeObserver(() => resize());
     resizeObserver.observe(visual);
 
@@ -245,8 +233,6 @@
     intersectionObserver.observe(visual);
 
     reducedMotion.addEventListener?.('change', () => {
-      state.pointer.target = 0;
-      state.pointer.strength = 0;
       if (reducedMotion.matches) {
         stop();
         draw(performance.now());
@@ -278,7 +264,7 @@
             height: item.height,
             visible: item.visible,
             ready: item.ready,
-            pointerStrength: item.pointer.strength
+            pointerStrength: 0
           }))
         };
       }
