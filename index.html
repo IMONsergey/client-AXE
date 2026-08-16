@@ -63,27 +63,16 @@
 
         <div class="hero__visual">
           <div class="hero__globe-shell">
+            <svg class="hero__globe-orbits hero__globe-orbits--back" viewBox="0 0 1000 1000" aria-hidden="true">
+              <path class="orbit__line orbit__line--back" d="M130 789A470 170 -38 0 1 870 211"/>
+            </svg>
+
             <div class="hero__globe-canvas">
               <canvas id="axe-globe" aria-label="Интерактивный глобус"></canvas>
             </div>
 
-            <svg class="hero__globe-orbits" viewBox="0 0 1000 1000" aria-hidden="true">
-              <g class="orbit orbit--one">
-                <path class="orbit__base" pathLength="100" d="M118 714C224 806 440 748 646 596C824 465 932 300 920 196"/>
-                <path class="orbit__pulse" pathLength="100" d="M118 714C224 806 440 748 646 596C824 465 932 300 920 196"/>
-              </g>
-              <g class="orbit orbit--two">
-                <path class="orbit__base" pathLength="100" d="M100 660C230 785 475 728 690 555C840 434 942 300 946 228"/>
-                <path class="orbit__pulse" pathLength="100" d="M100 660C230 785 475 728 690 555C840 434 942 300 946 228"/>
-              </g>
-              <g class="orbit orbit--three">
-                <path class="orbit__base" pathLength="100" d="M140 752C304 842 596 722 790 525C888 426 946 322 950 264"/>
-                <path class="orbit__pulse" pathLength="100" d="M140 752C304 842 596 722 790 525C888 426 946 322 950 264"/>
-              </g>
-              <g class="orbit orbit--four">
-                <path class="orbit__base" pathLength="100" d="M452 868C642 830 812 712 900 570C955 481 976 398 965 342"/>
-                <path class="orbit__pulse" pathLength="100" d="M452 868C642 830 812 712 900 570C955 481 976 398 965 342"/>
-              </g>
+            <svg class="hero__globe-orbits hero__globe-orbits--front" viewBox="0 0 1000 1000" aria-hidden="true">
+              <path class="orbit__line orbit__line--front" d="M870 211A470 170 -38 0 1 130 789"/>
             </svg>
           </div>
         </div>

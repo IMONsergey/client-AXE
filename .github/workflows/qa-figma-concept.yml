@@ -1,4 +1,4 @@
-name: QA Figma concept
+name: QA AXE implementation
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         with:
           ref: feat/figma-concept-1
 
-      - name: Validate local dependencies and markup
+      - name: Validate local dependencies and implementation invariants
         shell: python
         run: |
           from pathlib import Path
@@ -32,6 +32,7 @@ jobs:
           root = Path('.')
           html = Path('index.html').read_text(encoding='utf-8')
           css = Path('assets/css/styles.css').read_text(encoding='utf-8')
+          refinements = Path('assets/css/refinements.css').read_text(encoding='utf-8')
           fonts = Path('assets/css/fonts.css').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
           typo = Path('assets/js/typograph.js').read_text(encoding='utf-8')
@@ -42,7 +43,7 @@ jobs:
               'fonts.gstatic.com',
               'assets/images/arrow.png',
           )
-          combined = '\n'.join((html, css, fonts, globe, typo))
+          combined = '\n'.join((html, css, refinements, fonts, globe, typo))
           for item in forbidden:
               assert item not in combined, f'forbidden runtime dependency remains: {item}'
 
@@ -50,6 +51,16 @@ jobs:
           assert 'id="icon-arrow"' in html, 'vector arrow symbol is missing'
           assert 'pointerdown' in globe and 'pointermove' in globe, 'globe drag interaction is missing'
           assert 'ResizeObserver' in globe, 'hero/globe synchronization is missing'
+          assert 'arcs: []' in globe, 'COBE internal arcs must stay disabled'
+
+          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2, 'orbit must be exactly two visual halves of one logical orbit'
+          assert 'orbit--one' not in html and 'orbit--two' not in html and 'orbit--three' not in html and 'orbit--four' not in html, 'legacy orbit groups remain'
+          assert 'orbit__pulse' not in html, 'travelling orbit pulse remains in markup'
+          assert 'stroke-dasharray' not in refinements, 'dash animation must not be used by the active orbit'
+
+          assert 'aspect-ratio: 1 / 1' in refinements, 'mobile metrics must keep a square 3x3 visual grid'
+          assert 'grid-template-rows: repeat(3, minmax(0, 1fr))' in refinements, 'mobile metrics rows must be equal'
+          assert 'aspect-ratio: 2 / 1' in refinements, 'mobile document area must be one row of two equal cells'
 
           refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
           refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', fonts)]
@@ -62,14 +73,6 @@ jobs:
           assert html.count('class="direction-card"') == 3
           assert html.count('metric-card metric-card--') == 3
           assert Path('assets/vendor/cobe.js').exists()
-
-      - name: Download Figma reference
-        shell: bash
-        run: |
-          curl --fail --location --retry 3 --silent --show-error \
-            "https://www.figma.com/api/mcp/asset/71a3a872-16fa-4479-b5df-b28a3ae2f79d.png" \
-            --output figma-reference-1440.png
-          test -s figma-reference-1440.png
 
       - name: Start static server
         shell: bash
@@ -100,7 +103,6 @@ jobs:
         with:
           name: visual-qa
           path: |
-            figma-reference-1440.png
             preview-1440.png
             preview-1024.png
             preview-768.png
