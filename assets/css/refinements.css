@@ -88,6 +88,7 @@
 
 @media (max-width: 680px) {
   /* Exactly 3 x 3 equal visual cells. At this breakpoint layout padding is 16px on both sides. */
+  /* Equivalent target: --metric-cell-size: calc((100vw - 32px) / 3); division spelling is avoided at runtime for cross-browser parsing. */
   .metrics {
     --metric-cell-size: calc(33.333333vw - 10.666667px);
     position: relative;
