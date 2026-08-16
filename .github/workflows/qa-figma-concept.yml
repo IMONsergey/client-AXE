@@ -1,0 +1,78 @@
+name: QA Figma concept
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/qa-figma-concept.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Validate local dependencies
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          html = Path('index.html').read_text(encoding='utf-8')
+          css = Path('assets/css/styles.css').read_text(encoding='utf-8')
+          fonts = Path('assets/css/fonts.css').read_text(encoding='utf-8')
+
+          forbidden = ('www.figma.com/api/mcp/asset', 'fonts.googleapis.com', 'fonts.gstatic.com')
+          combined = '\n'.join((html, css, fonts))
+          for item in forbidden:
+              assert item not in combined, f'external runtime dependency remains: {item}'
+
+          refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
+          refs += [f'assets/css/{p}' for p in re.findall(r'url\("\.\/([^"?]+)"\)', css)]
+          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', fonts)]
+          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', css)]
+
+          missing = sorted({ref for ref in refs if not (root / ref).exists()})
+          assert not missing, f'missing local files: {missing}'
+
+          assert html.count('class="country"') == 7
+          assert html.count('class="direction-card"') == 3
+          assert html.count('metric-card metric-card--') == 3
+
+      - name: Start static server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+
+      - name: Capture desktop and mobile
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,2993" --full-page http://127.0.0.1:4173/ preview-1440.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page http://127.0.0.1:4173/ preview-390.png
+          test -s preview-1440.png
+          test -s preview-390.png
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa
+          path: |
+            preview-1440.png
+            preview-390.png
+          if-no-files-found: error
+          retention-days: 1
