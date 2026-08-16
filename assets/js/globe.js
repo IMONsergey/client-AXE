@@ -7,18 +7,18 @@ if (canvas) {
 
   const connections = [
     { from: [37.7749, -122.4194], to: [51.5074, -0.1278], phase: 0.00 },
-    { from: [40.7128, -74.0060], to: [52.5200, 13.4050], phase: 0.17 },
-    { from: [48.8566, 2.3522], to: [25.2048, 55.2708], phase: 0.34 },
-    { from: [25.2048, 55.2708], to: [1.3521, 103.8198], phase: 0.51 },
-    { from: [1.3521, 103.8198], to: [35.6762, 139.6503], phase: 0.68 },
-    { from: [35.6762, 139.6503], to: [-33.8688, 151.2093], phase: 0.85 },
+    { from: [40.7128, -74.0060],  to: [52.5200, 13.4050], phase: 0.17 },
+    { from: [48.8566, 2.3522],    to: [25.2048, 55.2708], phase: 0.34 },
+    { from: [25.2048, 55.2708],   to: [1.3521, 103.8198], phase: 0.51 },
+    { from: [1.3521, 103.8198],   to: [35.6762, 139.6503], phase: 0.68 },
+    { from: [35.6762, 139.6503],  to: [-33.8688, 151.2093], phase: 0.85 },
     { from: [-23.5505, -46.6333], to: [40.7128, -74.0060], phase: 0.25 },
     { from: [34.0522, -118.2437], to: [35.6762, 139.6503], phase: 0.59 }
   ];
 
-  // Palette is tuned to the Figma hero: dark teal body, cyan land dots and links.
-  const ARC_ON = [0.02, 0.73, 0.82];
-  const ARC_OFF = [0.01, 0.18, 0.23];
+  // Recolor the prepared COBE fragment to the Figma hero palette.
+  const ARC_ON = [0.02, 0.76, 0.86];
+  const ARC_OFF = [0.01, 0.22, 0.27];
 
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
   const smoothstep = (a, b, value) => {
@@ -28,7 +28,8 @@ if (canvas) {
   const mix = (a, b, t) => a + (b - a) * t;
   const mix3 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)];
 
-  let phi = -0.50;
+  // Figma faces Eurasia/Africa rather than the Americas.
+  let phi = 2.45;
   const theta = 0.52;
   let globe;
 
@@ -47,21 +48,21 @@ if (canvas) {
     height: cssSize,
     phi,
     theta,
-    dark: 1,
+    dark: 0.78,
     diffuse: 1.05,
     mapSamples: 40000,
-    mapBrightness: 7.2,
+    mapBrightness: 7.6,
     mapBaseBrightness: 0,
-    baseColor: [0.015, 0.22, 0.27],
-    glowColor: [0.00, 0.30, 0.34],
-    markerColor: [0.05, 0.80, 0.90],
+    baseColor: [0.02, 0.76, 0.86],
+    glowColor: [0.00, 0.28, 0.32],
+    markerColor: [0.05, 0.82, 0.92],
     markers: [],
     arcs: [],
     arcColor: ARC_ON,
-    arcWidth: 0.32,
+    arcWidth: 0.30,
     arcHeight: 0.20,
     markerElevation: 0.012,
-    scale: 1.04,
+    scale: 1.23,
     opacity: 0.98
   });
 
