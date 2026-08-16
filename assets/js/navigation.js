@@ -1,8 +1,9 @@
 (() => {
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.site-nav');
+  const header = document.querySelector('.site-header');
 
-  if (!toggle || !nav) return;
+  if (!toggle || !nav || !header) return;
 
   const mobileQuery = window.matchMedia('(max-width: 1320px)');
   const links = [...nav.querySelectorAll('a')];
@@ -73,6 +74,64 @@
 
   syncState(false);
 
+  /* Sticky header: preserve the original flow slot, then move the real header to body
+     while pinned so it is not constrained by .visual-stage's stacking context. */
+  const anchor = document.createComment('axe-header-anchor');
+  const placeholder = document.createElement('div');
+  placeholder.className = 'site-header-placeholder';
+  placeholder.setAttribute('aria-hidden', 'true');
+  header.parentNode.insertBefore(anchor, header);
+  header.insertAdjacentElement('afterend', placeholder);
+
+  let pinned = false;
+  let flowHeight = 0;
+  let ticking = false;
+
+  function measureHeader() {
+    if (pinned) return;
+    flowHeight = Math.max(1, Math.round(header.getBoundingClientRect().height));
+    document.documentElement.style.setProperty('--axe-header-flow-height', `${flowHeight}px`);
+  }
+
+  function pinHeader() {
+    if (pinned) return;
+    measureHeader();
+    pinned = true;
+    placeholder.classList.add('is-active');
+    header.classList.add('is-pinned');
+    document.body.appendChild(header);
+  }
+
+  function unpinHeader() {
+    if (!pinned) return;
+    pinned = false;
+    header.classList.remove('is-pinned');
+    placeholder.classList.remove('is-active');
+    anchor.parentNode.insertBefore(header, placeholder);
+    measureHeader();
+  }
+
+  function syncPinnedState() {
+    ticking = false;
+    const shouldPin = window.scrollY > 28;
+    if (shouldPin) pinHeader();
+    else unpinHeader();
+  }
+
+  function schedulePinnedState() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(syncPinnedState);
+  }
+
+  measureHeader();
+  syncPinnedState();
+  window.addEventListener('scroll', schedulePinnedState, { passive: true });
+  window.addEventListener('resize', () => {
+    if (!pinned) measureHeader();
+    schedulePinnedState();
+  }, { passive: true });
+
   Object.defineProperty(window, '__AXE_NAVIGATION__', {
     configurable: true,
     value: {
@@ -84,6 +143,19 @@
         };
       },
       close
+    }
+  });
+
+  Object.defineProperty(window, '__AXE_STICKY_HEADER__', {
+    configurable: true,
+    value: {
+      getState() {
+        return {
+          pinned,
+          flowHeight,
+          inBody: header.parentElement === document.body
+        };
+      }
     }
   });
 })();
