@@ -59,10 +59,10 @@ jobs:
           assert match, 'MAP_SAMPLES constant missing'
           assert int(match.group(1).replace('_', '')) <= 32767, 'COBE sample count exceeds shader-safe range'
 
-          assert 'aspect-ratio: 1 / 1' in refinements
-          assert '.metric-row:nth-child(1) { top: 0; bottom: 66.666666%; }' in refinements
-          assert '.metric-row:nth-child(2) { top: 33.333333%; bottom: 33.333333%; }' in refinements
-          assert '.metric-row:nth-child(3) { top: 66.666666%; bottom: 0; }' in refinements
+          assert '--metric-cell-size: calc((100vw - 32px) / 3)' in refinements
+          assert 'height: calc(100vw - 32px) !important' in refinements
+          assert 'flex: 0 0 var(--metric-cell-size)' in refinements
+          assert 'height: var(--metric-cell-size) !important' in refinements
           assert 'aspect-ratio: 2 / 1' in refinements
           assert '.document-card {\n    grid-column: 1;' in refinements
 
