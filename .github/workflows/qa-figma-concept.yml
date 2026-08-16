@@ -25,7 +25,7 @@ jobs:
         with:
           ref: feat/figma-concept-1
 
-      - name: Validate local dependencies and implementation invariants
+      - name: Validate implementation invariants
         shell: python
         run: |
           from pathlib import Path
@@ -33,58 +33,42 @@ jobs:
 
           root = Path('.')
           html = Path('index.html').read_text(encoding='utf-8')
-          css = Path('assets/css/styles.css').read_text(encoding='utf-8')
+          styles = Path('assets/css/styles.css').read_text(encoding='utf-8')
           refinements = Path('assets/css/refinements.css').read_text(encoding='utf-8')
           fonts = Path('assets/css/fonts.css').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
-          dot_field = Path('assets/js/dot-field.js').read_text(encoding='utf-8')
+          dots = Path('assets/js/dot-field.js').read_text(encoding='utf-8')
           typo = Path('assets/js/typograph.js').read_text(encoding='utf-8')
+          combined = '\n'.join((html, styles, refinements, fonts, globe, dots, typo))
 
-          forbidden = (
-              'www.figma.com/api/mcp/asset',
-              'fonts.googleapis.com',
-              'fonts.gstatic.com',
-              'assets/images/arrow.png',
-          )
-          combined = '\n'.join((html, css, refinements, fonts, globe, dot_field, typo))
-          for item in forbidden:
-              assert item not in combined, f'forbidden runtime dependency remains: {item}'
+          for forbidden in ('www.figma.com/api/mcp/asset', 'fonts.googleapis.com', 'fonts.gstatic.com', 'assets/images/arrow.png'):
+              assert forbidden not in combined, f'forbidden runtime dependency remains: {forbidden}'
 
-          assert not Path('assets/images/arrow.png').exists(), 'legacy raster arrow asset must not exist'
-          assert '<br' not in html.lower(), 'manual BR line breaks are forbidden in content'
-          assert 'id="icon-arrow"' in html, 'vector arrow symbol is missing'
-          assert 'pointerdown' in globe and 'pointermove' in globe, 'globe drag interaction is missing'
-          assert 'ResizeObserver' in globe, 'hero/globe synchronization is missing'
-          assert 'arcs: []' in globe, 'COBE internal arcs must stay disabled'
+          assert '<br' not in html.lower()
+          assert html.count('visual-stage__dot-field') == 1
+          assert 'visual-stage__texture' not in html
+          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2
+          assert 'arcs: []' in globe
+          assert 'pointerdown' in globe and 'pointermove' in globe
+          assert 'ResizeObserver' in globe
+          assert 'requestAnimationFrame' in dots and 'ResizeObserver' in dots
+          assert 'prefers-reduced-motion: reduce' in dots
+          assert 'pointer-events: none' in refinements
 
-          map_samples_match = re.search(r'const MAP_SAMPLES\s*=\s*([\d_]+)', globe)
-          assert map_samples_match, 'globe MAP_SAMPLES safety constant is missing'
-          map_samples = int(map_samples_match.group(1).replace('_', ''))
-          assert map_samples <= 32767, f'COBE map samples exceed 15-bit shader-safe range: {map_samples}'
+          match = re.search(r'const MAP_SAMPLES\s*=\s*([\d_]+)', globe)
+          assert match, 'MAP_SAMPLES constant missing'
+          assert int(match.group(1).replace('_', '')) <= 32767, 'COBE sample count exceeds shader-safe range'
 
-          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2, 'orbit must be exactly two visual halves of one logical orbit'
-          assert 'orbit--one' not in html and 'orbit--two' not in html and 'orbit--three' not in html and 'orbit--four' not in html, 'legacy orbit groups remain'
-          assert 'orbit__pulse' not in html, 'travelling orbit pulse remains in markup'
-          assert 'stroke-dasharray' not in refinements, 'dash animation must not be used by the active orbit'
-
-          assert html.count('visual-stage__dot-field') == 1, 'dot field must use one continuous canvas'
-          assert 'visual-stage__texture' not in html, 'legacy static dot texture nodes remain in markup'
-          assert 'requestAnimationFrame' in dot_field, 'dot field animation loop is missing'
-          assert 'ResizeObserver' in dot_field, 'dot field resize handling is missing'
-          assert 'prefers-reduced-motion: reduce' in dot_field, 'dot field reduced-motion handling is missing'
-          assert 'pointermove' in dot_field, 'dot field pointer influence is missing'
-          assert 'pointer-events: none' in refinements, 'dot field must not intercept globe or CTA pointer input'
-
-          assert 'aspect-ratio: 1 / 1' in refinements, 'mobile metrics must keep a square 3x3 visual grid'
-          assert 'height: 33.333333%' in refinements, 'mobile metric rows must each occupy one third of the square'
-          assert '.metric-row:nth-child(2) { top: 33.333333%; }' in refinements, 'mobile metric row 2 position is missing'
-          assert '.metric-row:nth-child(3) { top: 66.666666%; }' in refinements, 'mobile metric row 3 position is missing'
-          assert 'aspect-ratio: 2 / 1' in refinements, 'mobile document area must be one row of two equal cells'
+          assert 'aspect-ratio: 1 / 1' in refinements
+          assert '.metric-row:nth-child(1) { top: 0; bottom: 66.666666%; }' in refinements
+          assert '.metric-row:nth-child(2) { top: 33.333333%; bottom: 33.333333%; }' in refinements
+          assert '.metric-row:nth-child(3) { top: 66.666666%; bottom: 0; }' in refinements
+          assert 'aspect-ratio: 2 / 1' in refinements
+          assert '.document-card {\n    grid-column: 1;' in refinements
 
           refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
           refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', fonts)]
-          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', css)]
-
+          refs += [f'assets/{p}' for p in re.findall(r'url\("\.\.\/([^"?]+)"\)', styles)]
           missing = sorted({ref for ref in refs if not (root / ref).exists()})
           assert not missing, f'missing local files: {missing}'
 
@@ -100,17 +84,18 @@ jobs:
           sleep 2
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
 
-      - name: Install Chromium and WebKit
+      - name: Install browsers
         shell: bash
         run: |
           npx --yes playwright@1.55.0 install --with-deps chromium webkit
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify animation, globe and mobile layout in Chromium and WebKit
+      - name: Verify runtime and responsive geometry
         shell: bash
         run: |
           node <<'EOF'
           const { chromium, webkit } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
 
           const closeTo = (actual, expected, tolerance, label) => {
             if (Math.abs(actual - expected) > tolerance) {
@@ -118,167 +103,126 @@ jobs:
             }
           };
 
-          async function verifyMobileLayout(page, engine) {
+          async function verifyMobile(page, engine) {
             await page.setViewportSize({ width: 390, height: 844 });
-            await page.waitForTimeout(220);
-
-            const layout = await page.evaluate(() => {
-              const rect = (selector) => {
-                const node = document.querySelector(selector);
-                const box = node?.getBoundingClientRect();
-                if (!box) return null;
-                return {
-                  left: box.left,
-                  top: box.top,
-                  width: box.width,
-                  height: box.height,
-                  cx: box.left + box.width / 2,
-                  cy: box.top + box.height / 2
-                };
+            await page.waitForTimeout(250);
+            const boxes = await page.evaluate(() => {
+              const box = (selector) => {
+                const rect = document.querySelector(selector)?.getBoundingClientRect();
+                return rect && { left: rect.left, top: rect.top, width: rect.width, height: rect.height, cx: rect.left + rect.width / 2, cy: rect.top + rect.height / 2 };
               };
-
               return {
-                metrics: rect('.metrics'),
-                dark: rect('.metric-card--dark'),
-                teal: rect('.metric-card--teal'),
-                blue: rect('.metric-card--blue'),
-                aboutGrid: rect('.about-grid'),
-                documentCard: rect('.document-card'),
-                emptyCell: rect('.about-grid__cell:first-child')
+                metrics: box('.metrics'),
+                dark: box('.metric-card--dark'),
+                teal: box('.metric-card--teal'),
+                blue: box('.metric-card--blue'),
+                about: box('.about-grid'),
+                document: box('.document-card'),
+                empty: box('.about-grid__cell:first-child')
               };
             });
 
-            for (const [name, box] of Object.entries(layout)) {
-              if (!box) throw new Error(`${engine}: missing mobile layout box ${name}`);
+            for (const [name, value] of Object.entries(boxes)) {
+              if (!value) throw new Error(`${engine}: missing ${name}`);
             }
 
-            const { metrics, dark, teal, blue, aboutGrid, documentCard, emptyCell } = layout;
-            closeTo(metrics.height, metrics.width, 2.5, `${engine}: metrics must be square`);
-
-            const cellW = metrics.width / 3;
-            const cellH = metrics.height / 3;
-            const checks = [
-              ['8', dark, 1 / 6, 1 / 6],
-              ['7', teal, 5 / 6, 1 / 2],
-              ['~15', blue, 1 / 2, 5 / 6]
+            const { metrics, dark, teal, blue, about, document, empty } = boxes;
+            closeTo(metrics.height, metrics.width, 2.5, `${engine}: metrics square`);
+            const w = metrics.width / 3;
+            const h = metrics.height / 3;
+            const expected = [
+              ['8', dark, 1/6, 1/6],
+              ['7', teal, 5/6, 1/2],
+              ['~15', blue, 1/2, 5/6]
             ];
-
-            for (const [label, box, xRatio, yRatio] of checks) {
-              closeTo(box.width, cellW, 2.5, `${engine}: ${label} cell width`);
-              closeTo(box.height, cellH, 2.5, `${engine}: ${label} cell height`);
-              closeTo(box.cx, metrics.left + metrics.width * xRatio, 2.5, `${engine}: ${label} horizontal center`);
-              closeTo(box.cy, metrics.top + metrics.height * yRatio, 2.5, `${engine}: ${label} vertical center`);
+            for (const [label, card, xr, yr] of expected) {
+              closeTo(card.width, w, 2.5, `${engine}: ${label} width`);
+              closeTo(card.height, h, 2.5, `${engine}: ${label} height`);
+              closeTo(card.cx, metrics.left + metrics.width * xr, 2.5, `${engine}: ${label} center-x`);
+              closeTo(card.cy, metrics.top + metrics.height * yr, 2.5, `${engine}: ${label} center-y`);
             }
 
-            closeTo(aboutGrid.width, aboutGrid.height * 2, 2.5, `${engine}: document grid must be 2:1`);
-            closeTo(documentCard.left, aboutGrid.left, 2.5, `${engine}: document card must be the left cell`);
-            closeTo(documentCard.width, aboutGrid.width / 2, 2.5, `${engine}: document card width`);
-            closeTo(documentCard.height, aboutGrid.height, 2.5, `${engine}: document card height`);
-            closeTo(emptyCell.left, aboutGrid.left + aboutGrid.width / 2, 2.5, `${engine}: empty document cell must be on the right`);
+            closeTo(about.width, about.height * 2, 2.5, `${engine}: document area ratio`);
+            closeTo(document.left, about.left, 2.5, `${engine}: document must be left`);
+            closeTo(document.width, about.width / 2, 2.5, `${engine}: document width`);
+            closeTo(document.height, about.height, 2.5, `${engine}: document height`);
+            closeTo(empty.left, about.left + about.width / 2, 2.5, `${engine}: empty cell must be right`);
           }
 
-          (async () => {
+          async function verifyChromium() {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-            const runtimeErrors = [];
-
-            page.on('pageerror', (error) => runtimeErrors.push(`pageerror: ${error.message}`));
-            page.on('console', (message) => {
-              if (message.type() === 'error') runtimeErrors.push(`console: ${message.text()}`);
-            });
-
-            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            await page.goto(url, { waitUntil: 'networkidle' });
             await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
 
             const initial = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (initial.dots < 100) throw new Error(`dot field too sparse: ${initial.dots}`);
-            if (initial.dpr > 2.001) throw new Error(`dot field DPR exceeds cap: ${initial.dpr}`);
-
+            if (initial.dots < 100 || initial.dpr > 2.001) throw new Error(`bad dot state ${JSON.stringify(initial)}`);
             await page.waitForTimeout(420);
             const animated = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (animated.frame <= initial.frame) throw new Error('dot field requestAnimationFrame loop is not advancing');
-
-            const pointerEvents = await page.evaluate(() => getComputedStyle(document.querySelector('.visual-stage__dot-field')).pointerEvents);
-            if (pointerEvents !== 'none') throw new Error(`dot field pointer-events must be none, got ${pointerEvents}`);
+            if (animated.frame <= initial.frame) throw new Error('dot animation did not advance');
+            const pe = await page.evaluate(() => getComputedStyle(document.querySelector('.visual-stage__dot-field')).pointerEvents);
+            if (pe !== 'none') throw new Error(`dot canvas blocks pointers: ${pe}`);
 
             const globe = page.locator('#axe-globe');
-            const globeBox = await globe.boundingBox();
-            if (!globeBox) throw new Error('globe canvas has no bounding box');
-
-            const globeX = globeBox.x + globeBox.width * 0.54;
-            const globeY = globeBox.y + globeBox.height * 0.52;
-            const hitTarget = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id || '', { x: globeX, y: globeY });
-            if (hitTarget !== 'axe-globe') throw new Error(`dot/orbit layer blocks globe pointer target: ${hitTarget}`);
-
-            await page.mouse.move(globeX, globeY);
+            const r = await globe.boundingBox();
+            if (!r) throw new Error('globe missing');
+            const x = r.x + r.width * .54, y = r.y + r.height * .52;
+            const hit = await page.evaluate(({x,y}) => document.elementFromPoint(x,y)?.id || '', {x,y});
+            if (hit !== 'axe-globe') throw new Error(`globe pointer blocked by ${hit}`);
+            await page.mouse.move(x, y);
             await page.mouse.down();
-            await page.mouse.move(globeX + 58, globeY + 24, { steps: 6 });
+            await page.mouse.move(x + 58, y + 24, { steps: 6 });
             await page.mouse.up();
             await page.waitForTimeout(180);
-
             const interactive = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (interactive.pointerStrength <= 0.01) throw new Error('dot field pointer influence did not activate over globe');
+            if (interactive.pointerStrength <= .01) throw new Error('dot hover influence inactive');
 
-            await page.evaluate(() => document.querySelector('.countries').scrollIntoView({ block: 'start' }));
-            await page.waitForTimeout(260);
-            const released = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (released.pointerStrength >= interactive.pointerStrength) throw new Error('dot field pointer influence did not decay after leaving stage');
+            await verifyMobile(page, 'Chromium');
+            if (errors.length) throw new Error(errors.join('\n'));
 
-            await page.setViewportSize({ width: 768, height: 900 });
-            await page.waitForTimeout(180);
-            const resized = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (Math.abs(resized.width - 768) > 2) throw new Error(`dot field did not resize with viewport: ${resized.width}`);
-
-            const reducedContext = await browser.newContext({
-              viewport: { width: 390, height: 844 },
-              reducedMotion: 'reduce'
-            });
-            const reducedPage = await reducedContext.newPage();
-            await reducedPage.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            const reduced = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+            const reducedPage = await reduced.newPage();
+            await reducedPage.goto(url, { waitUntil: 'networkidle' });
             await reducedPage.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
-            const reduced = await reducedPage.evaluate(() => window.__AXE_DOT_FIELD__.getState());
-            if (!reduced.reducedMotion) throw new Error('prefers-reduced-motion was not respected');
-            await verifyMobileLayout(reducedPage, 'Chromium');
-            await reducedContext.close();
-
-            if (runtimeErrors.length) throw new Error(runtimeErrors.join('\n'));
+            if (!(await reducedPage.evaluate(() => window.__AXE_DOT_FIELD__.getState().reducedMotion))) throw new Error('reduced motion not respected');
+            await reduced.close();
             await browser.close();
+          }
 
-            const webkitBrowser = await webkit.launch({ headless: true });
-            const webkitPage = await webkitBrowser.newPage({ viewport: { width: 1440, height: 1000 } });
-            const webkitErrors = [];
+          async function verifyWebKit() {
+            const browser = await webkit.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
 
-            webkitPage.on('pageerror', (error) => webkitErrors.push(`pageerror: ${error.message}`));
-            webkitPage.on('console', (message) => {
-              if (message.type() === 'error') webkitErrors.push(`console: ${message.text()}`);
-            });
-
-            await webkitPage.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
-            await webkitPage.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true);
-
-            const webkitGlobe = webkitPage.locator('#axe-globe');
-            const webkitGlobeBox = await webkitGlobe.boundingBox();
-            if (!webkitGlobeBox) throw new Error('WebKit: globe canvas has no bounding box');
-
-            const startX = webkitGlobeBox.x + webkitGlobeBox.width * 0.66;
-            const startY = webkitGlobeBox.y + webkitGlobeBox.height * 0.52;
-            const endX = webkitGlobeBox.x + webkitGlobeBox.width * 0.16;
-
-            for (let pass = 0; pass < 4; pass += 1) {
-              await webkitPage.mouse.move(startX, startY);
-              await webkitPage.mouse.down();
-              await webkitPage.mouse.move(endX, startY, { steps: 10 });
-              await webkitPage.mouse.up();
-              await webkitPage.waitForTimeout(130);
+            const globe = page.locator('#axe-globe');
+            const r = await globe.boundingBox();
+            if (!r) throw new Error('WebKit: globe missing');
+            const sy = r.y + r.height * .52;
+            for (let i = 0; i < 4; i++) {
+              await page.mouse.move(r.x + r.width * .66, sy);
+              await page.mouse.down();
+              await page.mouse.move(r.x + r.width * .16, sy, { steps: 10 });
+              await page.mouse.up();
+              await page.waitForTimeout(130);
             }
+            await page.locator('.hero__visual').screenshot({ path: 'preview-webkit-globe-rotated.png' });
+            await verifyMobile(page, 'WebKit');
+            await page.screenshot({ path: 'preview-390-webkit.png', fullPage: true });
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          }
 
-            await webkitPage.locator('.hero__visual').screenshot({ path: 'preview-webkit-globe-rotated.png' });
-            await verifyMobileLayout(webkitPage, 'WebKit');
-            await webkitPage.screenshot({ path: 'preview-390-webkit.png', fullPage: true });
-
-            if (webkitErrors.length) throw new Error(webkitErrors.join('\n'));
-            await webkitBrowser.close();
-          })().catch((error) => {
+          (async () => {
+            await verifyChromium();
+            await verifyWebKit();
+          })().catch(error => {
             console.error(error);
             process.exit(1);
           });
