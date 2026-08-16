@@ -17,8 +17,8 @@ if (canvas) {
   ];
 
   // Recolor the prepared COBE fragment to the Figma hero palette.
-  const ARC_ON = [0.02, 0.76, 0.86];
-  const ARC_OFF = [0.01, 0.22, 0.27];
+  const ARC_ON = [0.02, 0.68, 0.77];
+  const ARC_OFF = [0.01, 0.20, 0.24];
 
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
   const smoothstep = (a, b, value) => {
@@ -28,8 +28,8 @@ if (canvas) {
   const mix = (a, b, t) => a + (b - a) * t;
   const mix3 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)];
 
-  // Figma faces Eurasia/Africa rather than the Americas.
-  let phi = 2.45;
+  // Frame Africa, the Middle East and Asia together, matching the Figma composition.
+  let phi = 1.60;
   const theta = 0.52;
   let globe;
 
@@ -48,18 +48,18 @@ if (canvas) {
     height: cssSize,
     phi,
     theta,
-    dark: 0.78,
+    dark: 0.65,
     diffuse: 1.05,
-    mapSamples: 40000,
-    mapBrightness: 7.6,
+    mapSamples: 50000,
+    mapBrightness: 3.0,
     mapBaseBrightness: 0,
-    baseColor: [0.02, 0.76, 0.86],
-    glowColor: [0.00, 0.28, 0.32],
-    markerColor: [0.05, 0.82, 0.92],
+    baseColor: [0.02, 0.58, 0.66],
+    glowColor: [0.00, 0.22, 0.26],
+    markerColor: [0.05, 0.72, 0.82],
     markers: [],
     arcs: [],
     arcColor: ARC_ON,
-    arcWidth: 0.30,
+    arcWidth: 0.28,
     arcHeight: 0.20,
     markerElevation: 0.012,
     scale: 1.23,
@@ -87,7 +87,7 @@ if (canvas) {
     const arcs = connections.map((connection, index) => {
       const local = ((seconds / cycle + connection.phase) % 1 + 1) % 1;
       let visibility = envelope(local);
-      visibility = Math.pow(visibility, 1.35) * 0.70;
+      visibility = Math.pow(visibility, 1.35) * 0.62;
 
       return {
         id: `arc-${index}`,
