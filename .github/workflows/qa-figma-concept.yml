@@ -76,7 +76,9 @@ jobs:
           assert 'pointer-events: none' in refinements, 'dot field must not intercept globe or CTA pointer input'
 
           assert 'aspect-ratio: 1 / 1' in refinements, 'mobile metrics must keep a square 3x3 visual grid'
-          assert 'grid-template-rows: repeat(3, minmax(0, 1fr))' in refinements, 'mobile metrics rows must be equal'
+          assert 'height: 33.333333%' in refinements, 'mobile metric rows must each occupy one third of the square'
+          assert '.metric-row:nth-child(2) { top: 33.333333%; }' in refinements, 'mobile metric row 2 position is missing'
+          assert '.metric-row:nth-child(3) { top: 66.666666%; }' in refinements, 'mobile metric row 3 position is missing'
           assert 'aspect-ratio: 2 / 1' in refinements, 'mobile document area must be one row of two equal cells'
 
           refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
