@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html class="is-loading" lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,8 +8,17 @@
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="assets/css/refinements.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
 </head>
 <body>
+  <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="preloader__mark" aria-hidden="true">
+      <img src="assets/images/logo-ace.svg" alt="">
+    </div>
+    <span class="preloader__percent">0%</span>
+    <span class="preloader__track" aria-hidden="true"><span class="preloader__bar"></span></span>
+  </div>
+
   <svg class="svg-sprite" aria-hidden="true">
     <symbol id="icon-arrow" viewBox="0 0 24 24">
       <path d="M3.5 12H19M12.5 5.5L19 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -29,7 +38,7 @@
             </span>
           </a>
 
-          <nav class="site-nav" aria-label="Навигация">
+          <nav class="site-nav" id="site-navigation" aria-label="Навигация">
             <a class="typo" href="#about">Об ассоциации</a>
             <a class="typo" href="#media">Медиа</a>
             <a class="typo" href="#management">Органы управления</a>
@@ -39,6 +48,10 @@
             <a class="typo" href="#join">Вступление</a>
             <a class="typo" href="#contacts">Контакты</a>
           </nav>
+
+          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
+            <span class="menu-toggle__lines" aria-hidden="true"></span>
+          </button>
 
           <a class="header-request" href="#trade-requests">
             <span>Trade Requests</span>
@@ -155,7 +168,9 @@
               </div>
               <span class="direction-card__index">01</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-links.png" alt="" width="417" height="150">
+            <div class="direction-card__visual direction-card__visual--links" data-pattern="dots" aria-hidden="true">
+              <canvas class="direction-card__pattern"></canvas>
+            </div>
           </article>
 
           <article class="direction-card">
@@ -166,7 +181,9 @@
               </div>
               <span class="direction-card__index">02</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-pricing.png" alt="" width="417" height="150">
+            <div class="direction-card__visual direction-card__visual--pricing" data-pattern="lines" aria-hidden="true">
+              <canvas class="direction-card__pattern"></canvas>
+            </div>
           </article>
 
           <article class="direction-card">
@@ -177,7 +194,9 @@
               </div>
               <span class="direction-card__index">03</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-platform.png" alt="" width="417" height="150">
+            <div class="direction-card__visual direction-card__visual--platform" data-pattern="orbit" aria-hidden="true">
+              <canvas class="direction-card__pattern"></canvas>
+            </div>
           </article>
         </section>
       </div>
@@ -199,7 +218,10 @@
     </section>
   </main>
 
+  <script src="assets/js/preloader.js"></script>
   <script src="assets/js/typograph.js"></script>
+  <script src="assets/js/navigation.js"></script>
+  <script src="assets/js/direction-patterns.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>
 </body>
