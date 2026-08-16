@@ -10,6 +10,7 @@ on:
       - assets/css/**
       - assets/js/**
       - assets/vendor/**
+      - assets/images/**
 
 permissions:
   contents: read
@@ -47,6 +48,7 @@ jobs:
           for item in forbidden:
               assert item not in combined, f'forbidden runtime dependency remains: {item}'
 
+          assert not Path('assets/images/arrow.png').exists(), 'legacy raster arrow asset must not exist'
           assert '<br' not in html.lower(), 'manual BR line breaks are forbidden in content'
           assert 'id="icon-arrow"' in html, 'vector arrow symbol is missing'
           assert 'pointerdown' in globe and 'pointermove' in globe, 'globe drag interaction is missing'
