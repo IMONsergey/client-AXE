@@ -1,8 +1,8 @@
 name: Deploy AXE preview
 # Dark source: feat/figma-concept-1 @ 13ea65f8fe4e83d8f707198939e6e61606e80c9a
 # Light source: feat/figma-concept-light @ da70550d8b48e3897bd9afe005b15cd3dcfd4234
-# Dark map source: feat/figma-concept-map-dark @ a886ee8b625e4e5698694b464449dae2d3a63acf
-# Light map source: feat/figma-concept-map-light @ 936e70ac0c2187c14de0ae26a40780dd4754a3d3
+# Dark map source: feat/figma-concept-map-dark @ bc22df75348e7a0a7791360fc102c4060619de73
+# Light map source: feat/figma-concept-map-light @ 319241f9121a0ebd133d801d9a91896c53babf73
 
 on:
   push:
