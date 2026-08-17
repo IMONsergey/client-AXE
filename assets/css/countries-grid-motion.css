@@ -1,134 +1,52 @@
-/* Countries grid motion — visible geometric tracing, deliberately slow and soft. */
+/* Countries grid motion — content first, quiet grid resolve second. */
 
-.country > .country__trace {
-  position: absolute;
-  z-index: 4;
-  inset: 0;
-  display: block;
-  pointer-events: none;
-  opacity: 1;
-  transform: none;
-  transition: opacity 360ms var(--motion-ease);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1840ms);
-}
-
-.motion-ready .country > .country__trace {
-  opacity: 1;
-  transform: none;
-}
-
+.country > .country__trace,
 .country__trace-line {
-  position: absolute;
-  display: block;
-  background: rgba(0, 143, 158, 0.84);
-  will-change: transform;
+  display: none !important;
 }
 
-/* The moving contour is slightly stronger than the final 1px matrix, but its
-   slower circuit and overlap between sides keep it elegant rather than mechanical. */
-.country__trace-line--top,
-.country__trace-line--bottom {
-  width: 100%;
-  height: 2px;
-  transform: scaleX(0);
-}
-
-.country__trace-line--left,
-.country__trace-line--right {
-  width: 2px;
-  height: 100%;
-  transform: scaleY(0);
-}
-
-.country__trace-line--top {
-  top: 0;
-  left: 0;
-  transform-origin: left center;
-  transition: transform 660ms cubic-bezier(.20,.74,.18,1);
-  transition-delay: var(--country-trace-delay, 0ms);
-}
-
-.country__trace-line--right {
-  top: 0;
-  right: 0;
-  transform-origin: center top;
-  transition: transform 640ms cubic-bezier(.20,.74,.18,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 390ms);
-}
-
-.country__trace-line--bottom {
-  right: 0;
-  bottom: 0;
-  transform-origin: right center;
-  transition: transform 680ms cubic-bezier(.20,.74,.18,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 790ms);
-}
-
-.country__trace-line--left {
-  bottom: 0;
-  left: 0;
-  transform-origin: center bottom;
-  transition: transform 650ms cubic-bezier(.20,.74,.18,1);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1200ms);
-}
-
-.motion-ready .countries__grid.is-tracing .country__trace-line--top,
-.motion-ready .countries__grid.is-tracing .country__trace-line--bottom {
-  transform: scaleX(1);
-}
-
-.motion-ready .countries__grid.is-tracing .country__trace-line--left,
-.motion-ready .countries__grid.is-tracing .country__trace-line--right {
-  transform: scaleY(1);
-}
-
-.motion-ready .countries__grid.is-tracing .country > .country__trace {
-  opacity: 0;
-}
-
-/* Permanent 1px rules resolve beneath the tracer only near the end. */
+/* Keep the final geometry fully formed at all times. Only opacity changes, so
+   there are no stray travelling lines or open-looking cells during reveal. */
 .motion-ready .countries__grid .country::before {
   opacity: 0;
   background-size:
     var(--country-top-size) 1px,
     1px 100%,
     100% 1px;
-  transition: opacity 320ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1660ms) !important;
+  transition: opacity 760ms var(--motion-ease) !important;
+  transition-delay: calc(var(--motion-delay, 0ms) + 300ms) !important;
 }
 
 .motion-ready .countries__grid .country::after {
   opacity: 0;
   transform: scaleY(1);
-  transition: opacity 320ms var(--motion-ease) !important;
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 1660ms) !important;
+  transition: opacity 760ms var(--motion-ease) !important;
+  transition-delay: calc(var(--motion-delay, 0ms) + 300ms) !important;
 }
 
-.motion-ready .countries__grid.is-tracing .country::before,
-.motion-ready .countries__grid.is-tracing .country::after {
+.motion-ready .countries__grid .country.is-visible::before,
+.motion-ready .countries__grid .country.is-visible::after {
   opacity: 1;
 }
 
-/* Flags and labels arrive during the latter half of the contour build. */
+/* The flag and country name are now the first readable event. */
 .motion-ready .countries__grid .country > img,
 .motion-ready .countries__grid .country > span:not(.country__trace) {
   opacity: 0;
-  transform: translate3d(0, 6px, 0);
+  transform: translate3d(0, 7px, 0);
   transition:
     opacity 900ms var(--motion-ease),
-    transform 1180ms var(--motion-ease-soft);
-  transition-delay: calc(var(--country-trace-delay, 0ms) + 980ms) !important;
+    transform 1160ms var(--motion-ease-soft);
+  transition-delay: var(--motion-delay, 0ms) !important;
 }
 
-.motion-ready .countries__grid.is-tracing .country > img,
-.motion-ready .countries__grid.is-tracing .country > span:not(.country__trace) {
+.motion-ready .countries__grid .country.is-visible > img,
+.motion-ready .countries__grid .country.is-visible > span:not(.country__trace) {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .country > .country__trace { display: none !important; }
-
   .motion-ready .countries__grid .country::before,
   .motion-ready .countries__grid .country::after,
   .motion-ready .countries__grid .country > img,
