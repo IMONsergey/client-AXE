@@ -60,6 +60,16 @@ jobs:
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
+          const sectionIds = ['media','management','members','documents','news','join','contacts','trade-requests'];
+          const revealAll = async (page) => {
+            for (const id of sectionIds) {
+              await page.evaluate((value) => document.getElementById(value)?.scrollIntoView({ behavior:'auto', block:'center' }), id);
+              await page.waitForTimeout(220);
+            }
+            await page.evaluate(() => scrollTo(0,0));
+            await page.waitForTimeout(700);
+          };
+
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -73,6 +83,8 @@ jobs:
 
             const scroll = await page.evaluate(() => window.__AXE_SMOOTH_SCROLL__?.getState());
             if (!scroll?.native || scroll.enabled || scroll.running) throw new Error(`custom scroll active ${JSON.stringify(scroll)}`);
+            const cssScroll = await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior);
+            if (cssScroll !== 'auto') throw new Error(`scroll behavior ${cssScroll}`);
 
             const state = await page.evaluate(() => window.__AXE_EXTENDED__.getState());
             if (state.gallerySlides !== 3 || state.quoteSlides !== 3 || state.newsItems !== 4 || state.members !== 6 || state.documents !== 3) {
@@ -100,16 +112,26 @@ jobs:
             const stylesheetPresent = await page.evaluate(() => [...document.styleSheets].some(s => s.href?.includes('extended.css')));
             if (!stylesheetPresent) throw new Error('extended stylesheet missing');
 
+            await revealAll(page);
+            const revealed = await page.evaluate(() => ({
+              management: Number(getComputedStyle(document.querySelector('#management .management-copy')).opacity),
+              members: Number(getComputedStyle(document.querySelector('#members .members-roster')).opacity),
+              join: Number(getComputedStyle(document.querySelector('#join .join-copy .ext-title')).opacity),
+              contacts: Number(getComputedStyle(document.querySelector('#contacts .contacts-grid')).opacity)
+            }));
+            if (Object.values(revealed).some(v => v < .95)) throw new Error(`reveals incomplete ${JSON.stringify(revealed)}`);
             await page.screenshot({ path:'full-1440.png', fullPage:true });
 
             await page.setViewportSize({ width:1024, height:900 });
             await page.reload({ waitUntil:'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await revealAll(page);
             await page.screenshot({ path:'full-1024.png', fullPage:true });
 
             await page.setViewportSize({ width:390, height:844 });
             await page.reload({ waitUntil:'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await revealAll(page);
             const mobile = await page.evaluate(() => ({
               bodyWidth: document.body.scrollWidth,
               viewport: innerWidth,
