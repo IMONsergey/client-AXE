@@ -31,6 +31,7 @@ jobs:
           assert '#b6435c' in css
           assert '#008998' in css
           assert '#bdd3d9' in css
+          assert 'mix-blend-mode: lighten' in css
           assert 'dark: 0.06' in globe
           assert 'baseColor: [0.84, 0.93, 0.94]' in globe
           assert 'markerColor: [0.00, 0.58, 0.65]' in globe
@@ -50,40 +51,75 @@ jobs:
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
-          (async () => {
-            const browser = await chromium.launch({ headless:true });
-            const page = await browser.newPage({ viewport:{ width:1440, height:1000 } });
-            const errors = [];
-            page.on('pageerror', e => errors.push(e.message));
-            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-            await page.goto('http://127.0.0.1:4173/', { waitUntil:'networkidle' });
+          const url = 'http://127.0.0.1:4173/';
+
+          async function waitReady(page) {
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
+          }
 
+          async function revealWholePage(page) {
+            for (const [selector, wait] of [
+              ['.metrics', 1250],
+              ['.about', 1350],
+              ['.directions', 2500],
+              ['.countries__grid', 3200]
+            ]) {
+              await page.evaluate((sel) => document.querySelector(sel)?.scrollIntoView({ behavior:'auto', block:'center' }), selector);
+              await page.waitForTimeout(wait);
+            }
+            await page.evaluate(() => scrollTo(0, 0));
+            await page.waitForTimeout(700);
+          }
+
+          async function verifyPalette(page) {
             const colors = await page.evaluate(() => ({
-              stage: getComputedStyle(document.querySelector('.visual-stage')).backgroundColor,
               title: getComputedStyle(document.querySelector('.hero__title')).color,
               blue: getComputedStyle(document.querySelector('.metric-card--dark')).backgroundColor,
               red: getComputedStyle(document.querySelector('.metric-card--teal')).backgroundColor,
               teal: getComputedStyle(document.querySelector('.metric-card--blue')).backgroundColor,
-              nav: getComputedStyle(document.querySelector('.site-header')).color
+              nav: getComputedStyle(document.querySelector('.site-header')).color,
+              globeOverlay: getComputedStyle(document.querySelector('.hero__globe-canvas'), '::after').backgroundColor,
+              globeBlend: getComputedStyle(document.querySelector('.hero__globe-canvas'), '::after').mixBlendMode
             }));
             const expected = {
               title: 'rgb(31, 50, 63)',
               blue: 'rgb(59, 127, 193)',
               red: 'rgb(182, 67, 92)',
               teal: 'rgb(0, 137, 152)',
-              nav: 'rgb(31, 50, 63)'
+              nav: 'rgb(31, 50, 63)',
+              globeOverlay: 'rgb(0, 149, 166)',
+              globeBlend: 'lighten'
             };
             for (const [key,value] of Object.entries(expected)) {
               if (colors[key] !== value) throw new Error(`${key}: ${colors[key]} != ${value}`);
             }
+          }
+
+          (async () => {
+            const browser = await chromium.launch({ headless:true });
+            const page = await browser.newPage({ viewport:{ width:1440, height:1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
+            await page.goto(url, { waitUntil:'networkidle' });
+            await waitReady(page);
+            await verifyPalette(page);
+            await revealWholePage(page);
             if (errors.length) throw new Error(errors.join('\n'));
+            await page.locator('.hero').screenshot({ path:'light-hero-1440.png' });
             await page.screenshot({ path:'light-1440.png', fullPage:true });
+
             await page.setViewportSize({ width:390, height:844 });
             await page.reload({ waitUntil:'networkidle' });
-            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await waitReady(page);
+            await verifyPalette(page);
+            await revealWholePage(page);
+            if (errors.length) throw new Error(errors.join('\n'));
             await page.screenshot({ path:'light-390.png', fullPage:true });
+
             await browser.close();
           })().catch(e => { console.error(e); process.exit(1); });
           EOF
@@ -92,6 +128,7 @@ jobs:
         with:
           name: axe-light-visual-qa
           path: |
+            light-hero-1440.png
             light-1440.png
             light-390.png
           if-no-files-found: error
