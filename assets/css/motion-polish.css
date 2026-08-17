@@ -210,3 +210,8 @@
     transition: none !important;
   }
 }
+
+/* Keep metric tiles in the same palette as the map and grid variants. */
+.metric-card--dark { background: #3b7fc1; }
+.metric-card--teal { background: #b6435c; }
+.metric-card--blue { background: #008998; }
