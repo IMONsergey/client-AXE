@@ -1,5 +1,18 @@
 /* Countries grid motion — content first, quiet grid resolve second. */
 
+/* Structural stitch between metrics and the right-side About matrix. It must not
+   inherit the generic reveal translation, otherwise a visible gap appears. */
+@media (min-width: 1051px) {
+  .about {
+    margin-top: -1px !important;
+  }
+
+  .motion-ready .about-grid.motion-reveal,
+  .motion-ready .about-grid.motion-reveal.is-visible {
+    transform: none !important;
+  }
+}
+
 .country > .country__trace,
 .country__trace-line {
   display: none !important;
