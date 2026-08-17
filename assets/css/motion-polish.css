@@ -210,3 +210,170 @@
     transition: none !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Light concept — palette and surfaces from Figma frame “Концепт №1”.       */
+/* Layout, typography, responsive geometry and motion choreography unchanged. */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --ink: #1f323f;
+  --night: #1f323f;
+  --teal: #008998;
+  --cyan: #0095a6;
+  --cyan-soft: #008998;
+  --grid-line: #bdd3d9;
+  --paper: #ffffff;
+  --country-bg: #f2f5f7;
+  --country-line: #bdd3d9;
+}
+
+body,
+.site-shell,
+.countries {
+  color: var(--ink);
+  background: #f2f5f7;
+}
+
+.visual-stage {
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, #d9ecef 0%, rgba(217,236,239,.34) 14%, rgba(242,245,247,0) 34%),
+    #f2f5f7;
+}
+
+.visual-stage::after {
+  background: linear-gradient(180deg, rgba(242,245,247,0) 0%, rgba(242,245,247,.42) 52%, #f2f5f7 100%);
+}
+
+.brand__ace,
+.brand__caption,
+.preloader__mark img {
+  filter: brightness(0) saturate(100%) invert(17%) sepia(16%) saturate(1034%) hue-rotate(159deg) brightness(92%) contrast(91%);
+}
+
+body .site-header {
+  color: #1f323f;
+  background-color: rgba(242,245,247,0);
+  border-bottom-color: rgba(189,211,217,0);
+  box-shadow: 0 10px 30px rgba(31,50,63,0);
+}
+
+body .site-header.is-scrolled {
+  color: #1f323f;
+  background-color: rgba(248,250,251,.82);
+  border-bottom-color: rgba(189,211,217,.72);
+  box-shadow: 0 12px 34px rgba(31,50,63,.06);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.header-request,
+.hero__request {
+  color: #fff;
+  background: #008998;
+}
+
+.header-request:hover,
+.header-request:focus-visible,
+.hero__request:hover,
+.hero__request:focus-visible {
+  color: #1f323f;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(31,50,63,.12);
+}
+
+.menu-toggle {
+  color: #1f323f;
+  border-color: rgba(31,50,63,.18);
+  background: rgba(255,255,255,.34);
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.about__link:hover,
+.about__link:focus-visible {
+  color: #008998;
+  opacity: 1;
+}
+
+.hero__title,
+.hero__text,
+.about__copy,
+.countries,
+.direction-card,
+.direction-card h3 {
+  color: #1f323f;
+}
+
+.about__link,
+.direction-card__index {
+  color: #008998;
+}
+
+.metrics,
+.about-grid,
+.countries__grid {
+  border-color: #bdd3d9;
+}
+
+.metric-cell,
+.about-grid__cell,
+.document-card,
+.country {
+  border-color: #bdd3d9;
+}
+
+.metric-card--dark { background: #3b7fc1; }
+.metric-card--teal { background: #b6435c; }
+.metric-card--blue { background: #008998; }
+
+.document-card {
+  color: #1f323f;
+  background: #fff;
+}
+
+.document-card:hover { background: #f8fbfc; }
+.document-card__footer { color: #7c8a92; }
+
+.direction-card,
+.direction-card__body {
+  background: #fff;
+}
+
+.visual-stage .orbit__line,
+.visual-stage .orbit__line--back,
+.visual-stage .orbit__line--front {
+  stroke: rgba(0,149,166,.22);
+}
+
+.visual-stage .orbit__pulse-line {
+  stroke: rgba(0,149,166,.72);
+  filter: drop-shadow(0 0 4px rgba(0,149,166,.18));
+}
+
+.preloader {
+  color: #1f323f;
+  background: #f2f5f7;
+}
+
+.preloader__percent { color: rgba(31,50,63,.72); }
+.preloader__track { background: rgba(0,137,152,.12); }
+.preloader__bar { background: #008998; }
+
+@media (max-width: 1320px) {
+  body .site-nav {
+    color: #1f323f;
+    background: #f2f5f7;
+  }
+
+  body .site-nav a,
+  body .site-nav a:first-child {
+    border-color: rgba(189,211,217,.82);
+  }
+
+  body .site-nav a:hover,
+  body .site-nav a:focus-visible {
+    color: #008998;
+  }
+}
