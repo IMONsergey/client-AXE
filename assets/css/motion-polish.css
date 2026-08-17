@@ -352,6 +352,20 @@ body .site-header.is-scrolled {
   filter: drop-shadow(0 0 4px rgba(0,149,166,.18));
 }
 
+/* COBE light mode naturally renders land points darker than the pale sphere.
+   A screen-space lighten layer maps only those dark pixels up to the Figma
+   #0095a6 teal while leaving the already-lighter sphere practically unchanged. */
+.hero__globe-canvas::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 4.4%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: #0095a6;
+  mix-blend-mode: lighten;
+}
+
 .preloader {
   color: #1f323f;
   background: #f2f5f7;
