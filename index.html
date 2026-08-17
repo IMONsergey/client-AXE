@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/motion.css">
   <link rel="stylesheet" href="assets/css/motion-polish.css">
+  <link rel="stylesheet" href="assets/css/extended.css">
 </head>
 <body>
   <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -68,7 +69,7 @@
 
           <div class="hero__copy">
             <p class="hero__text typo">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
-            <a class="hero__request" id="trade-requests" href="#">
+            <a class="hero__request" href="#trade-requests">
               <span class="typo">Войти в Trade Requests</span>
               <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
             </a>
@@ -140,19 +141,19 @@
           <div class="about__copy">
             <h2 class="typo">Об ассоциации</h2>
             <p class="typo">Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p>
-            <a class="about__link" href="#">
+            <a class="about__link" href="#media">
               <span class="typo">Читать полностью</span>
               <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
             </a>
           </div>
 
-          <div class="about-grid" id="documents">
+          <div class="about-grid">
             <div class="about-grid__cell" aria-hidden="true"></div>
             <div class="about-grid__cell" aria-hidden="true"></div>
             <div class="about-grid__cell" aria-hidden="true"></div>
             <div class="about-grid__cell" aria-hidden="true"></div>
             <div class="about-grid__cell" aria-hidden="true"></div>
-            <a class="document-card" href="#">
+            <a class="document-card" href="#documents">
               <img class="document-card__icon" src="assets/images/document-icon.svg" alt="" width="29" height="38">
               <span class="document-card__title typo">Декларация о создании ассоциации</span>
               <span class="document-card__footer">
@@ -200,7 +201,7 @@
       </div>
     </section>
 
-    <section class="countries" id="members" aria-labelledby="countries-title">
+    <section class="countries" id="countries" aria-labelledby="countries-title">
       <div class="countries__inner layout-container">
         <h2 class="typo" id="countries-title">Страны—участники</h2>
         <div class="countries__grid">
@@ -214,6 +215,315 @@
         </div>
       </div>
     </section>
+
+    <section class="ext-section media-section" id="media" aria-labelledby="media-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Медиа</p>
+          <h2 class="ext-title" id="media-title">Фотогалерея и цитаты руководителей</h2>
+        </div>
+
+        <div class="media-layout">
+          <div class="media-gallery ext-reveal" aria-label="Фотогалерея мероприятий">
+            <div class="media-gallery__track">
+              <article class="media-slide is-active" aria-hidden="false">
+                <div class="media-slide__visual" aria-hidden="true"></div>
+                <div class="media-slide__caption">
+                  <strong>Подписание Декларации на ПМЭФ-2025</strong>
+                  <span>Санкт-Петербург, июнь 2025</span>
+                </div>
+              </article>
+              <article class="media-slide" aria-hidden="true">
+                <div class="media-slide__visual" aria-hidden="true"></div>
+                <div class="media-slide__caption">
+                  <strong>Первое заседание ассоциации</strong>
+                  <span>Март 2026</span>
+                </div>
+              </article>
+              <article class="media-slide" aria-hidden="true">
+                <div class="media-slide__visual" aria-hidden="true"></div>
+                <div class="media-slide__caption">
+                  <strong>Общее собрание членов ассоциации</strong>
+                  <span>Июль 2026</span>
+                </div>
+              </article>
+            </div>
+            <div class="media-gallery__controls" aria-label="Переключение фотографий">
+              <button class="carousel-button carousel-button--prev" type="button" data-gallery-prev aria-label="Предыдущее фото"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+              <button class="carousel-button" type="button" data-gallery-next aria-label="Следующее фото"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+            </div>
+          </div>
+
+          <div class="quote-carousel ext-reveal" aria-label="Цитаты руководителей бирж-участниц">
+            <span class="quote-carousel__label">Цитаты руководителей бирж-участниц</span>
+            <div class="quote-carousel__viewport">
+              <article class="quote-card is-active" aria-hidden="false">
+                <blockquote>«Ассоциация призвана стать ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС».</blockquote>
+                <div class="quote-card__author"><strong>Игорь Артемьев</strong><span>Президент Петербургской Биржи, председатель Совета ассоциации</span></div>
+              </article>
+              <article class="quote-card" aria-hidden="true">
+                <blockquote>«Участие в инициативе по созданию ассоциации — шаг к устойчивому и долгосрочному сотрудничеству бирж региона».</blockquote>
+                <div class="quote-card__author"><strong>Кедар Дешпанде</strong><span>Главный коммерческий директор NCDEX, Индия</span></div>
+              </article>
+              <article class="quote-card" aria-hidden="true">
+                <blockquote>«Подписание меморандума — это новые возможности для участников биржевых торгов из Республики Беларусь».</blockquote>
+                <div class="quote-card__author"><strong>Александр Осмоловский</strong><span>Председатель правления БУТБ, Беларусь</span></div>
+              </article>
+            </div>
+            <div class="quote-carousel__footer">
+              <span class="quote-carousel__counter" data-quote-counter>01 / 03</span>
+              <div class="quote-carousel__controls" aria-label="Переключение цитат">
+                <button class="carousel-button carousel-button--prev" type="button" data-quote-prev aria-label="Предыдущая цитата"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+                <button class="carousel-button" type="button" data-quote-next aria-label="Следующая цитата"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ext-section management-section" id="management" aria-labelledby="management-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Управление</p>
+          <h2 class="ext-title" id="management-title">Органы управления</h2>
+        </div>
+
+        <div class="management-grid">
+          <div class="management-copy ext-stagger">
+            <p class="ext-body">Общее собрание членов — высший орган управления, определяющий стратегию ассоциации; созывается не реже одного раза в год.</p>
+            <p class="ext-body">Совет ассоциации обеспечивает текущее руководство между собраниями и координирует профильные рабочие группы.</p>
+            <p class="ext-body">Исполнительный директор отвечает за операционную деятельность и представление интересов ассоциации.</p>
+          </div>
+
+          <div class="management-architecture ext-stagger" aria-label="Структура органов управления">
+            <article class="management-node">
+              <span class="management-node__index">01</span>
+              <div class="management-node__content"><strong>Общее собрание членов</strong><p>Высший орган управления, определяющий стратегию ассоциации; созывается не реже одного раза в год.</p></div>
+            </article>
+            <article class="management-node">
+              <span class="management-node__index">02</span>
+              <div class="management-node__content"><strong>Совет ассоциации</strong><p>Обеспечивает текущее руководство между собраниями и координирует профильные рабочие группы.</p></div>
+            </article>
+            <article class="management-node">
+              <span class="management-node__index">03</span>
+              <div class="management-node__content"><strong>Исполнительный директор</strong><p>Отвечает за операционную деятельность и представление интересов ассоциации.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="management-bottom">
+          <div class="management-directions ext-reveal">
+            <h3>Профильные направления</h3>
+            <ul>
+              <li>Технологическая интеграция и межбиржевые линки.</li>
+              <li>Регламенты и стандарты биржевой торговли.</li>
+              <li>Ценовая аналитика и индикаторы.</li>
+            </ul>
+          </div>
+          <aside class="chair-card ext-reveal">
+            <p class="chair-card__label">Председатель Совета</p>
+            <strong>Игорь Артемьев</strong>
+            <span>Президент Петербургской Биржи</span>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="ext-section members-section" id="members" aria-labelledby="members-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Участники</p>
+          <h2 class="ext-title" id="members-title">Члены ассоциации</h2>
+        </div>
+
+        <div class="members-roster ext-stagger">
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">Петербургская Биржа</span><span class="member-card__country">Россия · 2008</span></div>
+            <h3>Петербургская Биржа</h3>
+            <p class="member-card__directions">Нефтепродукты<br>Металлы</p>
+            <span class="member-card__status">Член ассоциации</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">NCDEX</span><span class="member-card__country">Индия</span></div>
+            <h3>NCDEX</h3>
+            <p class="member-card__directions">Аграрные товары</p>
+            <span class="member-card__status">Член ассоциации</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">БУТБ</span><span class="member-card__country">Беларусь</span></div>
+            <h3>БУТБ</h3>
+            <p class="member-card__directions">Металлопродукция</p>
+            <span class="member-card__status">Член ассоциации</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">ЕТС</span><span class="member-card__country">Казахстан</span></div>
+            <h3>ЕТС</h3>
+            <p class="member-card__directions">Товарные торги</p>
+            <span class="member-card__status">Член ассоциации</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">УзРТСБ</span><span class="member-card__country">Узбекистан</span></div>
+            <h3>УзРТСБ</h3>
+            <p class="member-card__directions">Товарно-сырьевые торги</p>
+            <span class="member-card__status">Член ассоциации</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+          <article class="member-card">
+            <div class="member-card__top"><span class="member-card__mark">IEE</span><span class="member-card__country">Иран</span></div>
+            <h3>IEE</h3>
+            <p class="member-card__directions">Энергетические товары</p>
+            <span class="member-card__status">Член ассоциации (2026)</span>
+            <a class="member-card__link" href="#" data-prototype-link>Сайт биржи <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ext-section documents-section" id="documents" aria-labelledby="documents-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Документы</p>
+          <h2 class="ext-title" id="documents-title">Документы</h2>
+        </div>
+
+        <div class="documents-list ext-stagger">
+          <a class="document-row" href="#" data-prototype-link><span class="document-row__index">01</span><strong class="document-row__title">Устав ассоциации</strong><span class="document-row__action">Скачать PDF <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+          <a class="document-row" href="#" data-prototype-link><span class="document-row__index">02</span><strong class="document-row__title">Декларация о создании ассоциации</strong><span class="document-row__action">Скачать PDF <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+          <a class="document-row" href="#" data-prototype-link><span class="document-row__index">03</span><strong class="document-row__title">Регламент подачи заявок в Trade Requests</strong><span class="document-row__action">Скачать PDF <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="ext-section news-section" id="news" aria-labelledby="news-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Новости</p>
+          <h2 class="ext-title" id="news-title">Новости и события</h2>
+        </div>
+
+        <div class="news-list">
+          <article class="news-item ext-reveal">
+            <button class="news-item__trigger" type="button" aria-expanded="false">
+              <span class="news-item__meta">21 июля 2026 · Москва, Россия</span>
+              <strong class="news-item__headline">Ассоциация приступила к разработке глобальной стратегии международной торговли</strong>
+              <span class="news-item__plus" aria-hidden="true"></span>
+            </button>
+            <div class="news-item__panel" aria-hidden="true"><div class="news-item__panel-inner"><div class="news-item__content">
+              <p>Ассоциация товарных и фьючерсных бирж провела Общее собрание в формате видеоконференцсвязи, в ходе которого объявила о начале работы над созданием новой системы международной недискриминационной торговли.</p>
+              <p>В члены организации официально принята Иранская энергетическая биржа (IEE), общее число участников составило 8 бирж.</p>
+              <p>Президент Петербургской Биржи Игорь Артемьев отметил, что главной задачей ассоциации является формирование основ новой системы международной торговли, которая будет недискриминационной, а участники и клиенты бирж получат доступ к полной информации о товарах.</p>
+            </div></div></div>
+          </article>
+
+          <article class="news-item ext-reveal">
+            <button class="news-item__trigger" type="button" aria-expanded="false">
+              <span class="news-item__meta">25 ноября 2025 · Россия — Китай</span>
+              <strong class="news-item__headline">От деклараций к действиям: ассоциация начнёт работу до конца 2025 года</strong>
+              <span class="news-item__plus" aria-hidden="true"></span>
+            </button>
+            <div class="news-item__panel" aria-hidden="true"><div class="news-item__panel-inner"><div class="news-item__content">
+              <p>В рамках VII Российско-Китайского энергетического бизнес-форума президент Петербургской Биржи Игорь Артемьев представил детали формирования единого биржевого пространства между странами БРИКС+, ШОС и ЕАЭС.</p>
+              <p>Ключевым инструментом интеграции станут межбиржевые трансграничные «линки» и взаимная аккредитация брокеров.</p>
+              <p>Подписаны меморандумы о взаимопонимании с ведущими китайскими площадками, включая Шанхайскую биржу нефти и газа и Хайнаньскую биржу.</p>
+              <p>До конца 2025 года запланирована официальная регистрация ассоциации.</p>
+            </div></div></div>
+          </article>
+
+          <article class="news-item ext-reveal">
+            <button class="news-item__trigger" type="button" aria-expanded="false">
+              <span class="news-item__meta">19 июня 2025 · Санкт-Петербург, Россия</span>
+              <strong class="news-item__headline">Подписание Декларации о создании ассоциации — ПМЭФ-2025</strong>
+              <span class="news-item__plus" aria-hidden="true"></span>
+            </button>
+            <div class="news-item__panel" aria-hidden="true"><div class="news-item__panel-inner"><div class="news-item__content">
+              <p>На XXVIII Петербургском международном экономическом форуме подписана декларация о создании Международной ассоциации товарных и фьючерсных бирж.</p>
+              <p>Намерение присоединиться выразили:</p>
+              <ul>
+                <li>Петербургская Биржа;</li>
+                <li>NCDEX, Индия;</li>
+                <li>IME, Иран;</li>
+                <li>AEEX, Китай;</li>
+                <li>БУТБ, Беларусь;</li>
+                <li>ЕТС, Казахстан;</li>
+                <li>УзРТСБ, Узбекистан.</li>
+              </ul>
+              <p>Декларация закрепляет намерения сторон развивать взаимодействие между товарными и фьючерсными биржами стран ЕАЭС+, БРИКС+ и ШОС, включая трансграничную торговлю и создание международного ценового агентства.</p>
+            </div></div></div>
+          </article>
+
+          <article class="news-item ext-reveal">
+            <button class="news-item__trigger" type="button" aria-expanded="false">
+              <span class="news-item__meta">12 сентября 2026 · Москва, Россия</span>
+              <strong class="news-item__headline">Общее собрание членов ассоциации</strong>
+              <span class="news-item__plus" aria-hidden="true"></span>
+            </button>
+            <div class="news-item__panel" aria-hidden="true"><div class="news-item__panel-inner"><div class="news-item__content">
+              <p>Анонс.</p>
+              <p>Плановое Общее собрание членов ассоциации, на котором будут подведены итоги первого этапа работы и рассмотрены заявки новых кандидатов на вступление.</p>
+            </div></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ext-section join-section" id="join" aria-labelledby="join-title">
+      <div class="join-layout">
+        <div class="join-copy">
+          <p class="ext-kicker ext-reveal">Развитие</p>
+          <h2 class="ext-title ext-reveal" id="join-title">Вступление в ассоциацию</h2>
+          <div class="join-copy__text ext-stagger">
+            <p class="ext-body">К ассоциации может присоединиться любая товарная или фьючерсная биржа, зарегистрированная в стране-участнице, при условии согласия с уставом и регламентами и рекомендации не менее одного действующего члена.</p>
+            <p class="ext-body">Заявка на вступление рассматривается Советом ассоциации и утверждается на Общем собрании членов.</p>
+          </div>
+          <div class="join-copy__actions ext-reveal">
+            <a class="ext-button" href="#contacts"><span>Связаться по вопросу вступления</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+          </div>
+        </div>
+        <a class="join-document ext-reveal" href="#" data-prototype-link>
+          <span class="join-document__type">DOC</span>
+          <strong>Форма заявки на вступление</strong>
+          <span class="join-document__footer"><span>Форма заявки на вступление</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="ext-section contacts-section" id="contacts" aria-labelledby="contacts-title">
+      <div class="ext-container">
+        <div class="ext-section__head ext-reveal">
+          <p class="ext-kicker">Связь</p>
+          <h2 class="ext-title" id="contacts-title">Контакты</h2>
+        </div>
+
+        <div class="contacts-grid">
+          <div class="contacts-details ext-reveal">
+            <div class="contacts-details__item"><span>Адрес</span><strong>г. Москва</strong></div>
+            <div class="contacts-details__item"><span>Email</span><strong>info@ace-exchanges.org</strong></div>
+          </div>
+
+          <form class="contact-form ext-reveal" action="#" method="post">
+            <div class="form-field"><label for="contact-name">Имя</label><input id="contact-name" name="name" type="text"></div>
+            <div class="form-field"><label for="contact-email">Email</label><input id="contact-email" name="email" type="email"></div>
+            <div class="form-field form-field--message"><label for="contact-message">Сообщение</label><textarea id="contact-message" name="message"></textarea></div>
+            <button class="ext-button contact-form__submit" type="submit"><span>Отправить</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="trade-final" id="trade-requests" aria-labelledby="trade-final-title">
+      <div class="trade-final__inner">
+        <h2 id="trade-final-title" class="ext-reveal">Trade Requests</h2>
+        <div class="trade-final__aside ext-reveal">
+          <p>Подача и просмотр заявок на покупку/продажу товара доступны только авторизованным представителям бирж-членов ассоциации.</p>
+          <a class="ext-button" href="#" data-prototype-link><span>Войти в Trade Requests</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="assets/js/typograph.js"></script>
@@ -221,6 +531,7 @@
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/smooth-scroll.js"></script>
   <script src="assets/js/motion.js"></script>
+  <script src="assets/js/extended.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>
 </body>
