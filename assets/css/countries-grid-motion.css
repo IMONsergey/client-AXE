@@ -271,7 +271,7 @@
   .members-map__flag { width: 29px; height: 29px; flex-basis: 29px; }
   .members-map__legend-item span { font-size: 11px; }
   .members-map {
-    width: 118vw;
+    width: 112vw;
   }
   .members-map__tooltip { display: none; }
 }
