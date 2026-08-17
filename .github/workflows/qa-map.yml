@@ -24,10 +24,11 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
-          html = Path('index.html').read_text(encoding='utf-8')
           js = Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
           css = Path('assets/css/countries-grid-motion.css').read_text(encoding='utf-8')
-          assert 'smooth-scroll.js' not in html
+          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+          assert "addEventListener('wheel'" not in smooth
+          assert 'enabled: false' in smooth and 'native: true' in smooth
           assert '__AXE_COUNTRIES_MAP__' in js
           assert 'cdn.jsdelivr.net/gh/johan/world.geo.json' in js
           assert 'members-map__country' in js
@@ -61,6 +62,9 @@ jobs:
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:20000 });
+
+            const scrollState = await page.evaluate(() => window.__AXE_SMOOTH_SCROLL__?.getState());
+            if (!scrollState?.native || scrollState.enabled || scrollState.running) throw new Error(`custom scroll still active ${JSON.stringify(scrollState)}`);
 
             await page.evaluate(() => document.querySelector('.about')?.scrollIntoView({ behavior:'auto', block:'center' }));
             await page.waitForTimeout(1500);
