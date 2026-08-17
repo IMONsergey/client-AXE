@@ -210,3 +210,8 @@
     transition: none !important;
   }
 }
+
+/* Grid-only concept: reuse the brand colors already established in the map variants. */
+.metric-card--dark { background: #3b7fc1; }
+.metric-card--teal { background: #b6435c; }
+.metric-card--blue { background: #008998; }
