@@ -1,5 +1,6 @@
 name: Deploy AXE preview
-# Preview source: feat/figma-concept-1 @ fb7912b7ea0b648ec07ac1821c7765ea95d0735d
+# Dark source: feat/figma-concept-1 @ fb7912b7ea0b648ec07ac1821c7765ea95d0735d
+# Light source: feat/figma-concept-light @ b5e69881f96e85352955b915c78c133dc468a319
 
 on:
   push:
@@ -25,10 +26,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout current AXE concept
+      - name: Checkout current dark AXE concept
         uses: actions/checkout@v4
         with:
           ref: feat/figma-concept-1
+
+      - name: Checkout light AXE concept
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-light
+          path: _light_source
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -40,15 +47,20 @@ jobs:
           rm -rf _site
           mkdir -p _site
 
-          # Normal preview URL.
+          # Existing dark preview remains at the original URL.
           cp index.html _site/index.html
           cp -R assets _site/assets
 
-          # Cache-isolated fallback for this exact build.
-          ALT_PATH="fresh-fb7912b7"
-          mkdir -p "_site/${ALT_PATH}"
-          cp index.html "_site/${ALT_PATH}/index.html"
-          cp -R assets "_site/${ALT_PATH}/assets"
+          # Separate light preview; all asset URLs are path-isolated from dark.
+          mkdir -p _site/light
+          cp _light_source/index.html _site/light/index.html
+          cp -R _light_source/assets _site/light/assets
+
+          # Cache-isolated light fallback for this exact branch head.
+          LIGHT_ALT_PATH="light-fresh-b5e69881"
+          mkdir -p "_site/${LIGHT_ALT_PATH}"
+          cp _light_source/index.html "_site/${LIGHT_ALT_PATH}/index.html"
+          cp -R _light_source/assets "_site/${LIGHT_ALT_PATH}/assets"
 
           touch _site/.nojekyll
 
