@@ -30,11 +30,11 @@ jobs:
 
           for anchor in ['media','management','members','documents','news','join','contacts','trade-requests']:
               assert f'id="{anchor}"' in html, anchor
-          assert html.count('class="media-slide') == 3
-          assert html.count('class="quote-card') == 3
-          assert html.count('class="member-card') == 6
-          assert html.count('class="document-row') == 3
-          assert html.count('class="news-item ext-reveal"') == 4
+          assert html.count('<article class="media-slide') == 3
+          assert html.count('<article class="quote-card') == 3
+          assert html.count('<article class="member-card') == 6
+          assert html.count('<a class="document-row') == 3
+          assert html.count('<article class="news-item ext-reveal"') == 4
           assert 'Петербургская Биржа' in html and 'NCDEX' in html and 'IEE' in html
           assert 'Шанхайскую биржу нефти и газа' in html
           assert 'info@ace-exchanges.org' in html
@@ -97,11 +97,8 @@ jobs:
             const expanded = await page.locator('.news-item').first().evaluate(el => el.classList.contains('is-open'));
             if (!expanded) throw new Error('news accordion did not open');
 
-            const noBlur = await page.evaluate(() => {
-              const css = [...document.styleSheets].filter(s => s.href?.includes('extended.css'))[0];
-              return Boolean(css);
-            });
-            if (!noBlur) throw new Error('extended stylesheet missing');
+            const stylesheetPresent = await page.evaluate(() => [...document.styleSheets].some(s => s.href?.includes('extended.css')));
+            if (!stylesheetPresent) throw new Error('extended stylesheet missing');
 
             await page.screenshot({ path:'full-1440.png', fullPage:true });
 
