@@ -18,20 +18,29 @@
     { code: 'EGY', name: 'Египет', flag: 'flag-egypt.png', color: '#91afc2' }
   ];
 
-  /* Deliberately crop the world to the AXE geography: Europe / Russia / Asia /
-     North Africa. Americas, southern Africa and Oceania never enter the view. */
+  /* Focus on AXE geography, but leave enough longitude on the right to keep
+     Russia's dateline-crossing Far East complete. */
   const WIDTH = 1200;
   const HEIGHT = 560;
   const MIN_LON = 5;
-  const MAX_LON = 180;
+  const MAX_LON = 195;
   const MIN_LAT = 15;
   const MAX_LAT = 82;
+  const PAD_X = 48;
+  const PAD_Y = 18;
   const countryByCode = new Map(countries.map((country) => [country.code, country]));
 
-  const project = ([lon, lat]) => [
-    ((lon - MIN_LON) / (MAX_LON - MIN_LON)) * WIDTH,
-    ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * HEIGHT
-  ];
+  const normalizeLon = (lon, wrapDateline = false) => {
+    if (wrapDateline && lon < 0) return lon + 360;
+    return lon;
+  };
+
+  const project = ([rawLon, lat], wrapDateline = false) => {
+    const lon = normalizeLon(rawLon, wrapDateline);
+    const x = PAD_X + ((lon - MIN_LON) / (MAX_LON - MIN_LON)) * (WIDTH - PAD_X * 2);
+    const y = PAD_Y + ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * (HEIGHT - PAD_Y * 2);
+    return [x, y];
+  };
 
   function simplifyRing(ring, limit = 520) {
     if (!Array.isArray(ring) || ring.length <= limit) return ring || [];
@@ -42,16 +51,16 @@
     return result;
   }
 
-  const polygonPath = (ring, limit) => simplifyRing(ring, limit).map((point, index) => {
-    const [x, y] = project(point);
+  const polygonPath = (ring, limit, wrapDateline = false) => simplifyRing(ring, limit).map((point, index) => {
+    const [x, y] = project(point, wrapDateline);
     return `${index ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ') + ' Z';
 
-  const geometryPath = (geometry, limit = 520) => {
+  const geometryPath = (geometry, limit = 520, wrapDateline = false) => {
     if (!geometry) return '';
-    if (geometry.type === 'Polygon') return geometry.coordinates.map((ring) => polygonPath(ring, limit)).join(' ');
+    if (geometry.type === 'Polygon') return geometry.coordinates.map((ring) => polygonPath(ring, limit, wrapDateline)).join(' ');
     if (geometry.type === 'MultiPolygon') {
-      return geometry.coordinates.flatMap((polygon) => polygon.map((ring) => polygonPath(ring, limit))).join(' ');
+      return geometry.coordinates.flatMap((polygon) => polygon.map((ring) => polygonPath(ring, limit, wrapDateline))).join(' ');
     }
     return '';
   };
@@ -195,7 +204,8 @@
     countries.forEach((country, index) => {
       const feature = selectedFeatures.get(country.code);
       if (!feature) return;
-      let pathData = geometryPath(feature.geometry, 620);
+      const wrapDateline = country.code === 'RUS';
+      let pathData = geometryPath(feature.geometry, 620, wrapDateline);
       if (country.code === 'RUS' && rfExtraPath) pathData += ` ${rfExtraPath}`;
 
       const path = makePath('members-map__country', pathData);
