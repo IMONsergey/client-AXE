@@ -6,47 +6,28 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let started = false;
 
-  cells.forEach((cell, index) => {
-    cell.style.setProperty('--country-trace-delay', `${index * 125}ms`);
-
-    if (cell.querySelector('.country__trace')) return;
-
-    const trace = document.createElement('span');
-    trace.className = 'country__trace';
-    trace.setAttribute('aria-hidden', 'true');
-
-    ['top', 'right', 'bottom', 'left'].forEach((side) => {
-      const line = document.createElement('i');
-      line.className = `country__trace-line country__trace-line--${side}`;
-      trace.appendChild(line);
-    });
-
-    cell.appendChild(trace);
-  });
-
-  function startTracing() {
+  function start() {
     if (started) return;
     started = true;
-    grid.classList.add('is-tracing');
+    grid.classList.add('is-country-intro');
   }
 
   if (reducedMotion.matches || !('IntersectionObserver' in window)) {
-    startTracing();
+    start();
   } else {
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
-      startTracing();
+      start();
       observer.disconnect();
     }, {
-      threshold: 0.24,
-      rootMargin: '0px 0px -10% 0px'
+      threshold: 0.18,
+      rootMargin: '0px 0px -8% 0px'
     });
-
     observer.observe(grid);
   }
 
   reducedMotion.addEventListener?.('change', () => {
-    if (reducedMotion.matches) startTracing();
+    if (reducedMotion.matches) start();
   });
 
   Object.defineProperty(window, '__AXE_COUNTRIES_GRID__', {
@@ -57,7 +38,7 @@
           ready: true,
           started,
           cells: cells.length,
-          traces: document.querySelectorAll('.country__trace').length,
+          traces: 0,
           visible: document.querySelectorAll('.country.is-visible').length
         };
       }
