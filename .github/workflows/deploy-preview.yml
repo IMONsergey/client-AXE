@@ -3,6 +3,7 @@ name: Deploy AXE preview
 # Light source: feat/figma-concept-light @ da70550d8b48e3897bd9afe005b15cd3dcfd4234
 # Dark map source: feat/figma-concept-map-dark @ 826101616aa918cd56a887f7be3016e75f6a5b6c
 # Light map source: feat/figma-concept-map-light @ 8145223238dd8f8380f1b9331ccc165a408e60d7
+# Full dark prototype source: feat/full-dark-site @ 7137bf8e70c8605816f76782bd712cb7020e901e
 
 on:
   push:
@@ -51,6 +52,12 @@ jobs:
           ref: feat/figma-concept-map-light
           path: _map_light_source
 
+      - name: Checkout full dark prototype
+        uses: actions/checkout@v4
+        with:
+          ref: feat/full-dark-site
+          path: _full_dark_source
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -79,6 +86,11 @@ jobs:
           mkdir -p _site/map-light
           cp _map_light_source/index.html _site/map-light/index.html
           cp -R _map_light_source/assets _site/map-light/assets
+
+          # Full dark-page prototype with sections 3–10.
+          mkdir -p _site/full-dark
+          cp _full_dark_source/index.html _site/full-dark/index.html
+          cp -R _full_dark_source/assets _site/full-dark/assets
 
           touch _site/.nojekyll
 
