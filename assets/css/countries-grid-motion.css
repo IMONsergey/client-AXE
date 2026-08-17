@@ -1,71 +1,219 @@
-/* Countries grid motion — content first, quiet grid resolve second. */
+/* Map variant: metrics/About stitch + interactive countries map. */
 
-/* Structural stitch between metrics and the right-side About matrix. It must not
-   inherit the generic reveal translation, otherwise a visible gap appears. */
 @media (min-width: 1051px) {
-  .about {
-    margin-top: -1px !important;
-  }
-
+  .about { margin-top: -1px !important; }
   .motion-ready .about-grid.motion-reveal,
-  .motion-ready .about-grid.motion-reveal.is-visible {
-    transform: none !important;
-  }
+  .motion-ready .about-grid.motion-reveal.is-visible { transform: none !important; }
 }
 
-.country > .country__trace,
-.country__trace-line {
-  display: none !important;
+.members-map {
+  --map-bg: #071b27;
+  --map-panel: rgba(255,255,255,.035);
+  --map-line: rgba(112,220,236,.13);
+  --map-line-strong: rgba(112,220,236,.25);
+  --map-text: #f5fbfc;
+  --map-muted: rgba(224,247,250,.56);
+  position: relative;
+  display: block !important;
+  margin-top: 43px !important;
+  overflow: hidden;
+  border: 1px solid rgba(112,220,236,.18) !important;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 64% 40%, rgba(0,149,166,.16), transparent 34%),
+    linear-gradient(145deg, #061722 0%, #082735 56%, #063440 100%);
+  color: var(--map-text);
+  isolation: isolate;
 }
 
-/* Keep the final geometry fully formed at all times. Only opacity changes, so
-   there are no stray travelling lines or open-looking cells during reveal. */
-.motion-ready .countries__grid .country::before {
-  opacity: 0;
-  background-size:
-    var(--country-top-size) 1px,
-    1px 100%,
-    100% 1px;
-  transition: opacity 760ms var(--motion-ease) !important;
-  transition-delay: calc(var(--motion-delay, 0ms) + 300ms) !important;
+.members-map--light {
+  --map-bg: #f8fbfc;
+  --map-panel: rgba(31,50,63,.025);
+  --map-line: rgba(99,142,158,.18);
+  --map-line-strong: rgba(99,142,158,.34);
+  --map-text: #1f323f;
+  --map-muted: rgba(31,50,63,.54);
+  border-color: #bdd3d9 !important;
+  background:
+    radial-gradient(circle at 64% 40%, rgba(0,149,166,.08), transparent 34%),
+    linear-gradient(145deg, #ffffff 0%, #f4f8f9 60%, #eef5f6 100%);
 }
 
-.motion-ready .countries__grid .country::after {
-  opacity: 0;
-  transform: scaleY(1);
-  transition: opacity 760ms var(--motion-ease) !important;
-  transition-delay: calc(var(--motion-delay, 0ms) + 300ms) !important;
+.members-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), transparent 26%, rgba(0,0,0,.10));
+}
+.members-map--light::before {
+  background: linear-gradient(180deg, rgba(255,255,255,.66), transparent 32%, rgba(189,211,217,.06));
 }
 
-.motion-ready .countries__grid .country.is-visible::before,
-.motion-ready .countries__grid .country.is-visible::after {
+.members-map__topline {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--map-line);
+  font-size: 13px;
+  line-height: 1;
+}
+.members-map__count { color: var(--map-muted); letter-spacing: .02em; }
+.members-map__active { color: var(--map-text); font-size: 15px; font-weight: 500; }
+
+.members-map__canvas { position: relative; min-height: 500px; overflow: hidden; }
+.members-map__svg { display: block; width: 100%; height: auto; min-height: 500px; overflow: hidden; }
+.members-map__graticule line { stroke: var(--map-line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.members-map__route {
+  fill: none;
+  stroke: rgba(173,240,249,.24);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 13;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  animation: membersMapRoute 18s linear infinite;
+}
+.members-map--light .members-map__route { stroke: rgba(0,137,152,.28); }
+
+.members-map__country {
+  fill: var(--country-color);
+  fill-opacity: .72;
+  stroke: rgba(235,252,254,.50);
+  stroke-width: .9;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  outline: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill-opacity 420ms cubic-bezier(.16,.84,.24,1), opacity 420ms cubic-bezier(.16,.84,.24,1), stroke 420ms ease, stroke-width 420ms ease, filter 420ms ease;
+}
+.members-map--light .members-map__country { stroke: rgba(255,255,255,.9); fill-opacity: .68; }
+.members-map[data-active-country] .members-map__country { opacity: .56; }
+.members-map .members-map__country.is-active,
+.members-map__country:hover,
+.members-map__country:focus-visible {
   opacity: 1;
+  fill-opacity: .96;
+  stroke: rgba(255,255,255,.96);
+  stroke-width: 1.55;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--country-color) 48%, transparent));
+}
+.members-map--light .members-map__country.is-active,
+.members-map--light .members-map__country:hover,
+.members-map--light .members-map__country:focus-visible {
+  stroke: rgba(31,50,63,.72);
+  filter: drop-shadow(0 5px 9px color-mix(in srgb, var(--country-color) 20%, transparent));
 }
 
-/* The flag and country name are now the first readable event. */
-.motion-ready .countries__grid .country > img,
-.motion-ready .countries__grid .country > span:not(.country__trace) {
+.members-map__node { opacity: .64; transition: opacity 360ms ease; }
+.members-map__node.is-active { opacity: 1; }
+.members-map__node-ring { fill: none; stroke: rgba(255,255,255,.42); stroke-width: 1; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; }
+.members-map--light .members-map__node-ring { stroke: rgba(31,50,63,.30); }
+.members-map__node.is-active .members-map__node-ring { animation: membersMapPulse 2.8s ease-out infinite; }
+.members-map__node-core { fill: var(--country-color); stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.members-map--light .members-map__node-core { stroke: rgba(31,50,63,.55); }
+
+.members-map__legend {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--map-line);
+}
+.members-map__legend-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 9px minmax(0,1fr) auto;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  min-height: 72px;
+  padding: 0 14px;
+  border: 0;
+  border-right: 1px solid var(--map-line);
+  color: var(--map-muted);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 320ms ease, background-color 320ms ease;
+}
+.members-map__legend-item:last-child { border-right: 0; }
+.members-map__legend-item:hover,
+.members-map__legend-item:focus-visible,
+.members-map__legend-item.is-active { color: var(--map-text); background: rgba(255,255,255,.045); outline: none; }
+.members-map--light .members-map__legend-item:hover,
+.members-map--light .members-map__legend-item:focus-visible,
+.members-map--light .members-map__legend-item.is-active { background: rgba(0,137,152,.055); }
+.members-map__legend-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--country-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--country-color) 16%, transparent); }
+.members-map__legend-item span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; }
+.members-map__legend-item small { color: rgba(224,247,250,.30); font-size: 9px; font-variant-numeric: tabular-nums; }
+.members-map--light .members-map__legend-item small { color: rgba(31,50,63,.28); }
+
+.members-map__tooltip {
+  position: absolute;
+  z-index: 8;
+  transform: translate(14px, -50%);
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 4px;
+  color: #fff;
+  background: rgba(4,18,27,.90);
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
   opacity: 0;
-  transform: translate3d(0, 7px, 0);
-  transition:
-    opacity 900ms var(--motion-ease),
-    transform 1160ms var(--motion-ease-soft);
-  transition-delay: var(--motion-delay, 0ms) !important;
+  transition: opacity 160ms ease;
+}
+.members-map--light .members-map__tooltip { color: #1f323f; border-color: rgba(31,50,63,.12); background: rgba(255,255,255,.94); }
+.members-map__tooltip[aria-hidden="false"] { opacity: 1; }
+
+.motion-ready .members-map__topline,
+.motion-ready .members-map__canvas,
+.motion-ready .members-map__legend {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity 900ms var(--motion-ease), transform 1200ms var(--motion-ease-soft);
+}
+.motion-ready .members-map.is-country-intro.is-map-ready .members-map__topline,
+.motion-ready .members-map.is-country-intro.is-map-ready .members-map__canvas,
+.motion-ready .members-map.is-country-intro.is-map-ready .members-map__legend { opacity: 1; transform: none; }
+.motion-ready .members-map.is-country-intro.is-map-ready .members-map__canvas { transition-delay: 90ms; }
+.motion-ready .members-map.is-country-intro.is-map-ready .members-map__legend { transition-delay: 220ms; }
+
+@keyframes membersMapRoute { to { stroke-dashoffset: -180; } }
+@keyframes membersMapPulse { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.2); opacity: 0; } }
+
+@media (max-width: 900px) {
+  .members-map__canvas { min-height: 430px; }
+  .members-map__svg { min-height: 430px; }
+  .members-map__legend { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .members-map__legend-item { border-bottom: 1px solid var(--map-line); }
+  .members-map__legend-item:nth-child(4n) { border-right: 0; }
 }
 
-.motion-ready .countries__grid .country.is-visible > img,
-.motion-ready .countries__grid .country.is-visible > span:not(.country__trace) {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
+@media (max-width: 680px) {
+  .members-map { margin-top: 34px !important; border-radius: 7px; }
+  .members-map__topline { min-height: 58px; padding-inline: 16px; }
+  .members-map__active { font-size: 13px; }
+  .members-map__canvas { min-height: 330px; }
+  .members-map__svg { width: 150%; min-height: 330px; transform: translateX(-26%); }
+  .members-map__legend { display: flex; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .members-map__legend::-webkit-scrollbar { display: none; }
+  .members-map__legend-item { flex: 0 0 142px; min-height: 62px; scroll-snap-align: start; border-bottom: 0; }
+  .members-map__legend-item:nth-child(4n) { border-right: 1px solid var(--map-line); }
+  .members-map__tooltip { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .motion-ready .countries__grid .country::before,
-  .motion-ready .countries__grid .country::after,
-  .motion-ready .countries__grid .country > img,
-  .motion-ready .countries__grid .country > span:not(.country__trace) {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
+  .members-map__route,
+  .members-map__node-ring { animation: none !important; }
+  .motion-ready .members-map__topline,
+  .motion-ready .members-map__canvas,
+  .motion-ready .members-map__legend { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
