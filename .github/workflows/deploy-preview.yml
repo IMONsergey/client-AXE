@@ -1,6 +1,6 @@
 name: Deploy AXE preview
-# Dark source: feat/figma-concept-1 @ fb7912b7ea0b648ec07ac1821c7765ea95d0735d
-# Light source: feat/figma-concept-light @ e67dc93e5232a76ef0961d3c404e28b69d18741c
+# Dark source: feat/figma-concept-1 @ 1b335cbeaf2c979308af051903433c4a4bcb93d8
+# Light source: feat/figma-concept-light @ 6fdc3fceaa1132fc17b923163ea9d5777b37f5a3
 
 on:
   push:
@@ -56,11 +56,17 @@ jobs:
           cp _light_source/index.html _site/light/index.html
           cp -R _light_source/assets _site/light/assets
 
-          # Cache-isolated light fallback for this exact branch head.
-          LIGHT_ALT_PATH="light-fresh-e67dc93e"
+          # Cache-isolated light fallback for this exact build.
+          LIGHT_ALT_PATH="light-fresh-6fdc3fce"
           mkdir -p "_site/${LIGHT_ALT_PATH}"
           cp _light_source/index.html "_site/${LIGHT_ALT_PATH}/index.html"
           cp -R _light_source/assets "_site/${LIGHT_ALT_PATH}/assets"
+
+          # Cache-isolated dark fallback for this exact build.
+          DARK_ALT_PATH="fresh-1b335cbe"
+          mkdir -p "_site/${DARK_ALT_PATH}"
+          cp index.html "_site/${DARK_ALT_PATH}/index.html"
+          cp -R assets "_site/${DARK_ALT_PATH}/assets"
 
           touch _site/.nojekyll
 
