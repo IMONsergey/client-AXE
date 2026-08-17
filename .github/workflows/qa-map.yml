@@ -1,0 +1,124 @@
+name: QA AXE interactive map
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-map-dark
+      - feat/figma-concept-map-light
+    paths:
+      - index.html
+      - assets/css/**
+      - assets/js/**
+      - .github/workflows/qa-map.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qa-map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Static map invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          js = Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
+          css = Path('assets/css/countries-grid-motion.css').read_text(encoding='utf-8')
+          assert 'smooth-scroll.js' not in html
+          assert '__AXE_COUNTRIES_MAP__' in js
+          assert 'cdn.jsdelivr.net/gh/johan/world.geo.json' in js
+          assert 'members-map__country' in js
+          assert 'members-map__legend' in css
+          assert 'margin-top: -1px !important' in css
+          assert 'about-grid.motion-reveal' in css
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-map-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify map runtime and geometry
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const closeTo = (a,b,t,label) => { if (Math.abs(a-b) > t) throw new Error(`${label}: ${a} vs ${b}`); };
+          (async () => {
+            const browser = await chromium.launch({ headless:true });
+            const page = await browser.newPage({ viewport:{ width:1440, height:1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            await page.goto('http://127.0.0.1:4173/', { waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:20000 });
+
+            await page.evaluate(() => document.querySelector('.about')?.scrollIntoView({ behavior:'auto', block:'center' }));
+            await page.waitForTimeout(1500);
+            const stitch = await page.evaluate(() => {
+              const metrics = document.querySelector('.metrics').getBoundingClientRect();
+              const aboutGrid = document.querySelector('.about-grid').getBoundingClientRect();
+              return { metricsBottom:metrics.bottom, aboutTop:aboutGrid.top, transform:getComputedStyle(document.querySelector('.about-grid')).transform };
+            });
+            closeTo(stitch.aboutTop, stitch.metricsBottom, 2.2, 'metrics/about stitch');
+            if (stitch.transform !== 'none') throw new Error(`about grid transform ${stitch.transform}`);
+
+            await page.evaluate(() => document.querySelector('.members-map')?.scrollIntoView({ behavior:'auto', block:'center' }));
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().started === true, null, { timeout:5000 });
+            await page.waitForTimeout(900);
+            const state = await page.evaluate(() => ({
+              map: window.__AXE_COUNTRIES_MAP__.getState(),
+              legends: document.querySelectorAll('.members-map__legend-item').length,
+              paths: document.querySelectorAll('.members-map__country').length,
+              height: document.querySelector('.members-map').getBoundingClientRect().height
+            }));
+            if (state.map.countries !== 7 || state.legends !== 7 || state.paths !== 7) throw new Error(`map inventory ${JSON.stringify(state)}`);
+            if (state.height < 500) throw new Error(`map too short ${state.height}`);
+
+            await page.hover('.members-map__legend-item[data-code="CHN"]');
+            await page.waitForTimeout(180);
+            const active = await page.evaluate(() => ({
+              state: window.__AXE_COUNTRIES_MAP__.getState(),
+              label: document.querySelector('.members-map__active').textContent,
+              activePaths: document.querySelectorAll('.members-map__country.is-active').length
+            }));
+            if (active.state.activeCode !== 'CHN' || active.label.trim() !== 'Китай' || active.activePaths !== 1) throw new Error(`map interaction ${JSON.stringify(active)}`);
+
+            await page.locator('.countries').screenshot({ path:'map-1440.png' });
+
+            await page.setViewportSize({ width:390, height:844 });
+            await page.reload({ waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:20000 });
+            await page.evaluate(() => document.querySelector('.members-map')?.scrollIntoView({ behavior:'auto', block:'center' }));
+            await page.waitForTimeout(900);
+            const mobile = await page.evaluate(() => ({
+              width: document.querySelector('.members-map').getBoundingClientRect().width,
+              legendScroll: document.querySelector('.members-map__legend').scrollWidth > document.querySelector('.members-map__legend').clientWidth,
+              paths: document.querySelectorAll('.members-map__country').length
+            }));
+            if (!mobile.legendScroll || mobile.paths !== 7 || mobile.width > 390) throw new Error(`mobile map ${JSON.stringify(mobile)}`);
+            await page.locator('.countries').screenshot({ path:'map-390.png' });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axe-map-visual-qa
+          path: |
+            map-1440.png
+            map-390.png
+          if-no-files-found: error
+          retention-days: 1
