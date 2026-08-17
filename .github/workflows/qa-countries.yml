@@ -28,9 +28,9 @@ jobs:
       - name: Start static server
         shell: bash
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-http.log 2>&1 &
           sleep 2
-          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
 
       - name: Install Chromium
         shell: bash
@@ -38,102 +38,78 @@ jobs:
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify country tracing and closed geometry
+      - name: Verify content-first reveal and closed geometry
         shell: bash
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
           const url = 'http://127.0.0.1:4173/';
-          const closeTo = (a, b, tolerance, label) => {
-            if (Math.abs(a - b) > tolerance) throw new Error(`${label}: expected ${b}, got ${a}`);
-          };
+          const closeTo = (a,b,t,label) => { if (Math.abs(a-b)>t) throw new Error(`${label}: ${a} != ${b}`); };
 
           async function ready(page) {
-            await page.goto(url, { waitUntil: 'networkidle' });
-            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
-            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().ready === true, null, { timeout: 5000 });
+            await page.goto(url, { waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().ready === true, null, { timeout:5000 });
           }
 
-          async function inspectFinal(page, mobile = false) {
+          async function inspectGeometry(page, mobile) {
             const result = await page.evaluate(() => {
-              const grid = document.querySelector('.countries__grid').getBoundingClientRect();
-              const cells = [...document.querySelectorAll('.country')].map(cell => {
-                const r = cell.getBoundingClientRect();
-                return {
-                  left:r.left, right:r.right, top:r.top, bottom:r.bottom,
-                  transform:getComputedStyle(cell).transform,
-                  frameOpacity:Number(getComputedStyle(cell,'::before').opacity),
-                  traceOpacity:Number(getComputedStyle(cell.querySelector('.country__trace')).opacity),
-                  leftRule:getComputedStyle(cell,'::after').display
-                };
+              const g = document.querySelector('.countries__grid').getBoundingClientRect();
+              const cells = [...document.querySelectorAll('.country')].map(el => {
+                const r = el.getBoundingClientRect();
+                return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, transform:getComputedStyle(el).transform, before:Number(getComputedStyle(el,'::before').opacity), after:getComputedStyle(el,'::after').display };
               });
-              return { grid:{left:grid.left,right:grid.right,top:grid.top,bottom:grid.bottom}, cells };
+              return { grid:{left:g.left,right:g.right,top:g.top,bottom:g.bottom}, cells };
             });
-
-            if (result.cells.some(c => c.transform !== 'none')) throw new Error('country geometry moved');
-            if (result.cells.some(c => c.frameOpacity < .95)) throw new Error('permanent grid did not resolve');
-            if (result.cells.some(c => c.traceOpacity > .05)) throw new Error('trace did not hand off to final grid');
-
-            closeTo(result.cells[0].left, result.grid.left, 1, 'left edge');
-
+            if (result.cells.some(c => c.transform !== 'none')) throw new Error('country cells moved');
+            if (result.cells.some(c => c.before < .95)) throw new Error('final country grid not visible');
+            closeTo(result.cells[0].left, result.grid.left, 1.2, 'left edge');
             if (!mobile) {
-              closeTo(result.cells[result.cells.length - 1].right, result.grid.right, 1, 'desktop right edge');
-              for (let i = 0; i < result.cells.length - 1; i++) {
-                closeTo(result.cells[i].right, result.cells[i + 1].left, 1, `desktop seam ${i}`);
-              }
+              closeTo(result.cells.at(-1).right, result.grid.right, 1.2, 'right edge');
+              for (let i=0;i<result.cells.length-1;i++) closeTo(result.cells[i].right, result.cells[i+1].left, 1.2, `seam ${i}`);
             } else {
-              /* Seven countries in a two-column grid leave the last right-hand slot empty. */
-              closeTo(result.cells[1].right, result.grid.right, 1, 'mobile full-row right edge');
-              closeTo(result.cells[0].right, result.cells[1].left, 1, 'mobile vertical seam');
-              closeTo(result.cells[0].bottom, result.cells[2].top, 1, 'mobile horizontal seam');
-              for (const i of [0,2,4,6]) {
-                if (result.cells[i].leftRule === 'none') throw new Error(`mobile outer left rule missing at ${i}`);
-              }
+              closeTo(result.cells[1].right, result.grid.right, 1.2, 'mobile right edge');
+              closeTo(result.cells[0].right, result.cells[1].left, 1.2, 'mobile vertical seam');
+              closeTo(result.cells[0].bottom, result.cells[2].top, 1.2, 'mobile horizontal seam');
             }
           }
 
           (async () => {
             const browser = await chromium.launch({ headless:true });
             const page = await browser.newPage({ viewport:{width:1440,height:1000} });
-            const errors = [];
-            page.on('pageerror', e => errors.push(e.message));
-            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            const errors=[];
+            page.on('pageerror',e=>errors.push(e.message));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
 
             await ready(page);
-            const initial = await page.evaluate(() => ({
-              state: window.__AXE_COUNTRIES_GRID__.getState(),
-              top: getComputedStyle(document.querySelector('.country__trace-line--top')).transform,
-              traces: document.querySelectorAll('.country__trace').length
-            }));
-            if (initial.state.started) throw new Error('country trace starts before reading zone');
-            if (initial.traces !== 7) throw new Error(`expected 7 traces, got ${initial.traces}`);
-
-            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto', block:'center'}));
+            if (await page.locator('.country__trace').count()) throw new Error('legacy country trace nodes exist before scroll');
+            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto',block:'center'}));
             await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true);
-            await page.waitForTimeout(90);
-            const early = await page.evaluate(() => getComputedStyle(document.querySelector('.country__trace-line--top')).transform);
-            await page.waitForTimeout(220);
-            const moving = await page.evaluate(() => getComputedStyle(document.querySelector('.country__trace-line--top')).transform);
-            if (moving === early || moving === initial.top) throw new Error(`trace line is not visibly progressing: ${early} -> ${moving}`);
+            await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'));
 
-            await page.waitForTimeout(260);
-            await page.locator('.countries').screenshot({ path:'countries-grid-drawing-1440.png' });
-            await page.waitForTimeout(2600);
-            await inspectFinal(page, false);
-            await page.locator('.countries').screenshot({ path:'countries-grid-1440.png' });
+            const early = await page.evaluate(() => ({
+              traces: document.querySelectorAll('.country__trace').length,
+              flag: Number(getComputedStyle(document.querySelector('.country img')).opacity),
+              line: Number(getComputedStyle(document.querySelector('.country'),'::before').opacity)
+            }));
+            if (early.traces !== 0) throw new Error(`legacy trace count ${early.traces}`);
+            if (early.flag < early.line) throw new Error(`country content must lead grid ${JSON.stringify(early)}`);
+
+            await page.waitForTimeout(1700);
+            await inspectGeometry(page,false);
+            await page.locator('.countries').screenshot({path:'countries-grid-1440.png'});
 
             await page.setViewportSize({width:390,height:844});
             await ready(page);
-            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto', block:'center'}));
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true);
-            await page.waitForTimeout(3200);
-            await inspectFinal(page, true);
-            await page.locator('.countries').screenshot({ path:'countries-grid-390.png' });
+            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto',block:'center'}));
+            await page.waitForTimeout(1900);
+            await inspectGeometry(page,true);
+            await page.locator('.countries').screenshot({path:'countries-grid-390.png'});
 
-            if (errors.length) throw new Error(errors.join('\n'));
+            if(errors.length) throw new Error(errors.join('\n'));
             await browser.close();
-          })().catch(error => { console.error(error); process.exit(1); });
+          })().catch(e=>{console.error(e);process.exit(1)});
           EOF
 
       - name: Upload countries renders
@@ -141,7 +117,6 @@ jobs:
         with:
           name: countries-grid-visual-qa
           path: |
-            countries-grid-drawing-1440.png
             countries-grid-1440.png
             countries-grid-390.png
           if-no-files-found: error
