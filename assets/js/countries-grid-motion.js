@@ -6,28 +6,34 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const isLight = getComputedStyle(stage || document.body).color === 'rgb(31, 50, 63)';
 
+  /* Map variants intentionally share one palette. The dark-page alternative
+     uses the same cartographic colors as the light-page alternative. */
   const countries = [
-    { code: 'RUS', name: 'Россия', flag: 'flag-russia.png', color: isLight ? '#3b7fc1' : '#2fcfe2' },
-    { code: 'BLR', name: 'Беларусь', flag: 'flag-belarus.png', color: isLight ? '#008998' : '#149cb0' },
-    { code: 'KAZ', name: 'Казахстан', flag: 'flag-kazakhstan.png', color: isLight ? '#5aa7b5' : '#55b6c5' },
-    { code: 'UZB', name: 'Узбекистан', flag: 'flag-uzbekistan.png', color: isLight ? '#7899b4' : '#6d9fbd' },
-    { code: 'CHN', name: 'Китай', flag: 'flag-china.png', color: isLight ? '#b6435c' : '#168ea8' },
-    { code: 'IRN', name: 'Иран', flag: 'flag-iran.png', color: isLight ? '#6eafbb' : '#7bc3cf' },
-    { code: 'EGY', name: 'Египет', flag: 'flag-egypt.png', color: isLight ? '#91afc2' : '#a8d9df' }
+    { code: 'RUS', name: 'Россия', flag: 'flag-russia.png', color: '#3b7fc1' },
+    { code: 'BLR', name: 'Беларусь', flag: 'flag-belarus.png', color: '#008998' },
+    { code: 'KAZ', name: 'Казахстан', flag: 'flag-kazakhstan.png', color: '#5aa7b5' },
+    { code: 'UZB', name: 'Узбекистан', flag: 'flag-uzbekistan.png', color: '#7899b4' },
+    { code: 'CHN', name: 'Китай', flag: 'flag-china.png', color: '#b6435c' },
+    { code: 'IRN', name: 'Иран', flag: 'flag-iran.png', color: '#6eafbb' },
+    { code: 'EGY', name: 'Египет', flag: 'flag-egypt.png', color: '#91afc2' }
   ];
 
+  /* Deliberately crop the world to the AXE geography: Europe / Russia / Asia /
+     North Africa. Americas, southern Africa and Oceania never enter the view. */
   const WIDTH = 1200;
   const HEIGHT = 560;
-  const MIN_LAT = -60;
-  const MAX_LAT = 85;
+  const MIN_LON = 5;
+  const MAX_LON = 180;
+  const MIN_LAT = 15;
+  const MAX_LAT = 82;
   const countryByCode = new Map(countries.map((country) => [country.code, country]));
 
   const project = ([lon, lat]) => [
-    ((lon + 180) / 360) * WIDTH,
-    ((MAX_LAT - Math.max(MIN_LAT, Math.min(MAX_LAT, lat))) / (MAX_LAT - MIN_LAT)) * HEIGHT
+    ((lon - MIN_LON) / (MAX_LON - MIN_LON)) * WIDTH,
+    ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * HEIGHT
   ];
 
-  function simplifyRing(ring, limit = 180) {
+  function simplifyRing(ring, limit = 520) {
     if (!Array.isArray(ring) || ring.length <= limit) return ring || [];
     const step = Math.max(1, Math.ceil(ring.length / limit));
     const result = ring.filter((_, index) => index % step === 0);
@@ -36,49 +42,70 @@
     return result;
   }
 
-  const polygonPath = (ring) => simplifyRing(ring).map((point, index) => {
+  const polygonPath = (ring, limit) => simplifyRing(ring, limit).map((point, index) => {
     const [x, y] = project(point);
     return `${index ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ') + ' Z';
 
-  const geometryPath = (geometry) => {
+  const geometryPath = (geometry, limit = 520) => {
     if (!geometry) return '';
-    if (geometry.type === 'Polygon') return geometry.coordinates.map(polygonPath).join(' ');
+    if (geometry.type === 'Polygon') return geometry.coordinates.map((ring) => polygonPath(ring, limit)).join(' ');
     if (geometry.type === 'MultiPolygon') {
-      return geometry.coordinates.flatMap((polygon) => polygon.map(polygonPath)).join(' ');
+      return geometry.coordinates.flatMap((polygon) => polygon.map((ring) => polygonPath(ring, limit))).join(' ');
     }
     return '';
   };
 
+  function geometryTouchesViewport(geometry) {
+    let visible = false;
+    const visit = (value) => {
+      if (visible || !Array.isArray(value)) return;
+      if (typeof value[0] === 'number' && typeof value[1] === 'number') {
+        const [lon, lat] = value;
+        if (lon >= MIN_LON && lon <= MAX_LON && lat >= MIN_LAT && lat <= MAX_LAT) visible = true;
+        return;
+      }
+      value.forEach(visit);
+    };
+    visit(geometry?.coordinates);
+    return visible;
+  }
+
+  const inner = grid.parentElement;
+  const title = inner?.querySelector('#countries-title');
+  const head = document.createElement('div');
+  head.className = 'countries__head';
+  if (title) head.appendChild(title);
+
+  const legend = document.createElement('div');
+  legend.className = 'members-map__legend';
+  legend.setAttribute('role', 'list');
+  legend.setAttribute('aria-label', 'Страны—участники');
+  legend.innerHTML = countries.map((country) => `
+    <button class="members-map__legend-item" type="button" role="listitem" data-code="${country.code}" style="--country-color:${country.color}">
+      <img class="members-map__flag" src="assets/images/${country.flag}" alt="" width="32" height="32">
+      <span>${country.name}</span>
+    </button>
+  `).join('');
+  head.appendChild(legend);
+  inner?.insertBefore(head, grid);
+
   grid.className = `countries__grid members-map${isLight ? ' members-map--light' : ''}`;
   grid.innerHTML = `
-    <div class="members-map__meta" aria-hidden="true">
-      <span class="members-map__count">7 стран-участниц</span>
-      <span class="members-map__active">Россия</span>
-    </div>
     <div class="members-map__canvas">
-      <svg class="members-map__svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="Карта мира со странами-участницами. Границы Российской Федерации отображены в соответствии с официальной российской картографической трактовкой.">
+      <svg class="members-map__svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Карта региона со странами-участницами. Границы Российской Федерации отображены в соответствии с официальной российской картографической трактовкой.">
         <g class="members-map__world" aria-hidden="true"></g>
         <g class="members-map__selected" aria-label="Страны—участники"></g>
       </svg>
       <div class="members-map__tooltip" role="status" aria-hidden="true"></div>
     </div>
-    <div class="members-map__legend" role="list" aria-label="Страны—участники">
-      ${countries.map((country) => `
-        <button class="members-map__legend-item" type="button" role="listitem" data-code="${country.code}" style="--country-color:${country.color}">
-          <img class="members-map__flag" src="assets/images/${country.flag}" alt="" width="34" height="34">
-          <span>${country.name}</span>
-        </button>
-      `).join('')}
-    </div>
   `;
 
   const worldLayer = grid.querySelector('.members-map__world');
   const selectedLayer = grid.querySelector('.members-map__selected');
-  const activeLabel = grid.querySelector('.members-map__active');
   const tooltip = grid.querySelector('.members-map__tooltip');
   const canvas = grid.querySelector('.members-map__canvas');
-  const legendItems = [...grid.querySelectorAll('.members-map__legend-item')];
+  const legendItems = [...legend.querySelectorAll('.members-map__legend-item')];
 
   let activeCode = 'RUS';
   let started = false;
@@ -90,7 +117,6 @@
     if (!country) return;
     activeCode = code;
     grid.dataset.activeCountry = code;
-    activeLabel.textContent = country.name;
 
     grid.querySelectorAll('[data-country]').forEach((node) => {
       node.classList.toggle('is-active', node.dataset.country === code);
@@ -144,22 +170,23 @@
     const selectedFeatures = new Map();
 
     features.forEach((feature) => {
-      const pathData = geometryPath(feature.geometry);
-      if (!pathData) return;
-
       if (countryByCode.has(feature.id)) {
         selectedFeatures.set(feature.id, feature);
         return;
       }
+      if (!geometryTouchesViewport(feature.geometry)) return;
 
+      const pathData = geometryPath(feature.geometry, 300);
+      if (!pathData) return;
       const path = makePath('members-map__land', pathData);
+      path.dataset.worldCountry = feature.id || '';
       worldLayer.appendChild(path);
     });
 
     let rfExtraPath = '';
     try {
       const regions = await Promise.all(RF_REGION_URLS.map(loadJson));
-      rfExtraPath = regions.map((feature) => geometryPath(feature.geometry)).join(' ');
+      rfExtraPath = regions.map((feature) => geometryPath(feature.geometry, 620)).join(' ');
       rfOverrideLoaded = Boolean(rfExtraPath);
     } catch (error) {
       console.warn('AXE map: RF border override unavailable, base geometry used', error);
@@ -168,7 +195,7 @@
     countries.forEach((country, index) => {
       const feature = selectedFeatures.get(country.code);
       if (!feature) return;
-      let pathData = geometryPath(feature.geometry);
+      let pathData = geometryPath(feature.geometry, 620);
       if (country.code === 'RUS' && rfExtraPath) pathData += ` ${rfExtraPath}`;
 
       const path = makePath('members-map__country', pathData);
@@ -189,7 +216,7 @@
   }
 
   buildMap().catch((error) => {
-    console.error('AXE world map failed', error);
+    console.error('AXE regional map failed', error);
     grid.classList.add('is-map-error');
   });
 
@@ -235,7 +262,8 @@
           paths: grid.querySelectorAll('.members-map__country').length,
           worldPaths: grid.querySelectorAll('.members-map__land').length,
           rfOverrideLoaded,
-          light: isLight
+          light: isLight,
+          viewport: { minLon: MIN_LON, maxLon: MAX_LON, minLat: MIN_LAT, maxLat: MAX_LAT }
         };
       }
     }
