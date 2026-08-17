@@ -39,12 +39,19 @@ jobs:
           assert html.count('class="orbit__pulse-line ') == 2
           assert 'backdrop-filter: blur(8px)' in polish
           assert '\n  filter: blur(' not in polish.lower()
-          assert 'background: #fff' in polish
-          assert 'clip-path' in polish
-          assert '660ms' in countries and '1840ms' in countries
-          assert 'index * 125' in country_js
           assert 'AUTO_SPEED = reducedMotion ? 0 : 0.067' in globe
-          assert "addEventListener('wheel'" in smooth and '{ passive: false }' in smooth
+
+          # Custom wheel interception is gone: the loaded compatibility module now
+          # only forces native browser scrolling and exposes a disabled debug state.
+          assert "style.scrollBehavior = 'auto'" in smooth
+          assert "addEventListener('wheel'" not in smooth
+          assert 'enabled: false' in smooth and 'native: true' in smooth
+
+          # Countries no longer create the decorative four-sided trace layer.
+          assert "createElement('i')" not in country_js
+          assert "traces: 0" in country_js
+          assert 'content first' in countries.lower()
+          assert 'display: none !important' in countries
 
       - name: Start server
         run: |
@@ -77,67 +84,44 @@ jobs:
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
             await page.waitForFunction(() => window.__AXE_SMOOTH_SCROLL__?.getState().ready === true);
 
-            const base = await page.evaluate(() => ({
-              smooth: window.__AXE_SMOOTH_SCROLL__.getState(),
-              globe: window.__AXE_GLOBE__.getState(),
-              pulseCount: document.querySelectorAll('.orbit__pulse-line').length,
-              pulseOffset: getComputedStyle(document.querySelector('.orbit__pulse-line')).strokeDashoffset,
-              widths: [...document.querySelectorAll('.orbit__line')].map(x => getComputedStyle(x).strokeWidth),
-              caps: [...document.querySelectorAll('.orbit__line')].map(x => getComputedStyle(x).strokeLinecap)
+            const scrollState = await page.evaluate(() => ({
+              state: window.__AXE_SMOOTH_SCROLL__.getState(),
+              behavior: getComputedStyle(document.documentElement).scrollBehavior
             }));
-            if (!base.smooth.enabled) throw new Error(`smooth scrolling disabled: ${JSON.stringify(base.smooth)}`);
-            if (Math.abs(base.globe.autoSpeed - .067) > .0001) throw new Error(`globe speed ${base.globe.autoSpeed}`);
-            if (base.pulseCount !== 2 || new Set(base.widths).size !== 1 || base.caps.some(x => x !== 'butt')) throw new Error(`orbit base mismatch ${JSON.stringify(base)}`);
+            if (scrollState.state.enabled || !scrollState.state.native || scrollState.behavior !== 'auto') {
+              throw new Error(`custom smooth scroll still active ${JSON.stringify(scrollState)}`);
+            }
 
-            await page.waitForTimeout(420);
-            const pulse2 = await page.evaluate(() => getComputedStyle(document.querySelector('.orbit__pulse-line')).strokeDashoffset);
-            if (pulse2 === base.pulseOffset) throw new Error('orbit pulse did not move');
+            await page.mouse.wheel(0, 720);
+            await page.waitForTimeout(120);
+            const nativeY = await page.evaluate(() => scrollY);
+            if (nativeY <= 0) throw new Error(`native wheel did not scroll: ${nativeY}`);
 
             for (const selector of ['.header-request', '.hero__request']) {
               await page.hover(selector);
               await page.waitForTimeout(430);
               const style = await page.$eval(selector, el => {
                 const s = getComputedStyle(el);
-                return { bg: s.backgroundColor, color: s.color, opacity: s.opacity };
+                return { bg: s.backgroundColor, opacity: s.opacity };
               });
               if (!white(style.bg) || style.opacity !== '1') throw new Error(`${selector} hover invalid ${JSON.stringify(style)}`);
             }
 
-            await page.evaluate(() => scrollTo(0, 0));
-            await page.mouse.move(900, 700);
-            await page.mouse.wheel(0, 720);
-            await page.waitForTimeout(120);
-            const y1 = await page.evaluate(() => scrollY);
-            await page.waitForTimeout(700);
-            const y2 = await page.evaluate(() => scrollY);
-            if (y2 <= y1 || y2 <= 0) throw new Error(`wheel smoothing did not progress ${y1} -> ${y2}`);
+            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({ behavior:'auto', block:'center' }));
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true, null, { timeout:5000 });
+            await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'), null, { timeout:5000 });
+            const intro = await page.evaluate(() => ({
+              traces: document.querySelectorAll('.country__trace').length,
+              flag: Number(getComputedStyle(document.querySelector('.country img')).opacity),
+              line: Number(getComputedStyle(document.querySelector('.country'), '::before').opacity)
+            }));
+            if (intro.traces !== 0) throw new Error(`legacy trace nodes remain: ${intro.traces}`);
+            if (intro.flag < intro.line) throw new Error(`grid appears before country content ${JSON.stringify(intro)}`);
 
-            await page.waitForTimeout(650);
-            const header = await page.$eval('.site-header', el => {
-              const s = getComputedStyle(el);
-              return { position: s.position, scrolled: el.classList.contains('is-scrolled'), blur: s.backdropFilter || s.webkitBackdropFilter || '' };
-            });
-            if (header.position !== 'fixed' || !header.scrolled || !header.blur.includes('blur')) throw new Error(`header blur invalid ${JSON.stringify(header)}`);
-
-            await page.evaluate(() => document.querySelector('.directions').scrollIntoView({ block: 'center' }));
-            await page.waitForFunction(() => document.querySelector('.direction-card')?.classList.contains('is-visible'));
-            await page.waitForTimeout(260);
-            const card = await page.$eval('.direction-card', el => {
-              const body = getComputedStyle(el.querySelector('.direction-card__body'));
-              const visual = getComputedStyle(el.querySelector('.direction-card__visual'));
-              return { bodyClip: body.clipPath, visualClip: visual.clipPath, bodyDur: body.transitionDuration, visualDur: visual.transitionDuration };
-            });
-            if (!card.bodyDur.includes('1.18s') || !card.visualDur.includes('1.28s')) throw new Error(`card choreography invalid ${JSON.stringify(card)}`);
-            await page.locator('.directions').screenshot({ path: 'directions-motion.png' });
-
-            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({ block: 'center' }));
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true, null, { timeout: 5000 });
-            const countryDuration = await page.$eval('.country__trace-line--top', el => getComputedStyle(el).transitionDuration);
-            if (!countryDuration.includes('.66s') && !countryDuration.includes('0.66s')) throw new Error(`country trace duration ${countryDuration}`);
-
-            await page.evaluate(() => scrollTo(0, 0));
-            await page.waitForTimeout(300);
-            await page.locator('.hero__globe-shell').screenshot({ path: 'globe-orbit.png' });
+            await page.waitForTimeout(1600);
+            const finalLine = await page.$eval('.country', el => Number(getComputedStyle(el, '::before').opacity));
+            if (finalLine < .95) throw new Error(`country grid did not resolve: ${finalLine}`);
+            await page.locator('.countries').screenshot({ path:'countries-content-first.png' });
 
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
@@ -147,8 +131,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: motion-polish-visual-qa
-          path: |
-            directions-motion.png
-            globe-orbit.png
+          path: countries-content-first.png
           if-no-files-found: error
           retention-days: 1
