@@ -1,0 +1,140 @@
+name: QA AXE full dark prototype
+
+on:
+  push:
+    branches:
+      - feat/full-dark-site
+    paths:
+      - index.html
+      - assets/css/**
+      - assets/js/**
+      - .github/workflows/qa-full-dark.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qa-full-dark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Static full-site invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          css = Path('assets/css/extended.css').read_text(encoding='utf-8')
+          js = Path('assets/js/extended.js').read_text(encoding='utf-8')
+          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+
+          for anchor in ['media','management','members','documents','news','join','contacts','trade-requests']:
+              assert f'id="{anchor}"' in html, anchor
+          assert html.count('class="media-slide') == 3
+          assert html.count('class="quote-card') == 3
+          assert html.count('class="member-card') == 6
+          assert html.count('class="document-row') == 3
+          assert html.count('class="news-item ext-reveal"') == 4
+          assert 'Петербургская Биржа' in html and 'NCDEX' in html and 'IEE' in html
+          assert 'Шанхайскую биржу нефти и газа' in html
+          assert 'info@ace-exchanges.org' in html
+          assert '__AXE_EXTENDED__' in js
+          assert 'IntersectionObserver' in js
+          assert 'grid-template-rows: 0fr' in css
+          assert 'filter: blur' not in css
+          assert "addEventListener('wheel'" not in smooth
+          assert 'enabled: false' in smooth and 'native: true' in smooth
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-full-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Runtime interactions and responsive QA
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
+            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_EXTENDED__?.getState().ready === true, null, { timeout: 5000 });
+
+            const scroll = await page.evaluate(() => window.__AXE_SMOOTH_SCROLL__?.getState());
+            if (!scroll?.native || scroll.enabled || scroll.running) throw new Error(`custom scroll active ${JSON.stringify(scroll)}`);
+
+            const state = await page.evaluate(() => window.__AXE_EXTENDED__.getState());
+            if (state.gallerySlides !== 3 || state.quoteSlides !== 3 || state.newsItems !== 4 || state.members !== 6 || state.documents !== 3) {
+              throw new Error(`inventory ${JSON.stringify(state)}`);
+            }
+
+            await page.evaluate(() => document.querySelector('#media').scrollIntoView({ behavior:'auto' }));
+            await page.waitForTimeout(900);
+            await page.click('[data-gallery-next]');
+            await page.waitForTimeout(180);
+            const galleryIndex = await page.evaluate(() => window.__AXE_EXTENDED__.getState().galleryIndex);
+            if (galleryIndex !== 1) throw new Error(`gallery did not advance ${galleryIndex}`);
+
+            await page.click('[data-quote-next]');
+            await page.waitForTimeout(180);
+            const quoteIndex = await page.evaluate(() => window.__AXE_EXTENDED__.getState().quoteIndex);
+            if (quoteIndex !== 1) throw new Error(`quotes did not advance ${quoteIndex}`);
+
+            await page.evaluate(() => document.querySelector('#news').scrollIntoView({ behavior:'auto' }));
+            await page.waitForTimeout(700);
+            await page.click('.news-item__trigger');
+            const expanded = await page.locator('.news-item').first().evaluate(el => el.classList.contains('is-open'));
+            if (!expanded) throw new Error('news accordion did not open');
+
+            const noBlur = await page.evaluate(() => {
+              const css = [...document.styleSheets].filter(s => s.href?.includes('extended.css'))[0];
+              return Boolean(css);
+            });
+            if (!noBlur) throw new Error('extended stylesheet missing');
+
+            await page.screenshot({ path:'full-1440.png', fullPage:true });
+
+            await page.setViewportSize({ width:1024, height:900 });
+            await page.reload({ waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.screenshot({ path:'full-1024.png', fullPage:true });
+
+            await page.setViewportSize({ width:390, height:844 });
+            await page.reload({ waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            const mobile = await page.evaluate(() => ({
+              bodyWidth: document.body.scrollWidth,
+              viewport: innerWidth,
+              members: document.querySelectorAll('.member-card').length,
+              news: document.querySelectorAll('.news-item').length,
+              menu: getComputedStyle(document.querySelector('.menu-toggle')).display
+            }));
+            if (mobile.bodyWidth > mobile.viewport + 2) throw new Error(`horizontal overflow ${JSON.stringify(mobile)}`);
+            if (mobile.members !== 6 || mobile.news !== 4 || mobile.menu === 'none') throw new Error(`mobile structure ${JSON.stringify(mobile)}`);
+            await page.screenshot({ path:'full-390.png', fullPage:true });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axe-full-dark-visual-qa
+          path: |
+            full-1440.png
+            full-1024.png
+            full-390.png
+          if-no-files-found: error
+          retention-days: 1
