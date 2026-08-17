@@ -1,6 +1,8 @@
 name: Deploy AXE preview
-# Dark source: feat/figma-concept-1 @ 1b335cbeaf2c979308af051903433c4a4bcb93d8
-# Light source: feat/figma-concept-light @ 6fdc3fceaa1132fc17b923163ea9d5777b37f5a3
+# Dark source: feat/figma-concept-1 @ 13ea65f8fe4e83d8f707198939e6e61606e80c9a
+# Light source: feat/figma-concept-light @ da70550d8b48e3897bd9afe005b15cd3dcfd4234
+# Dark map source: feat/figma-concept-map-dark @ a886ee8b625e4e5698694b464449dae2d3a63acf
+# Light map source: feat/figma-concept-map-light @ 936e70ac0c2187c14de0ae26a40780dd4754a3d3
 
 on:
   push:
@@ -37,6 +39,18 @@ jobs:
           ref: feat/figma-concept-light
           path: _light_source
 
+      - name: Checkout dark map concept
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-map-dark
+          path: _map_dark_source
+
+      - name: Checkout light map concept
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-map-light
+          path: _map_light_source
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -51,22 +65,20 @@ jobs:
           cp index.html _site/index.html
           cp -R assets _site/assets
 
-          # Separate light preview; all asset URLs are path-isolated from dark.
+          # Existing light preview remains isolated from dark assets.
           mkdir -p _site/light
           cp _light_source/index.html _site/light/index.html
           cp -R _light_source/assets _site/light/assets
 
-          # Cache-isolated light fallback for this exact build.
-          LIGHT_ALT_PATH="light-fresh-6fdc3fce"
-          mkdir -p "_site/${LIGHT_ALT_PATH}"
-          cp _light_source/index.html "_site/${LIGHT_ALT_PATH}/index.html"
-          cp -R _light_source/assets "_site/${LIGHT_ALT_PATH}/assets"
+          # Alternative dark version with the interactive countries map.
+          mkdir -p _site/map-dark
+          cp _map_dark_source/index.html _site/map-dark/index.html
+          cp -R _map_dark_source/assets _site/map-dark/assets
 
-          # Cache-isolated dark fallback for this exact build.
-          DARK_ALT_PATH="fresh-1b335cbe"
-          mkdir -p "_site/${DARK_ALT_PATH}"
-          cp index.html "_site/${DARK_ALT_PATH}/index.html"
-          cp -R assets "_site/${DARK_ALT_PATH}/assets"
+          # Alternative light version with the interactive countries map.
+          mkdir -p _site/map-light
+          cp _map_light_source/index.html _site/map-light/index.html
+          cp -R _map_light_source/assets _site/map-light/assets
 
           touch _site/.nojekyll
 
