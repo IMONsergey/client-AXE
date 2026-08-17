@@ -1,6 +1,6 @@
 name: Deploy AXE preview
 # Dark source: feat/figma-concept-1 @ fb7912b7ea0b648ec07ac1821c7765ea95d0735d
-# Light source: feat/figma-concept-light @ b5e69881f96e85352955b915c78c133dc468a319
+# Light source: feat/figma-concept-light @ e67dc93e5232a76ef0961d3c404e28b69d18741c
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
           cp -R _light_source/assets _site/light/assets
 
           # Cache-isolated light fallback for this exact branch head.
-          LIGHT_ALT_PATH="light-fresh-b5e69881"
+          LIGHT_ALT_PATH="light-fresh-e67dc93e"
           mkdir -p "_site/${LIGHT_ALT_PATH}"
           cp _light_source/index.html "_site/${LIGHT_ALT_PATH}/index.html"
           cp -R _light_source/assets "_site/${LIGHT_ALT_PATH}/assets"
