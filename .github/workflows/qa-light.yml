@@ -1,0 +1,98 @@
+name: QA AXE light concept
+
+on:
+  push:
+    branches: [feat/figma-concept-light]
+    paths:
+      - index.html
+      - assets/css/**
+      - assets/js/**
+      - .github/workflows/qa-light.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qa-light:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-light
+
+      - name: Static theme invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          css = Path('assets/css/motion-polish.css').read_text(encoding='utf-8')
+          globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          assert '#d9ecef' in css
+          assert '#3b7fc1' in css
+          assert '#b6435c' in css
+          assert '#008998' in css
+          assert '#bdd3d9' in css
+          assert 'dark: 0.06' in globe
+          assert 'baseColor: [0.84, 0.93, 0.94]' in globe
+          assert 'markerColor: [0.00, 0.58, 0.65]' in globe
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-light-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify light runtime and render
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({ headless:true });
+            const page = await browser.newPage({ viewport:{ width:1440, height:1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            await page.goto('http://127.0.0.1:4173/', { waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+
+            const colors = await page.evaluate(() => ({
+              stage: getComputedStyle(document.querySelector('.visual-stage')).backgroundColor,
+              title: getComputedStyle(document.querySelector('.hero__title')).color,
+              blue: getComputedStyle(document.querySelector('.metric-card--dark')).backgroundColor,
+              red: getComputedStyle(document.querySelector('.metric-card--teal')).backgroundColor,
+              teal: getComputedStyle(document.querySelector('.metric-card--blue')).backgroundColor,
+              nav: getComputedStyle(document.querySelector('.site-header')).color
+            }));
+            const expected = {
+              title: 'rgb(31, 50, 63)',
+              blue: 'rgb(59, 127, 193)',
+              red: 'rgb(182, 67, 92)',
+              teal: 'rgb(0, 137, 152)',
+              nav: 'rgb(31, 50, 63)'
+            };
+            for (const [key,value] of Object.entries(expected)) {
+              if (colors[key] !== value) throw new Error(`${key}: ${colors[key]} != ${value}`);
+            }
+            if (errors.length) throw new Error(errors.join('\n'));
+            await page.screenshot({ path:'light-1440.png', fullPage:true });
+            await page.setViewportSize({ width:390, height:844 });
+            await page.reload({ waitUntil:'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
+            await page.screenshot({ path:'light-390.png', fullPage:true });
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axe-light-visual-qa
+          path: |
+            light-1440.png
+            light-390.png
+          if-no-files-found: error
+          retention-days: 1
