@@ -71,21 +71,21 @@ if (canvas && globeShell && heroContent && heroVisual) {
   syncGlobeToHero();
   const initialSize = canvasSize();
 
-  /* Light palette follows the original Figma concept: pale cyan sphere with
-     saturated #0095a6 map points and almost no dark shading. */
+  /* Figma light concept: very pale cyan sphere, cool cyan edge and saturated
+     teal land points. The previous build had a white rim and grey lower shading. */
   globe = createGlobe(canvas, {
     devicePixelRatio: dpr,
     width: initialSize,
     height: initialSize,
     phi,
     theta,
-    dark: 0.06,
-    diffuse: 1.08,
+    dark: 0.045,
+    diffuse: 0.92,
     mapSamples: MAP_SAMPLES,
-    mapBrightness: 4.9,
+    mapBrightness: 5.25,
     mapBaseBrightness: 0,
-    baseColor: [0.84, 0.93, 0.94],
-    glowColor: [0.92, 0.97, 0.98],
+    baseColor: [0.90, 0.96, 0.96],
+    glowColor: [0.78, 0.91, 0.93],
     markerColor: [0.00, 0.58, 0.65],
     markers: [],
     arcs: [],
