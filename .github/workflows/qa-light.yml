@@ -26,15 +26,24 @@ jobs:
           from pathlib import Path
           css = Path('assets/css/motion-polish.css').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+          countries = Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
           assert '#d9ecef' in css
           assert '#3b7fc1' in css
           assert '#b6435c' in css
           assert '#008998' in css
           assert '#bdd3d9' in css
           assert 'mix-blend-mode: lighten' in css
-          assert 'dark: 0.06' in globe
-          assert 'baseColor: [0.84, 0.93, 0.94]' in globe
+          assert 'dark: 0.045' in globe
+          assert 'diffuse: 0.92' in globe
+          assert 'mapBrightness: 5.25' in globe
+          assert 'baseColor: [0.90, 0.96, 0.96]' in globe
+          assert 'glowColor: [0.78, 0.91, 0.93]' in globe
           assert 'markerColor: [0.00, 0.58, 0.65]' in globe
+          assert "style.scrollBehavior = 'auto'" in smooth
+          assert "addEventListener('wheel'" not in smooth
+          assert 'enabled: false' in smooth and 'native: true' in smooth
+          assert "createElement('i')" not in countries and 'traces: 0' in countries
 
       - name: Start server
         run: |
@@ -57,6 +66,7 @@ jobs:
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
+            await page.waitForFunction(() => window.__AXE_SMOOTH_SCROLL__?.getState().ready === true, null, { timeout:5000 });
           }
 
           async function revealWholePage(page) {
@@ -64,7 +74,7 @@ jobs:
               ['.metrics', 1250],
               ['.about', 1350],
               ['.directions', 2500],
-              ['.countries__grid', 3200]
+              ['.countries__grid', 1900]
             ]) {
               await page.evaluate((sel) => document.querySelector(sel)?.scrollIntoView({ behavior:'auto', block:'center' }), selector);
               await page.waitForTimeout(wait);
@@ -81,7 +91,9 @@ jobs:
               teal: getComputedStyle(document.querySelector('.metric-card--blue')).backgroundColor,
               nav: getComputedStyle(document.querySelector('.site-header')).color,
               globeOverlay: getComputedStyle(document.querySelector('.hero__globe-canvas'), '::after').backgroundColor,
-              globeBlend: getComputedStyle(document.querySelector('.hero__globe-canvas'), '::after').mixBlendMode
+              globeBlend: getComputedStyle(document.querySelector('.hero__globe-canvas'), '::after').mixBlendMode,
+              scroll: window.__AXE_SMOOTH_SCROLL__.getState(),
+              scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior
             }));
             const expected = {
               title: 'rgb(31, 50, 63)',
@@ -95,6 +107,22 @@ jobs:
             for (const [key,value] of Object.entries(expected)) {
               if (colors[key] !== value) throw new Error(`${key}: ${colors[key]} != ${value}`);
             }
+            if (colors.scroll.enabled || !colors.scroll.native || colors.scrollBehavior !== 'auto') {
+              throw new Error(`custom smooth scroll still active ${JSON.stringify(colors.scroll)}/${colors.scrollBehavior}`);
+            }
+          }
+
+          async function verifyCountries(page) {
+            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({behavior:'auto',block:'center'}));
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true, null, { timeout:5000 });
+            await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'), null, { timeout:5000 });
+            const early = await page.evaluate(() => ({
+              traces: document.querySelectorAll('.country__trace').length,
+              flag: Number(getComputedStyle(document.querySelector('.country img')).opacity),
+              line: Number(getComputedStyle(document.querySelector('.country'),'::before').opacity)
+            }));
+            if (early.traces !== 0) throw new Error(`legacy trace nodes remain ${early.traces}`);
+            if (early.flag < early.line) throw new Error(`country grid leads content ${JSON.stringify(early)}`);
           }
 
           (async () => {
@@ -107,9 +135,10 @@ jobs:
             await page.goto(url, { waitUntil:'networkidle' });
             await waitReady(page);
             await verifyPalette(page);
+            await page.locator('.hero').screenshot({ path:'light-hero-1440.png' });
+            await verifyCountries(page);
             await revealWholePage(page);
             if (errors.length) throw new Error(errors.join('\n'));
-            await page.locator('.hero').screenshot({ path:'light-hero-1440.png' });
             await page.screenshot({ path:'light-1440.png', fullPage:true });
 
             await page.setViewportSize({ width:390, height:844 });
