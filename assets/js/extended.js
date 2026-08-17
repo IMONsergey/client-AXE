@@ -1,6 +1,7 @@
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   document.documentElement.classList.add('ext-motion');
+  document.documentElement.style.scrollBehavior = 'auto';
 
   function initReveals() {
     const targets = [...document.querySelectorAll('.ext-reveal, .ext-stagger')];
