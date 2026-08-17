@@ -31,8 +31,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const AUTO_RESUME_DELAY = 1350;
   const AUTO_SPEED = reducedMotion ? 0 : 0.067;
   const VERTICAL_LIMIT = 1.03;
-  // COBE's current dot shader encodes sample indices in 15 bits. Keep this below 32768
-  // so rotated views do not wrap high sample indices into thin streaks on some GPUs/WebKit.
   const MAP_SAMPLES = 30000;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -73,20 +71,22 @@ if (canvas && globeShell && heroContent && heroVisual) {
   syncGlobeToHero();
   const initialSize = canvasSize();
 
+  /* Light palette follows the original Figma concept: pale cyan sphere with
+     saturated #0095a6 map points and almost no dark shading. */
   globe = createGlobe(canvas, {
     devicePixelRatio: dpr,
     width: initialSize,
     height: initialSize,
     phi,
     theta,
-    dark: 0.72,
-    diffuse: 1.04,
+    dark: 0.06,
+    diffuse: 1.08,
     mapSamples: MAP_SAMPLES,
-    mapBrightness: 4.65,
+    mapBrightness: 4.9,
     mapBaseBrightness: 0,
-    baseColor: [0.018, 0.61, 0.69],
-    glowColor: [0.00, 0.21, 0.25],
-    markerColor: [0.04, 0.74, 0.84],
+    baseColor: [0.84, 0.93, 0.94],
+    glowColor: [0.92, 0.97, 0.98],
+    markerColor: [0.00, 0.58, 0.65],
     markers: [],
     arcs: [],
     scale: 1.14,
