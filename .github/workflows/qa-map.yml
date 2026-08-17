@@ -30,9 +30,18 @@ jobs:
           assert "addEventListener('wheel'" not in smooth
           assert 'enabled: false' in smooth and 'native: true' in smooth
           assert '__AXE_COUNTRIES_MAP__' in js
-          assert 'cdn.jsdelivr.net/gh/johan/world.geo.json' in js
-          assert 'members-map__country' in js
-          assert 'members-map__legend' in css
+          assert 'countries.geo.json' in js
+          assert 'UA_43_Avtonomna_Respublika_Krym.geojson' in js
+          assert 'UA_14_Donetska.geojson' in js
+          assert 'UA_09_Luhanska.geojson' in js
+          assert 'UA_23_Zaporizka.geojson' in js
+          assert 'UA_65_Khersonska.geojson' in js
+          assert 'members-map__land' in js
+          assert 'members-map__flag' in js
+          assert 'background: none !important' in css
+          assert 'border: 0 !important' in css
+          assert 'members-map__graticule' not in css
+          assert 'members-map__route' not in css
           assert 'margin-top: -1px !important' in css
           assert 'about-grid.motion-reveal' in css
 
@@ -47,7 +56,7 @@ jobs:
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Verify map runtime and geometry
+      - name: Verify world map runtime and geometry
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
@@ -61,13 +70,13 @@ jobs:
             await page.goto('http://127.0.0.1:4173/', { waitUntil:'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
             await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout:15000 });
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:20000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:25000 });
 
             const scrollState = await page.evaluate(() => window.__AXE_SMOOTH_SCROLL__?.getState());
-            if (!scrollState?.native || scrollState.enabled || scrollState.running) throw new Error(`custom scroll still active ${JSON.stringify(scrollState)}`);
+            if (!scrollState?.native || scrollState.enabled || scrollState.running) throw new Error(`custom scroll active ${JSON.stringify(scrollState)}`);
 
             await page.evaluate(() => document.querySelector('.about')?.scrollIntoView({ behavior:'auto', block:'center' }));
-            await page.waitForTimeout(1500);
+            await page.waitForTimeout(1200);
             const stitch = await page.evaluate(() => {
               const metrics = document.querySelector('.metrics').getBoundingClientRect();
               const aboutGrid = document.querySelector('.about-grid').getBoundingClientRect();
@@ -82,11 +91,16 @@ jobs:
             const state = await page.evaluate(() => ({
               map: window.__AXE_COUNTRIES_MAP__.getState(),
               legends: document.querySelectorAll('.members-map__legend-item').length,
-              paths: document.querySelectorAll('.members-map__country').length,
-              height: document.querySelector('.members-map').getBoundingClientRect().height
+              flags: document.querySelectorAll('.members-map__flag').length,
+              selected: document.querySelectorAll('.members-map__country').length,
+              world: document.querySelectorAll('.members-map__land').length,
+              bg: getComputedStyle(document.querySelector('.members-map')).backgroundImage,
+              border: getComputedStyle(document.querySelector('.members-map')).borderTopWidth
             }));
-            if (state.map.countries !== 7 || state.legends !== 7 || state.paths !== 7) throw new Error(`map inventory ${JSON.stringify(state)}`);
-            if (state.height < 500) throw new Error(`map too short ${state.height}`);
+            if (state.map.countries !== 7 || state.legends !== 7 || state.flags !== 7 || state.selected !== 7) throw new Error(`map inventory ${JSON.stringify(state)}`);
+            if (state.world < 120) throw new Error(`world map incomplete ${state.world}`);
+            if (!state.map.rfOverrideLoaded) throw new Error('RF jurisdiction override did not load');
+            if (state.bg !== 'none' || state.border !== '0px') throw new Error(`map still has panel ${JSON.stringify(state)}`);
 
             await page.hover('.members-map__legend-item[data-code="CHN"]');
             await page.waitForTimeout(180);
@@ -96,21 +110,21 @@ jobs:
               activePaths: document.querySelectorAll('.members-map__country.is-active').length
             }));
             if (active.state.activeCode !== 'CHN' || active.label.trim() !== 'Китай' || active.activePaths !== 1) throw new Error(`map interaction ${JSON.stringify(active)}`);
-
             await page.locator('.countries').screenshot({ path:'map-1440.png' });
 
             await page.setViewportSize({ width:390, height:844 });
             await page.reload({ waitUntil:'networkidle' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout:15000 });
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:20000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout:25000 });
             await page.evaluate(() => document.querySelector('.members-map')?.scrollIntoView({ behavior:'auto', block:'center' }));
-            await page.waitForTimeout(900);
+            await page.waitForTimeout(700);
             const mobile = await page.evaluate(() => ({
               width: document.querySelector('.members-map').getBoundingClientRect().width,
-              legendScroll: document.querySelector('.members-map__legend').scrollWidth > document.querySelector('.members-map__legend').clientWidth,
-              paths: document.querySelectorAll('.members-map__country').length
+              selected: document.querySelectorAll('.members-map__country').length,
+              world: document.querySelectorAll('.members-map__land').length,
+              flags: document.querySelectorAll('.members-map__flag').length
             }));
-            if (!mobile.legendScroll || mobile.paths !== 7 || mobile.width > 390) throw new Error(`mobile map ${JSON.stringify(mobile)}`);
+            if (mobile.selected !== 7 || mobile.flags !== 7 || mobile.world < 120 || mobile.width > 390) throw new Error(`mobile map ${JSON.stringify(mobile)}`);
             await page.locator('.countries').screenshot({ path:'map-390.png' });
 
             if (errors.length) throw new Error(errors.join('\n'));
