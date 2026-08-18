@@ -1,0 +1,63 @@
+name: Render AXE globe export
+
+on:
+  push:
+    branches:
+      - feat/globe-svg-export
+    paths:
+      - globe-export.html
+      - assets/js/globe-export.js
+      - assets/vendor/cobe.js
+      - .github/workflows/render-globe-export.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-globe-export.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/globe-export.html >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Render candidate angles
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const candidates = [
+            ['a', 3.08, 0.14],
+            ['b', 3.08, 0.05],
+            ['c', 3.24, 0.12],
+            ['d', 2.94, 0.12]
+          ];
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            for (const [name, phi, theta] of candidates) {
+              const page = await browser.newPage({ viewport: { width: 1000, height: 1000 } });
+              await page.goto(`http://127.0.0.1:4173/globe-export.html?phi=${phi}&theta=${theta}`, { waitUntil: 'networkidle' });
+              await page.waitForFunction(() => window.__AXE_GLOBE_EXPORT__?.ready === true, null, { timeout: 15000 });
+              await page.waitForTimeout(250);
+              await page.locator('#export-globe').screenshot({ path: `globe-${name}.png`, omitBackground: true });
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axe-globe-export-candidates
+          path: globe-*.png
+          if-no-files-found: error
+          retention-days: 1
