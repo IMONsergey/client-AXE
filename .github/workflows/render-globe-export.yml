@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   render:
@@ -33,6 +33,7 @@ jobs:
 
       - name: Render candidate angles
         run: |
+          mkdir -p exports/globe-candidates
           node <<'EOF'
           const { chromium } = require('playwright');
           const candidates = [
@@ -48,16 +49,24 @@ jobs:
               await page.goto(`http://127.0.0.1:4173/globe-export.html?phi=${phi}&theta=${theta}`, { waitUntil: 'networkidle' });
               await page.waitForFunction(() => window.__AXE_GLOBE_EXPORT__?.ready === true, null, { timeout: 15000 });
               await page.waitForTimeout(250);
-              await page.locator('#export-globe').screenshot({ path: `globe-${name}.png`, omitBackground: true });
+              await page.locator('#export-globe').screenshot({ path: `exports/globe-candidates/globe-${name}.png`, omitBackground: true });
               await page.close();
             }
             await browser.close();
           })().catch(e => { console.error(e); process.exit(1); });
           EOF
 
+      - name: Commit candidate renders
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/globe-candidates/*.png
+          git diff --cached --quiet || git commit -m "chore: render globe export candidates"
+          git push
+
       - uses: actions/upload-artifact@v4
         with:
           name: axe-globe-export-candidates
-          path: globe-*.png
+          path: exports/globe-candidates/globe-*.png
           if-no-files-found: error
           retention-days: 1
