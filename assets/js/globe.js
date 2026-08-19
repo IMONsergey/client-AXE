@@ -1,3 +1,5 @@
+import LAND_DATA from './globe-land-data.js';
+
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
 const heroContent = document.querySelector('.hero__content');
@@ -9,11 +11,11 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const desktopQuery = window.matchMedia('(min-width: 1200px)');
 
-  // A conventional, front-facing Eurasia/Russia view. Unlike the previous
-  // Fibonacci-sampled COBE shader, this renderer uses real continent geometry
-  // and a regular geo-dot lattice, so polar spirals / false land artifacts are gone.
-  let phi = 86 * Math.PI / 180;
-  let theta = 44 * Math.PI / 180;
+  // Familiar, front-facing Eurasia/Russia angle. The land points are sampled
+  // from real coastline geometry and jittered slightly, so only recognizable
+  // continents remain: no polar spirals, no Fibonacci bands, no fake islands.
+  let phi = 90 * Math.PI / 180;
+  let theta = 38 * Math.PI / 180;
   let targetPhi = phi;
   let targetTheta = theta;
   let velocityPhi = 0;
@@ -24,9 +26,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   let resumeAt = performance.now() + 1200;
   let lastFrame = performance.now();
   let readyDispatched = false;
-  let landPoints = [];
-  let geometryReady = false;
-  let loadError = null;
 
   const DRAG_SENSITIVITY = 0.0030;
   const DRAG_INERTIA_FACTOR = 0.28;
@@ -35,8 +34,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const AUTO_RESUME_DELAY = 1600;
   const AUTO_SPEED = reducedMotion ? 0 : 0.067;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
-  const WORLD_URL = 'https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json';
-  const DOT_STEP = 1.72;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const wrapPi = (value) => {
@@ -44,6 +41,25 @@ if (canvas && globeShell && heroContent && heroVisual) {
     while (value < -Math.PI) value += Math.PI * 2;
     return value;
   };
+
+  function decodeLandPoints(encoded) {
+    const binary = atob(encoded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+    const view = new DataView(bytes.buffer);
+    const result = [];
+    for (let offset = 0; offset + 3 < bytes.length; offset += 4) {
+      const lat = view.getInt16(offset, true) / 100;
+      const lon = view.getInt16(offset + 2, true) / 100;
+      result.push({
+        lat: lat * Math.PI / 180,
+        lon: lon * Math.PI / 180
+      });
+    }
+    return result;
+  }
+
+  const landPoints = decodeLandPoints(LAND_DATA);
 
   function syncGlobeToHero() {
     if (!desktopQuery.matches) {
@@ -78,120 +94,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
     return size;
   }
 
-  function unwrapRing(ring) {
-    const points = [];
-    let previous = null;
-    for (const coordinate of ring || []) {
-      let lon = Number(coordinate?.[0]);
-      const lat = Number(coordinate?.[1]);
-      if (!Number.isFinite(lon) || !Number.isFinite(lat)) continue;
-      if (previous !== null) {
-        while (lon - previous > 180) lon -= 360;
-        while (lon - previous < -180) lon += 360;
-      }
-      previous = lon;
-      points.push([lon, lat]);
-    }
-    if (points.length < 3) return null;
-    const lons = points.map((point) => point[0]);
-    const lats = points.map((point) => point[1]);
-    return {
-      points,
-      minLon: Math.min(...lons),
-      maxLon: Math.max(...lons),
-      minLat: Math.min(...lats),
-      maxLat: Math.max(...lats)
-    };
-  }
-
-  function prepPolygon(rings) {
-    const prepared = (rings || []).map(unwrapRing).filter(Boolean);
-    if (!prepared.length) return null;
-    const outer = prepared[0];
-    return {
-      rings: prepared,
-      minLon: outer.minLon,
-      maxLon: outer.maxLon,
-      minLat: outer.minLat,
-      maxLat: outer.maxLat
-    };
-  }
-
-  function prepGeometry(geometry) {
-    if (!geometry) return [];
-    if (geometry.type === 'Polygon') {
-      const polygon = prepPolygon(geometry.coordinates);
-      return polygon ? [polygon] : [];
-    }
-    if (geometry.type === 'MultiPolygon') {
-      return geometry.coordinates.map(prepPolygon).filter(Boolean);
-    }
-    return [];
-  }
-
-  function pointInRing(lon, lat, ring) {
-    let testLon = lon;
-    while (testLon < ring.minLon - 180) testLon += 360;
-    while (testLon > ring.maxLon + 180) testLon -= 360;
-
-    const candidates = [testLon, testLon + 360, testLon - 360];
-    for (const candidateLon of candidates) {
-      if (candidateLon < ring.minLon || candidateLon > ring.maxLon || lat < ring.minLat || lat > ring.maxLat) continue;
-      let inside = false;
-      const points = ring.points;
-      for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-        const [xi, yi] = points[i];
-        const [xj, yj] = points[j];
-        const crosses = ((yi > lat) !== (yj > lat)) &&
-          (candidateLon < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-9) + xi);
-        if (crosses) inside = !inside;
-      }
-      if (inside) return true;
-    }
-    return false;
-  }
-
-  function pointInPolygon(lon, lat, polygon) {
-    if (lat < polygon.minLat || lat > polygon.maxLat) return false;
-    const outer = polygon.rings[0];
-    if (!pointInRing(lon, lat, outer)) return false;
-    for (let i = 1; i < polygon.rings.length; i += 1) {
-      if (pointInRing(lon, lat, polygon.rings[i])) return false;
-    }
-    return true;
-  }
-
-  function buildLandPoints(features) {
-    const polygons = features.flatMap((feature) => prepGeometry(feature.geometry));
-    const points = [];
-    let row = 0;
-
-    for (let lat = -78; lat <= 84; lat += DOT_STEP) {
-      const cosLat = Math.max(0.22, Math.cos(lat * Math.PI / 180));
-      const lonStep = Math.min(6.5, DOT_STEP / cosLat);
-      const offset = (row % 2) * lonStep * 0.5;
-
-      for (let lon = -180 + offset; lon < 180; lon += lonStep) {
-        let land = false;
-        for (const polygon of polygons) {
-          if (pointInPolygon(lon, lat, polygon)) {
-            land = true;
-            break;
-          }
-        }
-        if (land) {
-          points.push({
-            lat: lat * Math.PI / 180,
-            lon: lon * Math.PI / 180
-          });
-        }
-      }
-      row += 1;
-    }
-
-    return points;
-  }
-
   function drawGlobe(size) {
     if (!context) return;
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -199,65 +101,63 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     const cx = size / 2;
     const cy = size / 2;
-    const radius = size * 0.445;
+    const radius = size * 0.44;
 
-    const atmosphere = context.createRadialGradient(cx, cy, radius * 0.76, cx, cy, radius * 1.09);
-    atmosphere.addColorStop(0, 'rgba(0, 73, 82, 0)');
-    atmosphere.addColorStop(0.78, 'rgba(0, 114, 126, 0.035)');
-    atmosphere.addColorStop(0.96, 'rgba(0, 184, 198, 0.16)');
-    atmosphere.addColorStop(1, 'rgba(0, 184, 198, 0)');
-    context.fillStyle = atmosphere;
+    const glow = context.createRadialGradient(cx, cy, radius * 0.78, cx, cy, radius * 1.06);
+    glow.addColorStop(0, 'rgba(0, 116, 127, 0)');
+    glow.addColorStop(0.84, 'rgba(0, 148, 161, 0.035)');
+    glow.addColorStop(0.97, 'rgba(0, 193, 207, 0.13)');
+    glow.addColorStop(1, 'rgba(0, 193, 207, 0)');
+    context.fillStyle = glow;
     context.beginPath();
-    context.arc(cx, cy, radius * 1.09, 0, Math.PI * 2);
+    context.arc(cx, cy, radius * 1.06, 0, Math.PI * 2);
     context.fill();
 
     const sphere = context.createRadialGradient(
-      cx - radius * 0.28,
-      cy - radius * 0.24,
-      radius * 0.08,
+      cx - radius * 0.24,
+      cy - radius * 0.22,
+      radius * 0.07,
       cx,
       cy,
       radius
     );
-    sphere.addColorStop(0, 'rgba(5, 89, 99, 0.93)');
-    sphere.addColorStop(0.54, 'rgba(3, 70, 80, 0.965)');
-    sphere.addColorStop(1, 'rgba(2, 48, 58, 0.99)');
+    sphere.addColorStop(0, 'rgba(4, 87, 97, 0.94)');
+    sphere.addColorStop(0.56, 'rgba(3, 68, 78, 0.97)');
+    sphere.addColorStop(1, 'rgba(2, 47, 57, 0.995)');
     context.fillStyle = sphere;
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.fill();
 
-    if (geometryReady && landPoints.length) {
-      const sinCenter = Math.sin(theta);
-      const cosCenter = Math.cos(theta);
-      const baseDot = Math.max(0.78, size / 570);
+    const sinCenter = Math.sin(theta);
+    const cosCenter = Math.cos(theta);
+    const baseDot = Math.max(0.72, size / 590);
 
-      for (const point of landPoints) {
-        const deltaLon = wrapPi(point.lon - phi);
-        const sinLat = Math.sin(point.lat);
-        const cosLat = Math.cos(point.lat);
-        const sinDelta = Math.sin(deltaLon);
-        const cosDelta = Math.cos(deltaLon);
+    for (const point of landPoints) {
+      const deltaLon = wrapPi(point.lon - phi);
+      const sinLat = Math.sin(point.lat);
+      const cosLat = Math.cos(point.lat);
+      const sinDelta = Math.sin(deltaLon);
+      const cosDelta = Math.cos(deltaLon);
 
-        const x = cosLat * sinDelta;
-        const y = cosCenter * sinLat - sinCenter * cosLat * cosDelta;
-        const z = sinCenter * sinLat + cosCenter * cosLat * cosDelta;
-        if (z <= 0.015) continue;
+      const x = cosLat * sinDelta;
+      const y = cosCenter * sinLat - sinCenter * cosLat * cosDelta;
+      const z = sinCenter * sinLat + cosCenter * cosLat * cosDelta;
+      if (z <= 0.012) continue;
 
-        const px = cx + radius * x;
-        const py = cy - radius * y;
-        const edge = clamp((z - 0.01) / 0.25, 0, 1);
-        const alpha = (0.45 + 0.52 * z) * (0.52 + 0.48 * edge);
-        const dotRadius = baseDot * (0.70 + 0.58 * z);
+      const px = cx + radius * x;
+      const py = cy - radius * y;
+      const edge = clamp((z - 0.01) / 0.23, 0, 1);
+      const alpha = (0.42 + 0.54 * z) * (0.48 + 0.52 * edge);
+      const dotRadius = baseDot * (0.72 + 0.54 * z);
 
-        context.fillStyle = `rgba(42, 225, 241, ${alpha.toFixed(3)})`;
-        context.beginPath();
-        context.arc(px, py, dotRadius, 0, Math.PI * 2);
-        context.fill();
-      }
+      context.fillStyle = `rgba(42, 225, 241, ${alpha.toFixed(3)})`;
+      context.beginPath();
+      context.arc(px, py, dotRadius, 0, Math.PI * 2);
+      context.fill();
     }
 
-    context.strokeStyle = 'rgba(42, 225, 241, 0.11)';
+    context.strokeStyle = 'rgba(42, 225, 241, 0.10)';
     context.lineWidth = Math.max(0.7, size / 900);
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -265,7 +165,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
   }
 
   function markReadyAfterPaint() {
-    if (readyDispatched || !geometryReady) return;
+    if (readyDispatched) return;
     readyDispatched = true;
     requestAnimationFrame(() => {
       canvas.dataset.globeReady = 'true';
@@ -274,25 +174,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
     });
   }
 
-  async function loadGeometry() {
-    try {
-      const response = await fetch(WORLD_URL, { mode: 'cors', cache: 'force-cache' });
-      if (!response.ok) throw new Error(`world geometry ${response.status}`);
-      const world = await response.json();
-      const features = (world.features || []).filter((feature) => feature.id !== 'ATA');
-      landPoints = buildLandPoints(features);
-      geometryReady = landPoints.length > 500;
-      if (!geometryReady) throw new Error(`not enough land points: ${landPoints.length}`);
-    } catch (error) {
-      loadError = String(error?.message || error);
-      console.error('AXE globe geometry failed', error);
-      // Keep the sphere visible rather than falling back to the old distorted
-      // Fibonacci map. The ready flag stays false so QA detects the failure.
-    }
-  }
-
   resizeCanvas();
-  loadGeometry();
 
   const resizeObserver = new ResizeObserver(() => resizeCanvas());
   resizeObserver.observe(heroContent);
@@ -367,13 +249,13 @@ if (canvas && globeShell && heroContent && heroVisual) {
     }
 
     const follow = 1 - Math.pow(1 - ROTATION_SMOOTHING, dt / 16.67);
-    let phiDelta = wrapPi(targetPhi - phi);
+    const phiDelta = wrapPi(targetPhi - phi);
     phi = wrapPi(phi + phiDelta * follow);
     theta += (targetTheta - theta) * follow;
 
     const size = resizeCanvas();
     drawGlobe(size);
-    if (geometryReady && size > 24) markReadyAfterPaint();
+    if (size > 24) markReadyAfterPaint();
     requestAnimationFrame(frame);
   }
 
@@ -389,9 +271,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
           size: canvasSize(),
           samples: landPoints.length,
           autoSpeed: AUTO_SPEED,
-          renderer: 'geo-dot-canvas',
-          geometryReady,
-          loadError
+          renderer: 'real-continent-canvas'
         };
       }
     }
