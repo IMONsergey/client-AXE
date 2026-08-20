@@ -99,7 +99,9 @@ jobs:
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
               if(diagnostics.desktop.hiddenRevealsAfterSweep) throw new Error('desktop hidden reveals '+diagnostics.desktop.hiddenRevealsAfterSweep);
               await page.screenshot({path:'desktop.png',fullPage:true});
-              await page.screenshot({path:'site-figma-scope.png',clip:{x:0,y:0,width:1440,height:4823}});
+              await page.setViewportSize({width:1440,height:4823});
+              await page.screenshot({path:'site-figma-scope.png'});
+              await page.setViewportSize({width:1440,height:1000});
               fs.copyFileSync('qa/visual-reference/figma-node-12-2.png','reference-figma.png');
 
               const renderComparison = async (kind, output) => {
