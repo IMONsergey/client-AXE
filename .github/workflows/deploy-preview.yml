@@ -4,7 +4,7 @@ name: Deploy AXE preview
 # Dark map source: feat/figma-concept-map-dark
 # Light map source: feat/figma-concept-map-light
 # Full dark prototype source: feat/full-dark-site
-# Structure candidate source: feat/structure-dark-map-v3 @ 8ee764d57a77128e6a7ac0b63979c2769a817de5
+# Structure candidate source: feat/structure-dark-map-v3 @ 5fdaab5568d530794cfb454f0ef83c935791054f
 
 on:
   push:
@@ -119,7 +119,7 @@ jobs:
             const content = [
               'status=success',
               'structure_branch=feat/structure-dark-map-v3',
-              'structure_head=8ee764d57a77128e6a7ac0b63979c2769a817de5',
+              'structure_head=5fdaab5568d530794cfb454f0ef83c935791054f',
               `workflow_sha=${context.sha}`,
               `page_url=${{ toJSON(steps.deployment.outputs.page_url) }}`
             ].join('\n') + '\n';
