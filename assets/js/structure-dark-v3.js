@@ -48,6 +48,35 @@
   if (slider) slider.tabIndex = 0;
   renderSlider(0);
 
+  const timelineSlider = document.querySelector('[data-timeline-slider]');
+  const timelineTrack = timelineSlider?.querySelector('.timeline-v3__track');
+  const timelineItems = timelineTrack ? [...timelineTrack.querySelectorAll('.timeline-item')] : [];
+  const timelinePrev = document.querySelector('[data-timeline-prev]');
+  const timelineNext = document.querySelector('[data-timeline-next]');
+  const timelineCurrent = document.querySelector('[data-timeline-current]');
+  let timelineIndex = 0;
+
+  function renderTimeline(nextIndex) {
+    if (!timelineSlider || !timelineTrack || !timelineItems.length) return;
+    timelineIndex = Math.max(0, Math.min(nextIndex, timelineItems.length - 1));
+    const itemWidth = timelineItems[0].getBoundingClientRect().width;
+    const gap = parseFloat(getComputedStyle(timelineTrack).columnGap || getComputedStyle(timelineTrack).gap) || 0;
+    timelineTrack.style.transform = `translate3d(${-(timelineIndex * (itemWidth + gap))}px, 0, 0)`;
+    timelinePrev?.toggleAttribute('disabled', timelineIndex === 0);
+    timelineNext?.toggleAttribute('disabled', timelineIndex === timelineItems.length - 1);
+    if (timelineCurrent) timelineCurrent.textContent = String(timelineIndex + 1).padStart(2, '0');
+  }
+
+  timelinePrev?.addEventListener('click', () => renderTimeline(timelineIndex - 1));
+  timelineNext?.addEventListener('click', () => renderTimeline(timelineIndex + 1));
+  timelineSlider?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') renderTimeline(timelineIndex - 1);
+    if (event.key === 'ArrowRight') renderTimeline(timelineIndex + 1);
+  });
+  window.addEventListener('resize', () => renderTimeline(timelineIndex), { passive: true });
+  if (timelineSlider) timelineSlider.tabIndex = 0;
+  renderTimeline(0);
+
   Object.defineProperty(window, '__AXE_STRUCTURE_V3__', {
     configurable: true,
     value: {
@@ -57,7 +86,8 @@
           reveals: revealTargets.length,
           eventSlides: slides.length,
           eventIndex: index,
-          tasks: document.querySelectorAll('.tasks-v3__list li').length,
+          timelineIndex,
+          tasks: document.querySelectorAll('[data-task]').length,
           directions: document.querySelectorAll('.direction-row').length,
           timeline: document.querySelectorAll('.timeline-item').length,
           quotes: document.querySelectorAll('.quote-v3').length
