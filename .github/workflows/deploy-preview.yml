@@ -1,9 +1,10 @@
 name: Deploy AXE preview
-# Dark source: feat/figma-concept-1 @ 46c8b0a44f2933f84244abad496e0551d2f9d9ea
-# Light source: feat/figma-concept-light @ da70550d8b48e3897bd9afe005b15cd3dcfd4234
-# Dark map source: feat/figma-concept-map-dark @ d2dda51eb82fad8a1bc245288abb5c38f781956a
-# Light map source: feat/figma-concept-map-light @ 8145223238dd8f8380f1b9331ccc165a408e60d7
-# Full dark prototype source: feat/full-dark-site @ c7d51b2ecc28c63d8f642b0b76831d5d82b9163e
+# Dark source: feat/figma-concept-1
+# Light source: feat/figma-concept-light
+# Dark map source: feat/figma-concept-map-dark
+# Light map source: feat/figma-concept-map-light
+# Full dark prototype source: feat/full-dark-site
+# Structure candidate source: feat/structure-dark-map-v3
 
 on:
   push:
@@ -58,6 +59,12 @@ jobs:
           ref: feat/full-dark-site
           path: _full_dark_source
 
+      - name: Checkout document-aligned structure candidate
+        uses: actions/checkout@v4
+        with:
+          ref: feat/structure-dark-map-v3
+          path: _structure_dark_source
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -87,10 +94,15 @@ jobs:
           cp _map_light_source/index.html _site/map-light/index.html
           cp -R _map_light_source/assets _site/map-light/assets
 
-          # Full dark-page prototype with sections 3–10.
+          # Full dark-page prototype with the earlier extended section set.
           mkdir -p _site/full-dark
           cp _full_dark_source/index.html _site/full-dark/index.html
           cp -R _full_dark_source/assets _site/full-dark/assets
+
+          # New candidate based on dark + map and the approved structure brief.
+          mkdir -p _site/structure-dark
+          cp _structure_dark_source/index.html _site/structure-dark/index.html
+          cp -R _structure_dark_source/assets _site/structure-dark/assets
 
           touch _site/.nojekyll
 
