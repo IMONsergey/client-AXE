@@ -1,0 +1,146 @@
+name: QA ACE structure dark map v3
+
+on:
+  push:
+    branches:
+      - feat/structure-dark-map-v3
+    paths:
+      - index.html
+      - assets/css/**
+      - assets/js/**
+      - .github/workflows/qa-structure-dark-v3.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/structure-dark-map-v3
+
+      - name: Static source invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          css = Path('assets/css/structure-dark-v3.css').read_text(encoding='utf-8')
+          js = Path('assets/js/structure-dark-v3.js').read_text(encoding='utf-8')
+          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+
+          assert 'family=Inter' in html and 'family=Oswald' in html
+          assert 'Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.' in html
+          assert 'Подробнее об Ассоциации' in html
+          assert 'Создание виртуальной торговой платформы' in html
+          assert html.count('class="timeline-item v3-reveal"') == 6
+          assert html.count('class="direction-row v3-reveal"') == 5
+          assert html.count('class="quote-v3') == 5
+          assert 'direction-card' not in html
+          assert 'hero__globe-orbits' not in html
+          assert 'Открыть Trade Requests' in html
+          assert 'Ключевые события' in html
+          assert '__AXE_STRUCTURE_V3__' in js
+          assert 'font-family: "Oswald"' in css
+          assert "addEventListener('wheel'" not in smooth
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ace-v3.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Runtime interactions and responsive visual QA
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
+            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
+            await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
+            await page.waitForTimeout(700);
+
+            const desktop = await page.evaluate(() => ({
+              width: document.documentElement.scrollWidth,
+              viewport: innerWidth,
+              structure: window.__AXE_STRUCTURE_V3__.getState(),
+              globe: window.__AXE_GLOBE__.getState(),
+              map: window.__AXE_COUNTRIES_MAP__.getState(),
+              bodyFont: getComputedStyle(document.body).fontFamily,
+              titleFont: getComputedStyle(document.querySelector('h1')).fontFamily,
+              navHrefs: [...document.querySelectorAll('.site-nav a')].map(a => a.getAttribute('href')),
+              orbitCount: document.querySelectorAll('.hero__globe-orbits').length,
+              smooth: window.__AXE_SMOOTH_SCROLL__?.getState()
+            }));
+
+            if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
+            if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
+            if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
+            if (desktop.orbitCount !== 0) throw new Error('decorative globe orbit remains');
+            if (desktop.globe.renderer !== 'real-continent-blue-noise' || desktop.globe.samples < 2500 || desktop.globe.samples > 4000) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
+            if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
+            if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
+            if (desktop.navHrefs.join(',') !== '#about,#members,#events') throw new Error(`header nav ${desktop.navHrefs}`);
+
+            await page.evaluate(() => document.querySelector('#events').scrollIntoView({ behavior:'auto', block:'start' }));
+            await page.waitForTimeout(500);
+            await page.click('[data-event-next]');
+            await page.waitForTimeout(180);
+            const eventIndex = await page.evaluate(() => window.__AXE_STRUCTURE_V3__.getState().eventIndex);
+            if (eventIndex !== 1) throw new Error(`event slider did not advance ${eventIndex}`);
+
+            await page.screenshot({ path: 'structure-dark-1440.png', fullPage: true });
+            await page.locator('#about').screenshot({ path: 'structure-about-1440.png' });
+            await page.locator('#members').screenshot({ path: 'structure-map-1440.png' });
+            await page.locator('#events').screenshot({ path: 'structure-events-1440.png' });
+
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
+            await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
+            await page.waitForTimeout(500);
+
+            const mobile = await page.evaluate(() => ({
+              width: document.documentElement.scrollWidth,
+              viewport: innerWidth,
+              menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
+              structure: window.__AXE_STRUCTURE_V3__.getState(),
+              map: window.__AXE_COUNTRIES_MAP__.getState()
+            }));
+            if (mobile.width > mobile.viewport + 2) throw new Error(`mobile horizontal overflow ${JSON.stringify(mobile)}`);
+            if (mobile.menu === 'none') throw new Error('mobile menu hidden');
+            if (mobile.structure.quotes !== 5 || mobile.map.loaded !== 7) throw new Error(`mobile inventory ${JSON.stringify(mobile)}`);
+            await page.screenshot({ path: 'structure-dark-390.png', fullPage: true });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ace-structure-dark-map-v3-visual-qa
+          path: |
+            structure-dark-1440.png
+            structure-about-1440.png
+            structure-map-1440.png
+            structure-events-1440.png
+            structure-dark-390.png
+          if-no-files-found: error
+          retention-days: 2
