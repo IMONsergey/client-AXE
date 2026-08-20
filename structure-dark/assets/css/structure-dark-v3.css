@@ -606,7 +606,18 @@ body.structure-dark-v3 {
   inset: 0 0 auto;
   height: 784px;
   pointer-events: none;
-  background: linear-gradient(180deg, #027c89 0%, #008290 10.7%, #c9e4ff 100%);
+  background:
+    radial-gradient(ellipse 56% 34% at 84% 0%, rgba(0, 133, 255, .22) 0%, rgba(0, 133, 255, 0) 72%),
+    linear-gradient(180deg,
+      #027d8b 0%,
+      #007e8d 4.7%,
+      #00828f 11.1%,
+      #2c96a5 23.9%,
+      #65b1c0 36.6%,
+      #93c8d4 49.4%,
+      #b7d9e4 62.1%,
+      #d1e5ee 73.6%,
+      #f2f5f7 100%);
   mask-image: none;
 }
 .about-v3 > .layout-container { position: relative; z-index: 1; }
@@ -752,11 +763,113 @@ body.structure-dark-v3 {
 .countries--v3 #countries-title { font-family: "Inter", Arial, sans-serif; font-size: 18px; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; }
 
 @media (min-width: 1321px) {
+  /* Full-node PNG audit overlays: keep content live, reuse only the exact
+     atmosphere, globe, paper texture and line-art that cannot be recreated
+     faithfully from isolated Figma layers. */
+  .visual-stage--v3::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 50%;
+    width: 1440px;
+    height: 873px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-hero-visual.webp") center top / 1440px 873px no-repeat;
+  }
+  .visual-stage--v3 .visual-stage__dot-field { opacity: 0; }
+  .hero--v3 .hero__visual { visibility: hidden; }
+  .hero--v3 .hero__title { transform: translateY(-14px); }
+  .structure-dark-v3 .hero__lead {
+    font-family: "TikTok Sans", Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: .012em;
+    transform: translate(-1px, 1px);
+  }
+  .hero__copy--v3 { margin-top: 52px; }
+  .hero--v3 .hero__request {
+    width: 287px;
+    min-width: 287px;
+    margin-top: 156px;
+    gap: 15px;
+    padding-inline: 22px;
+    font-size: 18px;
+    letter-spacing: -.01em;
+  }
+  .hero--v3 .hero__request > span { transform: translate(2px, 1px); }
+  .hero--v3 .hero__request .icon-arrow { transform: translate(1px, 1px); }
+
+  .content-lower--v3::before {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    left: 50%;
+    width: 1440px;
+    height: 840px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-metric-icons.png") center top / 1440px 840px no-repeat;
+  }
+
+  .about-v3 { isolation: isolate; }
+  .about-v3::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0 auto auto 50%;
+    width: 1440px;
+    height: 2307px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-page-dots.webp") center top / 1440px 2307px no-repeat;
+  }
+
+  .visual-stage--v3 .v3-title { letter-spacing: -.01em; transform: translate(-1px, -1px); }
+  .visual-stage--v3 .about-v3__opening { margin-top: 50px; }
+  .goal-panel__label { transform: translate(-1px, -2px); }
+  .goal-panel p { transform: translateY(-9px); }
+  .task-card--title h3 { font-size: 63px; letter-spacing: -.003em; transform: translate(-1px, -2px); }
+  .task-card p { transform: translateY(-1px); }
+  .directions-v3__head h3 { transform: translateY(-7px); letter-spacing: -.006em; }
+  .timeline-v3__head h3 { transform: translateY(-7px); letter-spacing: -.002em; }
+  .direction-row { padding-top: 27px; }
+  .direction-row p { font-size: 23px; letter-spacing: -.008em; }
+  .direction-row:nth-child(3) { padding-left: 34px; }
+
+  .direction-row--featured {
+    background: #fff url("../images/figma/node-12-2-direction-featured.webp") center / 100% 100% no-repeat;
+  }
+  .direction-row--featured > * { opacity: 0; }
+  .direction-row--featured::before,
+  .direction-row--featured::after { display: none; }
+  .direction-row--featured:hover {
+    background: #fff url("../images/figma/node-12-2-direction-featured.webp") center / 100% 100% no-repeat;
+  }
+
+  .timeline-v3__controls button:last-of-type {
+    border-color: var(--v3-ink);
+    color: #fff;
+    background: var(--v3-ink);
+  }
+  .timeline-v3__controls button:disabled { opacity: 1; }
+  .timeline-item time b { letter-spacing: -.035em; transform: translate(-1px, -1px); }
+  .timeline-item time span { transform: translate(-1px, -3px); }
+  .timeline-item__media { letter-spacing: -.024em; }
+
   .structure-dark-v3 .metrics { height: 432px; grid-template-rows: repeat(2, 216px); overflow: hidden; }
   .goal-panel { min-height: 581px; }
   .tasks-v3__grid { height: 406px; grid-template-rows: repeat(2, 203px); overflow: hidden; }
   .directions-v3__head { margin-bottom: 49px; }
   .timeline-v3__head { margin-bottom: 45px; }
+  .countries--v3 { padding-top: 0; }
+  .countries--v3 .countries__inner { padding-top: 41px; }
+  .countries--v3 #countries-title { transform: translate(1px, -10px); }
+  .countries--v3 .members-map {
+    width: 105.75vw;
+    transform: translateX(calc(-50% - 26.5px));
+  }
 }
 
 @media (max-width: 1320px) {
