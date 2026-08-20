@@ -14,13 +14,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   render:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
 
       - name: Start server
         run: |
@@ -50,18 +52,31 @@ jobs:
             if (state.samples >= state.sourceSamples) throw new Error(`point reduction missing ${JSON.stringify(state)}`);
             if (state.visibleSamples < 700 || state.visibleSamples > 5000) throw new Error(`unexpected visible density ${JSON.stringify(state)}`);
             if (Math.abs(state.phi - 75*Math.PI/180) > 1e-6 || Math.abs(state.theta - 47*Math.PI/180) > 1e-6) throw new Error('Russia-facing angle drifted');
-            fs.writeFileSync('axe-globe-russia.svg', state.svg, 'utf8');
-            await page.locator('#export-root').screenshot({path:'axe-globe-russia.png',omitBackground:true});
+            fs.mkdirSync('exports',{recursive:true});
+            fs.writeFileSync('exports/axe-globe-russia.svg', state.svg, 'utf8');
+            await page.locator('#export-root').screenshot({path:'exports/axe-globe-russia.png',omitBackground:true});
             if(errors.length) throw new Error(errors.join('\n'));
             await browser.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           EOF
 
+      - name: Persist export in branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/axe-globe-russia.svg exports/axe-globe-russia.png
+          if git diff --cached --quiet; then
+            echo "Export unchanged"
+          else
+            git commit -m "chore: render current globe export"
+            git push origin HEAD:feat/figma-concept-1
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: axe-globe-russia-svg
           path: |
-            axe-globe-russia.svg
-            axe-globe-russia.png
+            exports/axe-globe-russia.svg
+            exports/axe-globe-russia.png
           if-no-files-found: error
           retention-days: 2
