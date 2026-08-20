@@ -1,4 +1,5 @@
 (() => {
+  // Document-aligned candidate interactions: reveal + key-events slider.
   const root = document.documentElement;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const revealTargets = [...document.querySelectorAll('.v3-reveal')];
