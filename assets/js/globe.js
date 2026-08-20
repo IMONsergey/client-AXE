@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js';
+} from './globe-model.js?v=figma-12-2-pixel-final';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
