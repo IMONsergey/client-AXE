@@ -109,13 +109,19 @@ jobs:
               if(d.orbitCount) throw new Error('orbit remains');
               if(!d.globe||d.globe.renderer!=='real-continent-blue-noise'||d.globe.samples<2500||d.globe.samples>4000) throw new Error('globe '+JSON.stringify(d.globe));
               if(!d.map||d.map.loaded!==7||d.map.paths!==7||d.map.worldPaths<10) throw new Error('map '+JSON.stringify(d.map));
-              if(d.nav.join(',')!=='#about,#members,#events') throw new Error('nav '+d.nav);
+              if(d.nav.join(',')!=='#about,#events,#,#members,#,#,#,#') throw new Error('nav '+d.nav);
 
               await page.evaluate(()=>document.querySelector('#events').scrollIntoView({behavior:'auto'}));
               await page.waitForTimeout(300);
               await page.click('[data-event-next]');
               await page.waitForTimeout(160);
-              if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().eventIndex))!==1) throw new Error('slider failed');
+              if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().eventIndex))!==1) throw new Error('event slider failed');
+
+              await page.evaluate(()=>document.querySelector('#timeline').scrollIntoView({behavior:'auto'}));
+              await page.waitForTimeout(300);
+              await page.click('[data-timeline-next]');
+              await page.waitForTimeout(700);
+              if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().timelineIndex))!==1) throw new Error('timeline slider failed');
 
               await page.setViewportSize({width:1024,height:900});
               await page.reload({waitUntil:'domcontentloaded'});
