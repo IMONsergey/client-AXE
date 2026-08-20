@@ -22,6 +22,8 @@ jobs:
           ref: feat/structure-dark-map-v3
 
       - name: Static source invariants
+        id: static
+        continue-on-error: true
         shell: python
         run: |
           from pathlib import Path
@@ -29,7 +31,6 @@ jobs:
           css = Path('assets/css/structure-dark-v3.css').read_text(encoding='utf-8')
           js = Path('assets/js/structure-dark-v3.js').read_text(encoding='utf-8')
           smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
-
           assert 'family=Inter' in html and 'family=Oswald' in html
           assert 'Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.' in html
           assert 'Подробнее об Ассоциации' in html
@@ -46,35 +47,38 @@ jobs:
           assert "addEventListener('wheel'" not in smooth
 
       - name: Start server
+        id: server
+        continue-on-error: true
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ace-v3.log 2>&1 &
           sleep 2
           curl --fail --silent http://127.0.0.1:4173/ >/dev/null
 
       - name: Install Chromium
+        id: chromium
+        continue-on-error: true
         run: |
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
       - name: Runtime interactions and responsive visual QA
+        id: runtime
+        continue-on-error: true
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
-
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
             const errors = [];
             page.on('pageerror', e => errors.push(e.message));
             page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-
             await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
             await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
             await page.waitForTimeout(700);
-
             const desktop = await page.evaluate(() => ({
               width: document.documentElement.scrollWidth,
               viewport: innerWidth,
@@ -87,7 +91,6 @@ jobs:
               orbitCount: document.querySelectorAll('.hero__globe-orbits').length,
               smooth: window.__AXE_SMOOTH_SCROLL__?.getState()
             }));
-
             if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
@@ -96,26 +99,22 @@ jobs:
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
             if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
             if (desktop.navHrefs.join(',') !== '#about,#members,#events') throw new Error(`header nav ${desktop.navHrefs}`);
-
             await page.evaluate(() => document.querySelector('#events').scrollIntoView({ behavior:'auto', block:'start' }));
             await page.waitForTimeout(500);
             await page.click('[data-event-next]');
             await page.waitForTimeout(180);
             const eventIndex = await page.evaluate(() => window.__AXE_STRUCTURE_V3__.getState().eventIndex);
             if (eventIndex !== 1) throw new Error(`event slider did not advance ${eventIndex}`);
-
             await page.screenshot({ path: 'structure-dark-1440.png', fullPage: true });
             await page.locator('#about').screenshot({ path: 'structure-about-1440.png' });
             await page.locator('#members').screenshot({ path: 'structure-map-1440.png' });
             await page.locator('#events').screenshot({ path: 'structure-events-1440.png' });
-
             await page.setViewportSize({ width: 390, height: 844 });
             await page.reload({ waitUntil: 'domcontentloaded' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
             await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
             await page.waitForTimeout(500);
-
             const mobile = await page.evaluate(() => ({
               width: document.documentElement.scrollWidth,
               viewport: innerWidth,
@@ -127,21 +126,28 @@ jobs:
             if (mobile.menu === 'none') throw new Error('mobile menu hidden');
             if (mobile.structure.quotes !== 5 || mobile.map.loaded !== 7) throw new Error(`mobile inventory ${JSON.stringify(mobile)}`);
             await page.screenshot({ path: 'structure-dark-390.png', fullPage: true });
-
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
           })().catch(e => { console.error(e); process.exit(1); });
           EOF
 
-      - name: Persist QA renders
+      - name: Persist QA outcome and renders
+        if: always()
         run: |
           mkdir -p qa/structure-dark-v3
-          cp structure-dark-1440.png qa/structure-dark-v3/desktop.png
-          cp structure-about-1440.png qa/structure-dark-v3/about.png
-          cp structure-map-1440.png qa/structure-dark-v3/map.png
-          cp structure-events-1440.png qa/structure-dark-v3/events.png
-          cp structure-dark-390.png qa/structure-dark-v3/mobile.png
-          printf 'QA passed\n' > qa/structure-dark-v3/status.txt
+          for pair in \
+            'structure-dark-1440.png:desktop.png' \
+            'structure-about-1440.png:about.png' \
+            'structure-map-1440.png:map.png' \
+            'structure-events-1440.png:events.png' \
+            'structure-dark-390.png:mobile.png'; do
+            src="${pair%%:*}"; dst="${pair##*:}"
+            if [ -f "$src" ]; then cp "$src" "qa/structure-dark-v3/$dst"; fi
+          done
+          printf 'static=%s\nserver=%s\nchromium=%s\nruntime=%s\n' \
+            '${{ steps.static.outcome }}' '${{ steps.server.outcome }}' '${{ steps.chromium.outcome }}' '${{ steps.runtime.outcome }}' \
+            > qa/structure-dark-v3/status.txt
+          if [ -f /tmp/ace-v3.log ]; then cp /tmp/ace-v3.log qa/structure-dark-v3/server.log; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add qa/structure-dark-v3
@@ -150,14 +156,18 @@ jobs:
             git push origin HEAD:feat/structure-dark-map-v3
           fi
 
+      - name: Fail if QA did not pass
+        if: always()
+        run: |
+          test '${{ steps.static.outcome }}' = success
+          test '${{ steps.server.outcome }}' = success
+          test '${{ steps.chromium.outcome }}' = success
+          test '${{ steps.runtime.outcome }}' = success
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ace-structure-dark-map-v3-visual-qa
-          path: |
-            structure-dark-1440.png
-            structure-about-1440.png
-            structure-map-1440.png
-            structure-events-1440.png
-            structure-dark-390.png
-          if-no-files-found: error
+          path: qa/structure-dark-v3
+          if-no-files-found: warn
           retention-days: 2
