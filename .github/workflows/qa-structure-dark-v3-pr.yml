@@ -63,6 +63,22 @@ jobs:
               }
               await page.waitForTimeout(500);
 
+              const revealPage = async () => {
+                const viewport = page.viewportSize();
+                const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+                const step = Math.max(480, Math.floor((viewport?.height || 800) * 0.7));
+                for (let y = 0; y < pageHeight; y += step) {
+                  await page.evaluate(top => window.scrollTo(0, top), y);
+                  await page.waitForTimeout(90);
+                }
+                await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+                await page.waitForTimeout(250);
+                const hidden = await page.locator('.v3-reveal:not(.is-v3-visible)').count();
+                await page.evaluate(() => window.scrollTo(0, 0));
+                await page.waitForTimeout(180);
+                return hidden;
+              };
+
               diagnostics.desktop = await page.evaluate(() => ({
                 sw:document.documentElement.scrollWidth,
                 vw:innerWidth,
@@ -78,7 +94,9 @@ jobs:
                 mapError:document.querySelector('.countries__grid')?.classList.contains('is-map-error') || false
               }));
               diagnostics.consoleErrors=consoleErrors;
+              diagnostics.desktop.hiddenRevealsAfterSweep=await revealPage();
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              if(diagnostics.desktop.hiddenRevealsAfterSweep) throw new Error('desktop hidden reveals '+diagnostics.desktop.hiddenRevealsAfterSweep);
               await page.screenshot({path:'desktop.png',fullPage:true});
               await page.locator('#about').screenshot({path:'about.png'});
               await page.locator('#members').screenshot({path:'map.png'});
@@ -111,7 +129,9 @@ jobs:
                 structure:window.__AXE_STRUCTURE_V3__?.getState?.()||null,
                 map:window.__AXE_COUNTRIES_MAP__?.getState?.()||null
               }));
+              diagnostics.tablet.hiddenRevealsAfterSweep=await revealPage();
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              if(diagnostics.tablet.hiddenRevealsAfterSweep) throw new Error('tablet hidden reveals '+diagnostics.tablet.hiddenRevealsAfterSweep);
               await page.screenshot({path:'tablet.png',fullPage:true});
               if(diagnostics.tablet.sw>diagnostics.tablet.vw+2||diagnostics.tablet.menu==='none') throw new Error('tablet '+JSON.stringify(diagnostics.tablet));
 
@@ -127,7 +147,9 @@ jobs:
                 structure:window.__AXE_STRUCTURE_V3__?.getState?.()||null,
                 map:window.__AXE_COUNTRIES_MAP__?.getState?.()||null
               }));
+              diagnostics.mobile.hiddenRevealsAfterSweep=await revealPage();
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              if(diagnostics.mobile.hiddenRevealsAfterSweep) throw new Error('mobile hidden reveals '+diagnostics.mobile.hiddenRevealsAfterSweep);
               await page.screenshot({path:'mobile.png',fullPage:true});
               if(diagnostics.mobile.sw>diagnostics.mobile.vw+2||diagnostics.mobile.menu==='none') throw new Error('mobile '+JSON.stringify(diagnostics.mobile));
               if(consoleErrors.length) throw new Error(consoleErrors.join('\n'));
