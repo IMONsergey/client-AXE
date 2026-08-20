@@ -59,8 +59,9 @@ jobs:
             await page.goto('http://127.0.0.1:4173/globe-export.html',{waitUntil:'networkidle'});
             await page.waitForFunction(()=>window.__AXE_GLOBE_EXPORT__?.ready===true,null,{timeout:15000});
             const state=await page.evaluate(()=>window.__AXE_GLOBE_EXPORT__);
-            if (state.samples >= state.sourceSamples) throw new Error(`point reduction missing ${JSON.stringify(state)}`);
-            if (state.visibleSamples < 700 || state.visibleSamples > 5000) throw new Error(`unexpected visible density ${JSON.stringify(state)}`);
+            if (state.samples !== state.sourceSamples) throw new Error(`curated point cloud changed at runtime ${JSON.stringify(state)}`);
+            if (state.samples < 2500 || state.samples > 4000) throw new Error(`unexpected globe density ${JSON.stringify(state)}`);
+            if (state.visibleSamples < 1200 || state.visibleSamples > 2800) throw new Error(`unexpected visible density ${JSON.stringify(state)}`);
             if (Math.abs(state.phi - 75*Math.PI/180) > 1e-6 || Math.abs(state.theta - 47*Math.PI/180) > 1e-6) throw new Error('Russia-facing angle drifted');
             fs.mkdirSync('exports',{recursive:true});
             fs.writeFileSync('exports/axe-globe-russia.svg', state.svg, 'utf8');
