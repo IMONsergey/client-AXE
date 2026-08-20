@@ -784,7 +784,7 @@ body.structure-dark-v3 {
   .structure-dark-v3 .hero__lead {
     font-family: "TikTok Sans", Arial, sans-serif;
     font-weight: 500;
-    letter-spacing: .018em;
+    letter-spacing: .012em;
     transform: translate(-1px, 1px);
   }
   .hero__copy--v3 { margin-top: 52px; }
@@ -836,6 +836,7 @@ body.structure-dark-v3 {
   .timeline-v3__head h3 { transform: translateY(-7px); letter-spacing: -.002em; }
   .direction-row { padding-top: 27px; }
   .direction-row p { font-size: 23px; letter-spacing: -.008em; }
+  .direction-row:nth-child(3) { padding-left: 34px; }
 
   .direction-row--featured {
     background: #fff url("../images/figma/node-12-2-direction-featured.webp") center / 100% 100% no-repeat;
@@ -853,6 +854,9 @@ body.structure-dark-v3 {
     background: var(--v3-ink);
   }
   .timeline-v3__controls button:disabled { opacity: 1; }
+  .timeline-item time b { letter-spacing: -.035em; transform: translate(-1px, -1px); }
+  .timeline-item time span { transform: translate(-1px, -3px); }
+  .timeline-item__media { letter-spacing: -.024em; }
 
   .structure-dark-v3 .metrics { height: 432px; grid-template-rows: repeat(2, 216px); overflow: hidden; }
   .goal-panel { min-height: 581px; }
