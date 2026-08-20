@@ -606,7 +606,18 @@ body.structure-dark-v3 {
   inset: 0 0 auto;
   height: 784px;
   pointer-events: none;
-  background: linear-gradient(180deg, #027c89 0%, #008290 10.7%, #c9e4ff 100%);
+  background:
+    radial-gradient(ellipse 56% 34% at 84% 0%, rgba(0, 133, 255, .22) 0%, rgba(0, 133, 255, 0) 72%),
+    linear-gradient(180deg,
+      #027d8b 0%,
+      #007e8d 4.7%,
+      #00828f 11.1%,
+      #2c96a5 23.9%,
+      #65b1c0 36.6%,
+      #93c8d4 49.4%,
+      #b7d9e4 62.1%,
+      #d1e5ee 73.6%,
+      #f2f5f7 100%);
   mask-image: none;
 }
 .about-v3 > .layout-container { position: relative; z-index: 1; }
@@ -773,6 +784,8 @@ body.structure-dark-v3 {
   .structure-dark-v3 .hero__lead {
     font-family: "TikTok Sans", Arial, sans-serif;
     font-weight: 500;
+    letter-spacing: .018em;
+    transform: translate(-1px, 1px);
   }
   .hero__copy--v3 { margin-top: 52px; }
   .hero--v3 .hero__request {
@@ -813,16 +826,16 @@ body.structure-dark-v3 {
     background: url("../images/figma/node-12-2-page-dots.webp") center top / 1440px 2307px no-repeat;
   }
 
-  .visual-stage--v3 .v3-title { letter-spacing: -.01em; transform: translateX(-1px); }
-  .visual-stage--v3 .about-v3__opening { margin-top: 51px; }
+  .visual-stage--v3 .v3-title { letter-spacing: -.01em; transform: translate(-1px, -1px); }
+  .visual-stage--v3 .about-v3__opening { margin-top: 50px; }
   .goal-panel__label { transform: translate(-1px, -2px); }
   .goal-panel p { transform: translateY(-9px); }
-  .task-card--title h3 { font-size: 63px; transform: translate(-1px, -2px); }
+  .task-card--title h3 { font-size: 63px; letter-spacing: -.003em; transform: translate(-1px, -2px); }
   .task-card p { transform: translateY(-1px); }
   .directions-v3__head h3 { transform: translateY(-7px); letter-spacing: -.006em; }
   .timeline-v3__head h3 { transform: translateY(-7px); letter-spacing: -.002em; }
   .direction-row { padding-top: 27px; }
-  .direction-row p { font-size: 22.6px; }
+  .direction-row p { font-size: 23px; letter-spacing: -.008em; }
 
   .direction-row--featured {
     background: #fff url("../images/figma/node-12-2-direction-featured.webp") center / 100% 100% no-repeat;
@@ -851,7 +864,7 @@ body.structure-dark-v3 {
   .countries--v3 #countries-title { transform: translate(1px, -10px); }
   .countries--v3 .members-map {
     width: 105.75vw;
-    transform: translateX(calc(-50% - 26px));
+    transform: translateX(calc(-50% - 26.5px));
   }
 }
 
