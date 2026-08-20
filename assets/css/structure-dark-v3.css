@@ -519,6 +519,16 @@ body.structure-dark-v3 {
   width: 105%;
   height: 105%;
 }
+.hero__continents-reference {
+  position: absolute;
+  z-index: 2;
+  top: 11%;
+  left: 11.15%;
+  width: 77.82%;
+  height: 78%;
+  object-fit: contain;
+  pointer-events: none;
+}
 .hero__globe-orbit { fill: none; stroke: rgba(35, 215, 230, .82); stroke-width: 1.15; vector-effect: non-scaling-stroke; }
 .hero__globe-orbit--two { stroke: rgba(35, 215, 230, .34); }
 
@@ -562,6 +572,7 @@ body.structure-dark-v3 {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(400px, 2fr);
   gap: 0;
+  height: 408px;
   min-height: 408px;
   align-items: stretch;
   border-right: 1px solid var(--v4-grid-dark);
@@ -612,8 +623,8 @@ body.structure-dark-v3 {
 .goal-panel p {
   max-width: 960px;
   color: #fff;
-  font-size: clamp(50px, 4.4vw, 63px);
-  line-height: 1.06;
+  font-size: 49px;
+  line-height: 59px;
   font-weight: 500;
   letter-spacing: -.01em;
   text-wrap: wrap;
@@ -724,17 +735,18 @@ body.structure-dark-v3 {
   grid-template-columns: 243px 519px;
   flex: 0 0 762px;
   gap: 0;
+  height: 366px;
   min-height: 366px;
   padding: 0;
   border: 0;
 }
-.timeline-item__copy { display: flex; flex-direction: column; min-height: 366px; border: 1px solid var(--v4-grid-light); background: #fff; }
-.timeline-item time { display: flex; min-height: 114px; flex-direction: column; gap: 15px; padding: 23px 20px; border-bottom: 1px solid var(--v4-grid-light); color: #0c0606; }
+.timeline-item__copy { display: flex; height: 366px; min-height: 366px; flex-direction: column; overflow: hidden; border: 1px solid var(--v4-grid-light); background: #fff; }
+.timeline-item time { display: flex; height: 114px; min-height: 114px; flex-direction: column; gap: 15px; padding: 23px 20px; overflow: hidden; border-bottom: 1px solid var(--v4-grid-light); color: #0c0606; }
 .timeline-item time b { color: var(--v3-teal); font-size: 46px; line-height: .8; font-weight: 500; }
 .timeline-item time span { font-size: 20px; line-height: 1; }
-.timeline-item p { flex: 1; margin: 0; padding: 20px; color: #0c0606; font-size: 13px; line-height: 1.46; font-weight: 500; }
+.timeline-item p { flex: 1; margin: 0; padding: 20px; overflow: hidden; color: #0c0606; font-size: 13px; line-height: 19px; font-weight: 500; }
 .timeline-item i { padding: 0 20px 16px; color: var(--v3-teal); font-style: normal; font-size: 18px; }
-.timeline-item__media { display: grid; place-items: center; min-height: 366px; border: 1px solid var(--v4-grid-light); background: #076480; color: #24a6b5; font-family: "Oswald", sans-serif; font-size: 56px; font-weight: 500; text-transform: uppercase; }
+.timeline-item__media { display: grid; height: 366px; min-height: 366px; place-items: center; overflow: hidden; border: 1px solid var(--v4-grid-light); background: #076480; color: #24a6b5; font-family: "Oswald", sans-serif; font-size: 56px; font-weight: 500; text-transform: uppercase; }
 
 .countries--v3 { padding-top: 38px; }
 .countries--v3 #countries-title { font-family: "Inter", Arial, sans-serif; font-size: 18px; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; }
@@ -756,7 +768,7 @@ body.structure-dark-v3 {
   .hero--v3 .hero__visual { margin-top: 40px; transform: none; }
   .structure-dark-v3 .metric-cell { min-height: 182px; }
   .structure-dark-v3 .metric-card strong { font-size: 74px; }
-  .visual-stage--v3 .about-v3__intro { grid-template-columns: 1fr; }
+  .visual-stage--v3 .about-v3__intro { height: auto; grid-template-columns: 1fr; }
   .visual-stage--v3 .about-nav { max-width: none; margin-left: 34%; }
   .visual-stage--v3 .about-nav > :first-child { border-top: 1px solid var(--v4-grid-dark); }
   .goal-panel { min-height: 520px; }
@@ -831,8 +843,9 @@ body.structure-dark-v3 {
   .timeline-v3__controls button { width: 36px; height: 36px; }
   .timeline-v3__viewport { width: calc(100vw - 16px); }
   .timeline-item { grid-template-columns: 1fr; flex-basis: calc(100vw - 32px); min-height: 0; }
-  .timeline-item__copy { min-height: 340px; }
-  .timeline-item__media { min-height: 210px; font-size: 38px; }
+  .timeline-item { height: auto; }
+  .timeline-item__copy { height: auto; min-height: 340px; }
+  .timeline-item__media { height: auto; min-height: 210px; font-size: 38px; }
   .countries--v3 { padding-top: 84px; }
 }
 
