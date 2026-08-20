@@ -1,5 +1,6 @@
 (() => {
   // Document-aligned candidate interactions: reveal + key-events slider.
+  // QA trigger: validates the complete dark + map candidate at desktop and mobile widths.
   const root = document.documentElement;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const revealTargets = [...document.querySelectorAll('.v3-reveal')];
