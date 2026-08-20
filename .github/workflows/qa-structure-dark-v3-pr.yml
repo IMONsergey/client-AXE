@@ -7,6 +7,7 @@ on:
       - index.html
       - assets/css/**
       - assets/js/**
+      - qa/visual-reference/**
 
 permissions:
   contents: read
@@ -98,6 +99,26 @@ jobs:
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
               if(diagnostics.desktop.hiddenRevealsAfterSweep) throw new Error('desktop hidden reveals '+diagnostics.desktop.hiddenRevealsAfterSweep);
               await page.screenshot({path:'desktop.png',fullPage:true});
+              await page.screenshot({path:'site-figma-scope.png',clip:{x:0,y:0,width:1440,height:4823}});
+              fs.copyFileSync('qa/visual-reference/figma-node-12-2.png','reference-figma.png');
+
+              const renderComparison = async (kind, output) => {
+                const audit = await browser.newPage({viewport:{width:1440,height:4823}});
+                const siteRule = kind === 'difference'
+                  ? 'mix-blend-mode:difference;'
+                  : 'opacity:.5;';
+                await audit.setContent(`<!doctype html><meta charset="utf-8"><style>
+                  html,body{margin:0;width:1440px;height:4823px;overflow:hidden;background:#000}
+                  img{position:absolute;inset:0;width:1440px;height:4823px;object-fit:fill}
+                  .site{${siteRule}}
+                </style><img src="http://127.0.0.1:4173/qa/visual-reference/figma-node-12-2.png"><img class="site" src="http://127.0.0.1:4173/site-figma-scope.png">`);
+                await audit.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth));
+                await audit.screenshot({path:output,fullPage:true});
+                await audit.close();
+              };
+              await renderComparison('overlay','overlay-50.png');
+              await renderComparison('difference','difference.png');
+
               await page.locator('.hero--v3').screenshot({path:'hero.png'});
               await page.locator('#about').screenshot({path:'about.png'});
               await page.locator('#goal').screenshot({path:'goal.png'});
@@ -182,6 +203,10 @@ jobs:
             diagnostic.json
             runtime-error.txt
             desktop.png
+            reference-figma.png
+            site-figma-scope.png
+            overlay-50.png
+            difference.png
             hero.png
             about.png
             goal.png
