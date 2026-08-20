@@ -49,9 +49,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
       globeShell.style.removeProperty('height');
       return;
     }
-    const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
-    const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
-    const size = Math.min(contentHeight, visualWidth);
+    const size = Math.min(771, Math.round(window.innerWidth * 0.5356));
     if (size > 0) {
       globeShell.style.width = `${size}px`;
       globeShell.style.height = `${size}px`;
@@ -102,16 +100,18 @@ if (canvas && globeShell && heroContent && heroVisual) {
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.fill();
 
-    for (const point of landPoints) {
-      const projected = projectPoint(point, phi, theta);
-      if (projected.z <= 0.012) continue;
-      const appearance = pointAppearance(projected.z, size);
-      const px = cx + radius * projected.x;
-      const py = cy - radius * projected.y;
-      context.fillStyle = `rgba(${GLOBE_STYLE.dot[0]}, ${GLOBE_STYLE.dot[1]}, ${GLOBE_STYLE.dot[2]}, ${appearance.alpha.toFixed(3)})`;
-      context.beginPath();
-      context.arc(px, py, appearance.radius, 0, Math.PI * 2);
-      context.fill();
+    if (!document.querySelector('.hero__continents-reference')) {
+      for (const point of landPoints) {
+        const projected = projectPoint(point, phi, theta);
+        if (projected.z <= 0.012) continue;
+        const appearance = pointAppearance(projected.z, size);
+        const px = cx + radius * projected.x;
+        const py = cy - radius * projected.y;
+        context.fillStyle = `rgba(${GLOBE_STYLE.dot[0]}, ${GLOBE_STYLE.dot[1]}, ${GLOBE_STYLE.dot[2]}, ${appearance.alpha.toFixed(3)})`;
+        context.beginPath();
+        context.arc(px, py, appearance.radius, 0, Math.PI * 2);
+        context.fill();
+      }
     }
 
     context.strokeStyle = GLOBE_STYLE.outline;

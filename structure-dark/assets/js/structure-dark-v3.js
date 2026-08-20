@@ -64,7 +64,7 @@
     timelineTrack.style.transform = `translate3d(${-(timelineIndex * (itemWidth + gap))}px, 0, 0)`;
     timelinePrev?.toggleAttribute('disabled', timelineIndex === 0);
     timelineNext?.toggleAttribute('disabled', timelineIndex === timelineItems.length - 1);
-    if (timelineCurrent) timelineCurrent.textContent = String(timelineIndex + 1).padStart(2, '0');
+    if (timelineCurrent) timelineCurrent.textContent = String(timelineIndex + 1);
   }
 
   timelinePrev?.addEventListener('click', () => renderTimeline(timelineIndex - 1));
