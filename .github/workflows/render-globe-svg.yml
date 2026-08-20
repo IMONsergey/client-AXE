@@ -11,6 +11,16 @@ on:
       - assets/js/globe-export-svg.js
       - globe-export.html
       - .github/workflows/render-globe-svg.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - assets/js/globe.js
+      - assets/js/globe-model.js
+      - assets/js/globe-land-data.js
+      - assets/js/globe-export-svg.js
+      - globe-export.html
+      - .github/workflows/render-globe-svg.yml
   workflow_dispatch:
 
 permissions:
@@ -22,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/figma-concept-1
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'feat/figma-concept-1' }}
 
       - name: Start server
         run: |
@@ -61,6 +71,7 @@ jobs:
           EOF
 
       - name: Persist export in branch
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
