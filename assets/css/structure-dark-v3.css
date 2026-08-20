@@ -449,6 +449,7 @@ body.structure-dark-v3 {
   --v4-grid-light: rgba(0, 111, 129, .24);
 }
 
+.structure-dark-v3 .layout-container { width: min(1280px, calc(100% - 48px)); }
 .structure-dark-v3 .site-header__inner { width: min(1280px, calc(100% - 48px)); }
 .structure-dark-v3 .brand { flex-basis: 181px; width: 181px; }
 .structure-dark-v3 .site-nav { gap: 13px; font-size: 14px; }
@@ -628,6 +629,7 @@ body.structure-dark-v3 {
 .task-card {
   display: flex;
   min-width: 0;
+  height: 203px;
   min-height: 203px;
   flex-direction: column;
   gap: 23px;
@@ -635,9 +637,10 @@ body.structure-dark-v3 {
   border-right: 1px solid var(--v4-grid-light);
   border-bottom: 1px solid var(--v4-grid-light);
   background: rgba(255,255,255,.17);
+  overflow: hidden;
 }
-.task-card > span { color: var(--v3-teal); font-family: "Oswald", sans-serif; font-size: 26px; line-height: 1; }
-.task-card p { margin: 0; color: #0c0606; font-size: 15px; line-height: 1.42; font-weight: 500; }
+.task-card > span { color: var(--v3-teal); font-family: "Oswald", sans-serif; font-size: 26px; line-height: 31px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+.task-card p { margin: 0; color: #0c0606; font-size: 15px; line-height: 21px; font-weight: 500; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
 .task-card--title { justify-content: center; }
 .task-card--title h3 { margin: 0; font-family: "Oswald", sans-serif; font-size: 63px; line-height: .98; font-weight: 500; text-transform: uppercase; }
 .task-card--brand { align-items: center; justify-content: center; background: linear-gradient(125deg, #0a87a8, #008290 75%, #c9e4ff 135%); }
@@ -737,6 +740,7 @@ body.structure-dark-v3 {
 .countries--v3 #countries-title { font-family: "Inter", Arial, sans-serif; font-size: 18px; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; }
 
 @media (max-width: 1320px) {
+  .structure-dark-v3 .layout-container { width: calc(100% - 64px); }
   .visual-stage--v3 .site-header { top: 0; height: 72px; }
   .structure-dark-v3 .site-nav { gap: 0; font-size: clamp(25px, 3.4vw, 36px); }
   .structure-dark-v3 .site-nav__languages { width: min(100%, 760px); justify-content: flex-end; margin: 24px 0 0 auto; }
@@ -764,6 +768,7 @@ body.structure-dark-v3 {
 }
 
 @media (max-width: 680px) {
+  .structure-dark-v3 .layout-container { width: calc(100% - 32px); }
   .structure-dark-v3 .site-header__inner { width: calc(100% - 32px); }
   .structure-dark-v3 .header-request { display: none; }
   .hero--v3 { min-height: 0; grid-template-columns: 1fr; padding-top: 118px; padding-bottom: 72px; }
@@ -809,7 +814,7 @@ body.structure-dark-v3 {
   .goal-panel { min-height: 520px; grid-template-columns: 1fr; gap: 34px; padding: 78px 0 62px; }
   .goal-panel p { font-size: 35px; line-height: 1.08; }
   .tasks-v3__grid { grid-template-columns: 1fr; }
-  .task-card { min-height: 170px; padding: 25px 22px; }
+  .task-card { height: auto; min-height: 170px; padding: 25px 22px; }
   .task-card--title { min-height: 190px; }
   .task-card--title h3 { font-size: 52px; }
   .task-card--brand { min-height: 170px; }

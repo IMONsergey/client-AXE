@@ -1,6 +1,6 @@
 export const GLOBE_VIEW = Object.freeze({
   phi: 75 * Math.PI / 180,
-  theta: 47 * Math.PI / 180
+  theta: 25 * Math.PI / 180
 });
 
 export const GLOBE_STYLE = Object.freeze({

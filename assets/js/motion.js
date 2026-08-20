@@ -67,7 +67,9 @@
     if (!reducedMotion.matches) {
       /* Compact stagger values keep text reading as one sentence rather than a
          sequence of individual effects. */
-      splitWords(document.querySelector('.hero__title'), 32, 90);
+      if (!document.body.classList.contains('structure-dark-v3')) {
+        splitWords(document.querySelector('.hero__title'), 32, 90);
+      }
       splitWords(document.querySelector('.about__copy h2'), 38, 0);
       splitWords(document.querySelector('.countries h2'), 36, 0);
       document.querySelectorAll('.direction-card h3').forEach((element) => splitWords(element, 30, 0));
