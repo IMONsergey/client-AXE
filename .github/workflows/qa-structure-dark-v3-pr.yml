@@ -98,7 +98,12 @@ jobs:
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
               if(diagnostics.desktop.hiddenRevealsAfterSweep) throw new Error('desktop hidden reveals '+diagnostics.desktop.hiddenRevealsAfterSweep);
               await page.screenshot({path:'desktop.png',fullPage:true});
+              await page.locator('.hero--v3').screenshot({path:'hero.png'});
               await page.locator('#about').screenshot({path:'about.png'});
+              await page.locator('#goal').screenshot({path:'goal.png'});
+              await page.locator('.tasks-v3').screenshot({path:'tasks.png'});
+              await page.locator('#directions').screenshot({path:'directions.png'});
+              await page.locator('#timeline').screenshot({path:'timeline.png'});
               await page.locator('#members').screenshot({path:'map.png'});
               await page.locator('#events').screenshot({path:'events.png'});
 
@@ -106,7 +111,7 @@ jobs:
               if(d.sw>d.vw+2) throw new Error('desktop overflow '+JSON.stringify(d));
               if(!d.bodyFont.includes('Inter')||!d.titleFont.includes('Oswald')) throw new Error('fonts '+JSON.stringify(d));
               if(!d.structure||d.structure.tasks!==6||d.structure.directions!==5||d.structure.timeline!==6||d.structure.quotes!==5||d.structure.eventSlides!==3) throw new Error('inventory '+JSON.stringify(d.structure));
-              if(d.orbitCount) throw new Error('orbit remains');
+              if(d.orbitCount!==1) throw new Error('orbit overlay '+d.orbitCount);
               if(!d.globe||d.globe.renderer!=='real-continent-blue-noise'||d.globe.samples<2500||d.globe.samples>4000) throw new Error('globe '+JSON.stringify(d.globe));
               if(!d.map||d.map.loaded!==7||d.map.paths!==7||d.map.worldPaths<10) throw new Error('map '+JSON.stringify(d.map));
               if(d.nav.join(',')!=='#about,#events,#,#members,#,#,#,#') throw new Error('nav '+d.nav);
@@ -177,7 +182,12 @@ jobs:
             diagnostic.json
             runtime-error.txt
             desktop.png
+            hero.png
             about.png
+            goal.png
+            tasks.png
+            directions.png
+            timeline.png
             map.png
             events.png
             tablet.png
