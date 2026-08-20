@@ -80,7 +80,6 @@ jobs:
               diagnostics.consoleErrors=consoleErrors;
               fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
               await page.screenshot({path:'desktop.png',fullPage:true});
-              if(document.querySelector){ /* marker for source readability */ }
               await page.locator('#about').screenshot({path:'about.png'});
               await page.locator('#members').screenshot({path:'map.png'});
               await page.locator('#events').screenshot({path:'events.png'});
@@ -99,6 +98,22 @@ jobs:
               await page.click('[data-event-next]');
               await page.waitForTimeout(160);
               if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().eventIndex))!==1) throw new Error('slider failed');
+
+              await page.setViewportSize({width:1024,height:900});
+              await page.reload({waitUntil:'domcontentloaded'});
+              try { await page.waitForFunction(()=>window.__AXE_PRELOADER__?.getState().hidden===true,null,{timeout:16000}); } catch {}
+              try { await page.waitForFunction(()=>window.__AXE_COUNTRIES_MAP__?.getState().ready===true,null,{timeout:20000}); } catch {}
+              await page.waitForTimeout(400);
+              diagnostics.tablet=await page.evaluate(()=>({
+                sw:document.documentElement.scrollWidth,
+                vw:innerWidth,
+                menu:getComputedStyle(document.querySelector('.menu-toggle')).display,
+                structure:window.__AXE_STRUCTURE_V3__?.getState?.()||null,
+                map:window.__AXE_COUNTRIES_MAP__?.getState?.()||null
+              }));
+              fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              await page.screenshot({path:'tablet.png',fullPage:true});
+              if(diagnostics.tablet.sw>diagnostics.tablet.vw+2||diagnostics.tablet.menu==='none') throw new Error('tablet '+JSON.stringify(diagnostics.tablet));
 
               await page.setViewportSize({width:390,height:844});
               await page.reload({waitUntil:'domcontentloaded'});
@@ -137,6 +152,7 @@ jobs:
             about.png
             map.png
             events.png
+            tablet.png
             mobile.png
             failure.png
           if-no-files-found: warn
