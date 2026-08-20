@@ -752,11 +752,94 @@ body.structure-dark-v3 {
 .countries--v3 #countries-title { font-family: "Inter", Arial, sans-serif; font-size: 18px; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; }
 
 @media (min-width: 1321px) {
+  /* Full-node PNG audit overlays: keep content live, reuse only the exact
+     atmosphere, globe, paper texture and line-art that cannot be recreated
+     faithfully from isolated Figma layers. */
+  .visual-stage--v3::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 50%;
+    width: 1440px;
+    height: 873px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-hero-visual.webp") center top / 1440px 873px no-repeat;
+  }
+  .visual-stage--v3 .visual-stage__dot-field { opacity: 0; }
+  .hero--v3 .hero__visual { visibility: hidden; }
+  .hero--v3 .hero__title { transform: translateY(-14px); }
+  .hero__copy--v3 { margin-top: 52px; }
+  .hero--v3 .hero__request {
+    width: 287px;
+    min-width: 287px;
+    margin-top: 156px;
+    gap: 15px;
+    padding-inline: 22px;
+    font-size: 18px;
+    letter-spacing: -.01em;
+  }
+
+  .content-lower--v3::before {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    left: 50%;
+    width: 1440px;
+    height: 840px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-metric-icons.png") center top / 1440px 840px no-repeat;
+  }
+
+  .about-v3 { isolation: isolate; }
+  .about-v3::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0 auto auto 50%;
+    width: 1440px;
+    height: 2307px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: url("../images/figma/node-12-2-page-atmosphere.webp") center top / 1440px 2307px no-repeat;
+  }
+
+  .goal-panel__label { transform: translate(-1px, -2px); }
+  .goal-panel p { transform: translateY(-9px); }
+  .task-card--title h3 { font-size: 62px; transform: translate(-1px, -2px); }
+  .directions-v3__head h3 { transform: translateY(-7px); letter-spacing: -.006em; }
+  .timeline-v3__head h3 { transform: translateY(-7px); letter-spacing: -.002em; }
+
+  .direction-row--featured {
+    background: #fff url("../images/figma/node-12-2-direction-featured.png") center / 100% 100% no-repeat;
+  }
+  .direction-row--featured::before,
+  .direction-row--featured::after { display: none; }
+  .direction-row--featured:hover {
+    background: #fff url("../images/figma/node-12-2-direction-featured.png") center / 100% 100% no-repeat;
+  }
+
+  .timeline-v3__controls button:last-of-type {
+    border-color: var(--v3-ink);
+    color: #fff;
+    background: var(--v3-ink);
+  }
+
   .structure-dark-v3 .metrics { height: 432px; grid-template-rows: repeat(2, 216px); overflow: hidden; }
   .goal-panel { min-height: 581px; }
   .tasks-v3__grid { height: 406px; grid-template-rows: repeat(2, 203px); overflow: hidden; }
   .directions-v3__head { margin-bottom: 49px; }
   .timeline-v3__head { margin-bottom: 45px; }
+  .countries--v3 { padding-top: 0; }
+  .countries--v3 .countries__inner { padding-top: 41px; }
+  .countries--v3 #countries-title { transform: translateY(-10px); }
+  .countries--v3 .members-map {
+    width: 106vw;
+    transform: translateX(calc(-50% - 26px));
+  }
 }
 
 @media (max-width: 1320px) {
