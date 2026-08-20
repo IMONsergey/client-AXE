@@ -1,4 +1,5 @@
 name: Deploy AXE preview
+# Pages source re-triggered after repository publication
 # Dark source: feat/figma-concept-1
 # Light source: feat/figma-concept-light
 # Dark map source: feat/figma-concept-map-dark
