@@ -1,4 +1,13 @@
 import LAND_DATA from './globe-land-data.js';
+import {
+  GLOBE_STYLE,
+  GLOBE_VIEW,
+  clamp,
+  pointAppearance,
+  prepareLandPoints,
+  projectPoint,
+  wrapPi
+} from './globe-model.js';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -10,9 +19,11 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const desktopQuery = window.matchMedia('(min-width: 1200px)');
+  const landModel = prepareLandPoints(LAND_DATA);
+  const landPoints = landModel.points;
 
-  let phi = 90 * Math.PI / 180;
-  let theta = 38 * Math.PI / 180;
+  let phi = GLOBE_VIEW.phi;
+  let theta = GLOBE_VIEW.theta;
   let targetPhi = phi;
   let targetTheta = theta;
   let velocityPhi = 0;
@@ -31,29 +42,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const AUTO_RESUME_DELAY = 1600;
   const AUTO_SPEED = reducedMotion ? 0 : 0.067;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
-
-  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  const wrapPi = (value) => {
-    while (value > Math.PI) value -= Math.PI * 2;
-    while (value < -Math.PI) value += Math.PI * 2;
-    return value;
-  };
-
-  function decodeLandPoints(encoded) {
-    const binary = atob(encoded);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-    const view = new DataView(bytes.buffer);
-    const result = [];
-    for (let offset = 0; offset + 3 < bytes.length; offset += 4) {
-      const lat = view.getInt16(offset, true) / 100;
-      const lon = view.getInt16(offset + 2, true) / 100;
-      result.push({ lat: lat * Math.PI / 180, lon: lon * Math.PI / 180 });
-    }
-    return result;
-  }
-
-  const landPoints = decodeLandPoints(LAND_DATA);
 
   function syncGlobeToHero() {
     if (!desktopQuery.matches) {
@@ -90,58 +78,43 @@ if (canvas && globeShell && heroContent && heroVisual) {
     if (!context) return;
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.clearRect(0, 0, size, size);
-
     const cx = size / 2;
     const cy = size / 2;
-    const radius = size * 0.44;
+    const radius = size * GLOBE_STYLE.radiusRatio;
 
-    const glow = context.createRadialGradient(cx, cy, radius * 0.78, cx, cy, radius * 1.06);
-    glow.addColorStop(0, 'rgba(0, 116, 127, 0)');
-    glow.addColorStop(0.84, 'rgba(0, 148, 161, 0.035)');
-    glow.addColorStop(0.97, 'rgba(0, 193, 207, 0.13)');
-    glow.addColorStop(1, 'rgba(0, 193, 207, 0)');
+    const glow = context.createRadialGradient(cx, cy, radius * 0.84, cx, cy, radius * 1.04);
+    glow.addColorStop(0, GLOBE_STYLE.glow[0]);
+    glow.addColorStop(0.82, GLOBE_STYLE.glow[1]);
+    glow.addColorStop(0.97, GLOBE_STYLE.glow[2]);
+    glow.addColorStop(1, GLOBE_STYLE.glow[3]);
     context.fillStyle = glow;
     context.beginPath();
-    context.arc(cx, cy, radius * 1.06, 0, Math.PI * 2);
+    context.arc(cx, cy, radius * 1.04, 0, Math.PI * 2);
     context.fill();
 
     const sphere = context.createRadialGradient(cx - radius * 0.24, cy - radius * 0.22, radius * 0.07, cx, cy, radius);
-    sphere.addColorStop(0, 'rgba(4, 87, 97, 0.94)');
-    sphere.addColorStop(0.56, 'rgba(3, 68, 78, 0.97)');
-    sphere.addColorStop(1, 'rgba(2, 47, 57, 0.995)');
+    sphere.addColorStop(0, GLOBE_STYLE.sphere[0]);
+    sphere.addColorStop(0.56, GLOBE_STYLE.sphere[1]);
+    sphere.addColorStop(1, GLOBE_STYLE.sphere[2]);
     context.fillStyle = sphere;
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.fill();
 
-    const sinCenter = Math.sin(theta);
-    const cosCenter = Math.cos(theta);
-    const baseDot = Math.max(0.72, size / 590);
-
     for (const point of landPoints) {
-      const deltaLon = wrapPi(point.lon - phi);
-      const sinLat = Math.sin(point.lat);
-      const cosLat = Math.cos(point.lat);
-      const sinDelta = Math.sin(deltaLon);
-      const cosDelta = Math.cos(deltaLon);
-      const x = cosLat * sinDelta;
-      const y = cosCenter * sinLat - sinCenter * cosLat * cosDelta;
-      const z = sinCenter * sinLat + cosCenter * cosLat * cosDelta;
-      if (z <= 0.012) continue;
-
-      const px = cx + radius * x;
-      const py = cy - radius * y;
-      const edge = clamp((z - 0.01) / 0.23, 0, 1);
-      const alpha = (0.42 + 0.54 * z) * (0.48 + 0.52 * edge);
-      const dotRadius = baseDot * (0.72 + 0.54 * z);
-      context.fillStyle = `rgba(42, 225, 241, ${alpha.toFixed(3)})`;
+      const projected = projectPoint(point, phi, theta);
+      if (projected.z <= 0.012) continue;
+      const appearance = pointAppearance(projected.z, size);
+      const px = cx + radius * projected.x;
+      const py = cy - radius * projected.y;
+      context.fillStyle = `rgba(${GLOBE_STYLE.dot[0]}, ${GLOBE_STYLE.dot[1]}, ${GLOBE_STYLE.dot[2]}, ${appearance.alpha.toFixed(3)})`;
       context.beginPath();
-      context.arc(px, py, dotRadius, 0, Math.PI * 2);
+      context.arc(px, py, appearance.radius, 0, Math.PI * 2);
       context.fill();
     }
 
-    context.strokeStyle = 'rgba(42, 225, 241, 0.10)';
-    context.lineWidth = Math.max(0.7, size / 900);
+    context.strokeStyle = GLOBE_STYLE.outline;
+    context.lineWidth = Math.max(0.65, size / 1000);
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.stroke();
@@ -241,9 +214,10 @@ if (canvas && globeShell && heroContent && heroVisual) {
           theta,
           dragging,
           size: canvasSize(),
+          sourceSamples: landModel.sourceCount,
           samples: landPoints.length,
           autoSpeed: AUTO_SPEED,
-          renderer: 'real-continent-canvas'
+          renderer: 'real-continent-blue-noise'
         };
       }
     }
