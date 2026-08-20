@@ -1,0 +1,5 @@
+status=success
+structure_branch=feat/structure-dark-map-v3
+structure_head=5fdaab5568d530794cfb454f0ef83c935791054f
+workflow_sha=80c29afc50da15fdf2ad0ca7cc7ed42197b0ad6f
+page_url="https://imonsergey.github.io/client-AXE/"
