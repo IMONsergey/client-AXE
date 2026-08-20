@@ -595,7 +595,7 @@ body.structure-dark-v3 {
 
 .about-v3 {
   position: relative;
-  padding: 0 0 120px;
+  padding: 0 0 121px;
   color: var(--v3-ink);
   background: var(--v3-paper);
   overflow: hidden;
@@ -750,6 +750,14 @@ body.structure-dark-v3 {
 
 .countries--v3 { padding-top: 38px; }
 .countries--v3 #countries-title { font-family: "Inter", Arial, sans-serif; font-size: 18px; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; }
+
+@media (min-width: 1321px) {
+  .structure-dark-v3 .metrics { height: 432px; grid-template-rows: repeat(2, 216px); overflow: hidden; }
+  .goal-panel { min-height: 581px; }
+  .tasks-v3__grid { height: 406px; grid-template-rows: repeat(2, 203px); overflow: hidden; }
+  .directions-v3__head { margin-bottom: 49px; }
+  .timeline-v3__head { margin-bottom: 45px; }
+}
 
 @media (max-width: 1320px) {
   .structure-dark-v3 .layout-container { width: calc(100% - 64px); }
