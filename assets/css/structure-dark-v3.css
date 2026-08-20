@@ -522,10 +522,10 @@ body.structure-dark-v3 {
 .hero__continents-reference {
   position: absolute;
   z-index: 2;
-  top: 11%;
-  left: 11.15%;
-  width: 77.82%;
-  height: 78%;
+  top: 13.38%;
+  left: 13.46%;
+  width: 73.08%;
+  height: 73.24%;
   object-fit: contain;
   pointer-events: none;
 }

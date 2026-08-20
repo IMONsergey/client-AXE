@@ -4,7 +4,7 @@ export const GLOBE_VIEW = Object.freeze({
 });
 
 export const GLOBE_STYLE = Object.freeze({
-  radiusRatio: 0.395,
+  radiusRatio: 0.371,
   sphere: ['rgba(103, 153, 163, 0.98)', 'rgba(145, 180, 187, 0.985)', 'rgba(211, 220, 222, 0.995)'],
   dot: [42, 225, 241],
   outline: 'rgba(42, 225, 241, 0.055)',
