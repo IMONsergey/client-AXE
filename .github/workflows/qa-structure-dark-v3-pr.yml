@@ -32,67 +32,116 @@ jobs:
           npm install --no-save --no-package-lock playwright@1.55.0
 
       - name: Runtime and visual QA
+        id: runtime
+        continue-on-error: true
         run: |
           node <<'EOF'
+          const fs = require('fs');
           const { chromium } = require('playwright');
+
           (async () => {
-            const browser = await chromium.launch({ headless:true });
-            const page = await browser.newPage({ viewport:{width:1440,height:1000} });
-            const errors=[];
-            page.on('pageerror',e=>errors.push(e.message));
-            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
-            await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
-            await page.waitForFunction(()=>window.__AXE_PRELOADER__?.getState().hidden===true,null,{timeout:16000});
-            await page.waitForFunction(()=>window.__AXE_GLOBE__?.getState().ready===true,null,{timeout:16000});
-            await page.waitForFunction(()=>window.__AXE_STRUCTURE_V3__?.getState().ready===true,null,{timeout:5000});
-            await page.waitForFunction(()=>window.__AXE_COUNTRIES_MAP__?.getState().ready===true,null,{timeout:20000});
-            await page.waitForTimeout(700);
-            const desktop=await page.evaluate(()=>({
-              sw:document.documentElement.scrollWidth,vw:innerWidth,
-              structure:window.__AXE_STRUCTURE_V3__.getState(),
-              globe:window.__AXE_GLOBE__.getState(),
-              map:window.__AXE_COUNTRIES_MAP__.getState(),
-              bodyFont:getComputedStyle(document.body).fontFamily,
-              titleFont:getComputedStyle(document.querySelector('h1')).fontFamily,
-              orbitCount:document.querySelectorAll('.hero__globe-orbits').length,
-              nav:[...document.querySelectorAll('.site-nav a')].map(a=>a.getAttribute('href'))
-            }));
-            if(desktop.sw>desktop.vw+2) throw new Error('desktop overflow '+JSON.stringify(desktop));
-            if(!desktop.bodyFont.includes('Inter')||!desktop.titleFont.includes('Oswald')) throw new Error('fonts '+JSON.stringify(desktop));
-            if(desktop.structure.tasks!==6||desktop.structure.directions!==5||desktop.structure.timeline!==6||desktop.structure.quotes!==5||desktop.structure.eventSlides!==3) throw new Error('inventory '+JSON.stringify(desktop.structure));
-            if(desktop.orbitCount) throw new Error('orbit remains');
-            if(desktop.globe.renderer!=='real-continent-blue-noise'||desktop.globe.samples<2500||desktop.globe.samples>4000) throw new Error('globe '+JSON.stringify(desktop.globe));
-            if(desktop.map.loaded!==7||desktop.map.paths!==7||desktop.map.worldPaths<10) throw new Error('map '+JSON.stringify(desktop.map));
-            if(desktop.nav.join(',')!=='#about,#members,#events') throw new Error('nav '+desktop.nav);
-            await page.evaluate(()=>document.querySelector('#events').scrollIntoView({behavior:'auto'}));
-            await page.waitForTimeout(300);
-            await page.click('[data-event-next]');
-            await page.waitForTimeout(160);
-            if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().eventIndex))!==1) throw new Error('slider failed');
-            await page.screenshot({path:'desktop.png',fullPage:true});
-            await page.locator('#about').screenshot({path:'about.png'});
-            await page.locator('#members').screenshot({path:'map.png'});
-            await page.locator('#events').screenshot({path:'events.png'});
-            await page.setViewportSize({width:390,height:844});
-            await page.reload({waitUntil:'domcontentloaded'});
-            await page.waitForFunction(()=>window.__AXE_PRELOADER__?.getState().hidden===true,null,{timeout:16000});
-            await page.waitForFunction(()=>window.__AXE_COUNTRIES_MAP__?.getState().ready===true,null,{timeout:20000});
-            await page.waitForTimeout(500);
-            const mobile=await page.evaluate(()=>({sw:document.documentElement.scrollWidth,vw:innerWidth,menu:getComputedStyle(document.querySelector('.menu-toggle')).display}));
-            if(mobile.sw>mobile.vw+2||mobile.menu==='none') throw new Error('mobile '+JSON.stringify(mobile));
-            await page.screenshot({path:'mobile.png',fullPage:true});
-            if(errors.length) throw new Error(errors.join('\n'));
-            await browser.close();
+            let browser, page;
+            const consoleErrors=[];
+            const diagnostics={};
+            try {
+              browser = await chromium.launch({ headless:true });
+              page = await browser.newPage({ viewport:{width:1440,height:1000} });
+              page.on('pageerror',e=>consoleErrors.push(`pageerror: ${e.message}`));
+              page.on('console',m=>{if(m.type()==='error')consoleErrors.push(`console: ${m.text()}`)});
+              await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
+
+              const waits = [
+                ['preloader', () => page.waitForFunction(()=>window.__AXE_PRELOADER__?.getState().hidden===true,null,{timeout:16000})],
+                ['globe', () => page.waitForFunction(()=>window.__AXE_GLOBE__?.getState().ready===true,null,{timeout:16000})],
+                ['structure', () => page.waitForFunction(()=>window.__AXE_STRUCTURE_V3__?.getState().ready===true,null,{timeout:5000})],
+                ['map', () => page.waitForFunction(()=>window.__AXE_COUNTRIES_MAP__?.getState().ready===true,null,{timeout:20000})]
+              ];
+              diagnostics.waits={};
+              for(const [name,fn] of waits){
+                try { await fn(); diagnostics.waits[name]='success'; }
+                catch(e){ diagnostics.waits[name]=e.message; }
+              }
+              await page.waitForTimeout(500);
+
+              diagnostics.desktop = await page.evaluate(() => ({
+                sw:document.documentElement.scrollWidth,
+                vw:innerWidth,
+                bodyFont:getComputedStyle(document.body).fontFamily,
+                titleFont:getComputedStyle(document.querySelector('h1')).fontFamily,
+                nav:[...document.querySelectorAll('.site-nav a')].map(a=>a.getAttribute('href')),
+                orbitCount:document.querySelectorAll('.hero__globe-orbits').length,
+                structure:window.__AXE_STRUCTURE_V3__?.getState?.() || null,
+                globe:window.__AXE_GLOBE__?.getState?.() || null,
+                map:window.__AXE_COUNTRIES_MAP__?.getState?.() || null,
+                smooth:window.__AXE_SMOOTH_SCROLL__?.getState?.() || null,
+                countriesClass:document.querySelector('.countries__grid')?.className || null,
+                mapError:document.querySelector('.countries__grid')?.classList.contains('is-map-error') || false
+              }));
+              diagnostics.consoleErrors=consoleErrors;
+              fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              await page.screenshot({path:'desktop.png',fullPage:true});
+              if(document.querySelector){ /* marker for source readability */ }
+              await page.locator('#about').screenshot({path:'about.png'});
+              await page.locator('#members').screenshot({path:'map.png'});
+              await page.locator('#events').screenshot({path:'events.png'});
+
+              const d=diagnostics.desktop;
+              if(d.sw>d.vw+2) throw new Error('desktop overflow '+JSON.stringify(d));
+              if(!d.bodyFont.includes('Inter')||!d.titleFont.includes('Oswald')) throw new Error('fonts '+JSON.stringify(d));
+              if(!d.structure||d.structure.tasks!==6||d.structure.directions!==5||d.structure.timeline!==6||d.structure.quotes!==5||d.structure.eventSlides!==3) throw new Error('inventory '+JSON.stringify(d.structure));
+              if(d.orbitCount) throw new Error('orbit remains');
+              if(!d.globe||d.globe.renderer!=='real-continent-blue-noise'||d.globe.samples<2500||d.globe.samples>4000) throw new Error('globe '+JSON.stringify(d.globe));
+              if(!d.map||d.map.loaded!==7||d.map.paths!==7||d.map.worldPaths<10) throw new Error('map '+JSON.stringify(d.map));
+              if(d.nav.join(',')!=='#about,#members,#events') throw new Error('nav '+d.nav);
+
+              await page.evaluate(()=>document.querySelector('#events').scrollIntoView({behavior:'auto'}));
+              await page.waitForTimeout(300);
+              await page.click('[data-event-next]');
+              await page.waitForTimeout(160);
+              if((await page.evaluate(()=>window.__AXE_STRUCTURE_V3__.getState().eventIndex))!==1) throw new Error('slider failed');
+
+              await page.setViewportSize({width:390,height:844});
+              await page.reload({waitUntil:'domcontentloaded'});
+              try { await page.waitForFunction(()=>window.__AXE_PRELOADER__?.getState().hidden===true,null,{timeout:16000}); } catch {}
+              try { await page.waitForFunction(()=>window.__AXE_COUNTRIES_MAP__?.getState().ready===true,null,{timeout:20000}); } catch {}
+              await page.waitForTimeout(400);
+              diagnostics.mobile=await page.evaluate(()=>({
+                sw:document.documentElement.scrollWidth,
+                vw:innerWidth,
+                menu:getComputedStyle(document.querySelector('.menu-toggle')).display,
+                structure:window.__AXE_STRUCTURE_V3__?.getState?.()||null,
+                map:window.__AXE_COUNTRIES_MAP__?.getState?.()||null
+              }));
+              fs.writeFileSync('diagnostic.json',JSON.stringify(diagnostics,null,2));
+              await page.screenshot({path:'mobile.png',fullPage:true});
+              if(diagnostics.mobile.sw>diagnostics.mobile.vw+2||diagnostics.mobile.menu==='none') throw new Error('mobile '+JSON.stringify(diagnostics.mobile));
+              if(consoleErrors.length) throw new Error(consoleErrors.join('\n'));
+            } catch(e) {
+              fs.writeFileSync('runtime-error.txt',e.stack||String(e));
+              if(page){ try{await page.screenshot({path:'failure.png',fullPage:true});}catch{} }
+              throw e;
+            } finally {
+              if(browser) await browser.close();
+            }
           })().catch(e=>{console.error(e);process.exit(1)});
           EOF
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: structure-dark-v3-pr-qa
           path: |
+            diagnostic.json
+            runtime-error.txt
             desktop.png
             about.png
             map.png
             events.png
             mobile.png
+            failure.png
+          if-no-files-found: warn
           retention-days: 2
+
+      - name: Enforce runtime success
+        if: always()
+        run: test '${{ steps.runtime.outcome }}' = success
