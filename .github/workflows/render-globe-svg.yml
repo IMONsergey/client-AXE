@@ -1,0 +1,94 @@
+name: Render AXE globe SVG
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - assets/js/globe.js
+      - assets/js/globe-model.js
+      - assets/js/globe-land-data.js
+      - assets/js/globe-export-svg.js
+      - globe-export.html
+      - .github/workflows/render-globe-svg.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - assets/js/globe.js
+      - assets/js/globe-model.js
+      - assets/js/globe-land-data.js
+      - assets/js/globe-export-svg.js
+      - globe-export.html
+      - .github/workflows/render-globe-svg.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'feat/figma-concept-1' }}
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-globe-svg.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/globe-export.html >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Export and verify globe
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({ headless:true });
+            const page = await browser.newPage({ viewport:{ width:1200, height:1200 } });
+            const errors=[];
+            page.on('pageerror',e=>errors.push(e.message));
+            page.on('console',m=>{ if(m.type()==='error') errors.push(m.text()); });
+            await page.goto('http://127.0.0.1:4173/globe-export.html',{waitUntil:'networkidle'});
+            await page.waitForFunction(()=>window.__AXE_GLOBE_EXPORT__?.ready===true,null,{timeout:15000});
+            const state=await page.evaluate(()=>window.__AXE_GLOBE_EXPORT__);
+            if (state.samples !== state.sourceSamples) throw new Error(`curated point cloud changed at runtime ${JSON.stringify(state)}`);
+            if (state.samples < 2500 || state.samples > 4000) throw new Error(`unexpected globe density ${JSON.stringify(state)}`);
+            if (state.visibleSamples < 1200 || state.visibleSamples > 2800) throw new Error(`unexpected visible density ${JSON.stringify(state)}`);
+            if (Math.abs(state.phi - 75*Math.PI/180) > 1e-6 || Math.abs(state.theta - 47*Math.PI/180) > 1e-6) throw new Error('Russia-facing angle drifted');
+            fs.mkdirSync('exports',{recursive:true});
+            fs.writeFileSync('exports/axe-globe-russia.svg', state.svg, 'utf8');
+            await page.locator('#export-root').screenshot({path:'exports/axe-globe-russia.png',omitBackground:true});
+            if(errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          EOF
+
+      - name: Persist export in branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/axe-globe-russia.svg exports/axe-globe-russia.png
+          if git diff --cached --quiet; then
+            echo "Export unchanged"
+          else
+            git commit -m "chore: render current globe export"
+            git push origin HEAD:feat/figma-concept-1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axe-globe-russia-svg
+          path: |
+            exports/axe-globe-russia.svg
+            exports/axe-globe-russia.png
+          if-no-files-found: error
+          retention-days: 2
