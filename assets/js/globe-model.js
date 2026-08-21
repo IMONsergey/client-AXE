@@ -7,6 +7,7 @@ export const GLOBE_STYLE = Object.freeze({
   radiusRatio: 0.395,
   sphere: ['rgba(11, 84, 103, 0.985)', 'rgba(10, 105, 121, 0.99)', 'rgba(8, 55, 76, 0.995)'],
   dot: [42, 225, 241],
+  boundary: 'rgba(83, 235, 244, 0.42)',
   outline: 'rgba(42, 225, 241, 0.055)',
   glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.018)', 'rgba(0, 193, 207, 0.075)', 'rgba(0, 193, 207, 0)']
 });
