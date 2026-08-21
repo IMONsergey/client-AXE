@@ -58,12 +58,15 @@
 
   function renderTimeline(nextIndex) {
     if (!timelineSlider || !timelineTrack || !timelineItems.length) return;
-    timelineIndex = Math.max(0, Math.min(nextIndex, timelineItems.length - 1));
     const itemWidth = timelineItems[0].getBoundingClientRect().width;
     const gap = parseFloat(getComputedStyle(timelineTrack).columnGap || getComputedStyle(timelineTrack).gap) || 0;
+    const viewportWidth = timelineSlider.getBoundingClientRect().width;
+    const visibleItems = Math.max(1, Math.round((viewportWidth + gap) / (itemWidth + gap)));
+    const maxIndex = Math.max(0, timelineItems.length - visibleItems);
+    timelineIndex = Math.max(0, Math.min(nextIndex, maxIndex));
     timelineTrack.style.transform = `translate3d(${-(timelineIndex * (itemWidth + gap))}px, 0, 0)`;
     timelinePrev?.toggleAttribute('disabled', timelineIndex === 0);
-    timelineNext?.toggleAttribute('disabled', timelineIndex === timelineItems.length - 1);
+    timelineNext?.toggleAttribute('disabled', timelineIndex === maxIndex);
     if (timelineCurrent) timelineCurrent.textContent = String(timelineIndex + 1);
   }
 

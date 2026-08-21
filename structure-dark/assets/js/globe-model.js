@@ -7,8 +7,6 @@ export const GLOBE_STYLE = Object.freeze({
   radiusRatio: 0.395,
   sphere: ['rgba(11, 84, 103, 0.985)', 'rgba(10, 105, 121, 0.99)', 'rgba(8, 55, 76, 0.995)'],
   dot: [42, 225, 241],
-  boundary: 'rgba(104, 245, 250, 0.66)',
-  outline: 'rgba(42, 225, 241, 0.055)',
   glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.018)', 'rgba(0, 193, 207, 0.075)', 'rgba(0, 193, 207, 0)']
 });
 
@@ -62,10 +60,10 @@ export function projectPoint(point, phi, theta) {
 
 export function pointAppearance(z, size) {
   const edge = clamp((z - 0.01) / 0.23, 0, 1);
-  const baseDot = Math.max(1.12, size / 490);
+  const baseDot = Math.max(0.82, size / 680);
 
   return {
-    alpha: (0.52 + 0.44 * z) * (0.62 + 0.38 * edge),
-    radius: baseDot * (0.92 + 0.48 * z)
+    alpha: (0.58 + 0.38 * z) * (0.68 + 0.32 * edge),
+    radius: baseDot * (0.9 + 0.38 * z)
   };
 }

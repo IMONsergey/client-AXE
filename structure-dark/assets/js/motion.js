@@ -78,7 +78,7 @@
     registerReveal(document.querySelector('.hero__copy'), { delay: 150 });
     registerReveal(document.querySelector('.hero__visual'), { delay: 90, scale: true });
 
-    document.querySelectorAll('.metric-card').forEach((element, index) => {
+    document.querySelectorAll('.metric-card, .metric-link').forEach((element, index) => {
       registerReveal(element, { delay: index * 58, scale: true });
     });
 
