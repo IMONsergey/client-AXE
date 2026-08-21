@@ -511,7 +511,7 @@ body.structure-dark-v3 {
   background: var(--v3-teal);
   font-size: 19px;
 }
-.hero--v3 .hero__visual { position: relative; z-index: 1; align-items: start; margin-top: -134px; transform: translateX(-80px); }
+.hero--v3 .hero__visual { position: relative; z-index: 1; align-items: start; margin-top: -96px; transform: translateX(-80px); }
 .hero__globe-shell--clean { width: min(49vw, 640px); max-width: 640px; max-height: 640px; }
 .structure-dark-v3 .hero__globe-canvas { transform: none; }
 .structure-dark-v3 .hero__globe-orbits {

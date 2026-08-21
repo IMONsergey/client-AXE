@@ -1,4 +1,4 @@
-import LAND_DATA from './globe-land-data.js?v=relaxed-real-geography-2026-08-21';
+import LAND_DATA from './globe-land-data.js?v=fixed-geodesic-land-grid-2026-08-21';
 import {
   GLOBE_STYLE,
   GLOBE_VIEW,
@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js?v=relaxed-dot-cloud-2026-08-21';
+} from './globe-model.js?v=stable-geodesic-grid-2026-08-21';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -211,7 +211,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
           sourceSamples: landModel.sourceCount,
           samples: landPoints.length,
           autoSpeed: AUTO_SPEED,
-          renderer: 'real-continent-relaxed-dot-cloud'
+          renderer: 'fixed-icosahedral-land-grid'
         };
       }
     }
