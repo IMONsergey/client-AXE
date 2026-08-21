@@ -1,4 +1,4 @@
-import LAND_DATA from './globe-land-data.js';
+import LAND_DATA from './globe-land-data.js?v=real-geography-2026-08-21';
 import {
   GLOBE_STYLE,
   GLOBE_VIEW,
