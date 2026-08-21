@@ -46,6 +46,7 @@ jobs:
           assert '.timeline-v3__viewport' in css and 'overflow: visible' in css
           assert "for (const point of landPoints)" in globe
           assert 'WORLD_BOUNDARIES_URL' in globe and 'boundaryRings' in globe
+          assert "globe-model.js?v=client-review-boundaries-2026-08-21" in globe
           assert not list(Path('.').glob('node-12-2-*'))
           for name in ('about-icon-directions.png', 'about-icon-timeline.png', 'about-icon-members.png', 'direction-featured-background.webp'):
             assert (Path('assets/images/figma') / name).is_file()

@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js?v=client-review-2026-08-21';
+} from './globe-model.js?v=client-review-boundaries-2026-08-21';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -150,7 +150,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     context.save();
     context.strokeStyle = GLOBE_STYLE.boundary;
-    context.lineWidth = Math.max(0.7, size / 920);
+    context.lineWidth = Math.max(0.9, size / 760);
     context.lineCap = 'round';
     context.lineJoin = 'round';
     for (const ring of boundaryRings) {
