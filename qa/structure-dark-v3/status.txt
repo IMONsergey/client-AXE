@@ -1,4 +1,4 @@
-static=failure
+static=success
 server=success
 chromium=success
-runtime=failure
+runtime=success
