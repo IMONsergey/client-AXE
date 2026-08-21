@@ -46,13 +46,16 @@ jobs:
           assert html.count('class="about-nav__icon"') == 3
           assert html.count('class="metric-link__icon"') == 1
           assert 'hero__continents-reference' not in html
-          assert 'hero__globe-orbits' not in html
+          assert html.count('class="hero__globe-orbits"') == 1
+          assert html.count('<ellipse class="hero__globe-orbit"') == 1
+          assert 'hero__globe-orbit--two' not in html
           assert html.index('<header class="site-header">') < html.index('<main class="site-shell">')
           assert 'direction-featured-background.webp' in css
           assert '.timeline-v3__viewport' in css and 'overflow: visible' in css
           assert "for (const point of landPoints)" in globe
           assert 'WORLD_BOUNDARIES_URL' not in globe and 'boundaryRings' not in globe
           assert 'context.stroke()' not in globe
+          assert 'Math.min(720, Math.round(window.innerWidth * 0.55))' in globe
           assert "globe-model.js?v=dense-dots-only-2026-08-21" in globe
           assert "globe-land-data.js?v=dense-real-geography-2026-08-21" in globe
           encoded = re.search(r"'([^']+)'", globe_data).group(1)
@@ -116,6 +119,7 @@ jobs:
               metricIcon: (() => { const img = document.querySelector('.metric-link__icon'); return Boolean(img?.complete && img.naturalWidth > 0); })(),
               introBorder: getComputedStyle(document.querySelector('.about-v3__intro')).borderTopWidth,
               timelineOverflow: getComputedStyle(document.querySelector('.timeline-v3__viewport')).overflow,
+              monthSize: parseFloat(getComputedStyle(document.querySelector('.timeline-item time b')).fontSize),
               directionBackground: getComputedStyle(document.querySelector('.direction-row--featured')).backgroundImage,
               smooth: window.__AXE_SMOOTH_SCROLL__?.getState()
             }));
@@ -123,6 +127,7 @@ jobs:
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
             if (desktop.globe.renderer !== 'dense-real-continent-dots-only' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
+            if (desktop.globe.size < 715 || desktop.globe.size > 725 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globe: desktop.globe, monthSize: desktop.monthSize })}`);
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
             if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
             if (desktop.header.parent !== 'BODY' || desktop.header.position !== 'fixed' || !desktop.header.visible || Math.abs(desktop.header.top - 39) > 2) throw new Error(`header at top ${JSON.stringify(desktop.header)}`);
