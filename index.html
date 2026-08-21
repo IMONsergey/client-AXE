@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/motion.css">
   <link rel="stylesheet" href="assets/css/motion-polish.css">
-  <link rel="stylesheet" href="assets/css/structure-dark-v3.css?v=compact-globe-single-orbit-2026-08-21">
+  <link rel="stylesheet" href="assets/css/structure-dark-v3.css?v=compact-globe-depth-orbit-2026-08-21">
 </head>
 <body class="structure-dark-v3">
   <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -82,11 +82,14 @@
 
         <div class="hero__visual">
           <div class="hero__globe-shell hero__globe-shell--clean">
+            <svg class="hero__globe-orbits hero__globe-orbits--back" viewBox="0 0 1000 1000" aria-hidden="true">
+              <path class="orbit__line orbit__line--back" d="M130 789A470 170 -38 0 1 870 211"/>
+            </svg>
             <div class="hero__globe-canvas">
               <canvas id="axe-globe" aria-label="Интерактивный глобус с реальными материками"></canvas>
             </div>
-            <svg class="hero__globe-orbits" viewBox="0 0 800 800" aria-hidden="true">
-              <ellipse class="hero__globe-orbit" cx="400" cy="400" rx="458" ry="67" transform="rotate(-37 400 400)"/>
+            <svg class="hero__globe-orbits hero__globe-orbits--front" viewBox="0 0 1000 1000" aria-hidden="true">
+              <path class="orbit__line orbit__line--front" d="M870 211A470 170 -38 0 1 130 789"/>
             </svg>
           </div>
         </div>
@@ -256,7 +259,7 @@
   <script src="assets/js/smooth-scroll.js"></script>
   <script src="assets/js/motion.js?v=aligned-metric-reveal-2026-08-21"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
-  <script type="module" src="assets/js/globe.js?v=compact-dense-dots-2026-08-21"></script>
+  <script type="module" src="assets/js/globe.js?v=compact-relaxed-dots-depth-orbit-2026-08-21"></script>
   <script src="assets/js/structure-dark-v3.js?v=two-card-timeline-2026-08-21"></script>
 </body>
 </html>

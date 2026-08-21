@@ -38,8 +38,24 @@ export function decodeLandPoints(encoded) {
 }
 
 export function prepareLandPoints(encoded) {
-  const points = decodeLandPoints(encoded);
-  return { sourceCount: points.length, points };
+  const sourcePoints = decodeLandPoints(encoded);
+  const points = sourcePoints.map((point, index) => {
+    // The source follows a spherical sequence. A small deterministic tangent
+    // offset breaks its visible latitude bands without softening coastlines.
+    const seedA = Math.sin((index + 1) * 12.9898 + point.lat * 78.233) * 43758.5453;
+    const seedB = Math.sin((index + 1) * 39.3467 + point.lon * 11.135) * 24634.6345;
+    const angle = (seedA - Math.floor(seedA)) * Math.PI * 2;
+    const distance = (0.22 + (seedB - Math.floor(seedB)) * 0.28) * DEG;
+    const latitude = clamp(point.lat + Math.cos(angle) * distance, -Math.PI / 2, Math.PI / 2);
+    const longitudeScale = Math.max(0.34, Math.cos(point.lat));
+
+    return {
+      lat: latitude,
+      lon: wrapPi(point.lon + Math.sin(angle) * distance / longitudeScale)
+    };
+  });
+
+  return { sourceCount: sourcePoints.length, points };
 }
 
 export function projectPoint(point, phi, theta) {

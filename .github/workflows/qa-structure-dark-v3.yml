@@ -46,18 +46,18 @@ jobs:
           assert html.count('class="about-nav__icon"') == 3
           assert html.count('class="metric-link__icon"') == 1
           assert 'hero__continents-reference' not in html
-          assert html.count('class="hero__globe-orbits"') == 1
-          assert html.count('<ellipse class="hero__globe-orbit"') == 1
-          assert 'hero__globe-orbit--two' not in html
+          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2
+          assert html.count('class="orbit__line orbit__line--') == 2
+          assert 'hero__globe-orbits--back' in html and 'hero__globe-orbits--front' in html
           assert html.index('<header class="site-header">') < html.index('<main class="site-shell">')
           assert 'direction-featured-background.webp' in css
           assert '.timeline-v3__viewport' in css and 'overflow: visible' in css
           assert "for (const point of landPoints)" in globe
           assert 'WORLD_BOUNDARIES_URL' not in globe and 'boundaryRings' not in globe
           assert 'context.stroke()' not in globe
-          assert 'Math.min(720, Math.round(window.innerWidth * 0.55))' in globe
-          assert "globe-model.js?v=dense-dots-only-2026-08-21" in globe
-          assert "globe-land-data.js?v=dense-real-geography-2026-08-21" in globe
+          assert 'Math.min(640, Math.round(window.innerWidth * 0.49))' in globe
+          assert "globe-model.js?v=relaxed-dot-cloud-2026-08-21" in globe
+          assert "globe-land-data.js?v=relaxed-real-geography-2026-08-21" in globe
           encoded = re.search(r"'([^']+)'", globe_data).group(1)
           raw = base64.b64decode(encoded)
           points = [struct.unpack_from('<hh', raw, offset) for offset in range(0, len(raw), 4)]
@@ -111,6 +111,11 @@ jobs:
               structure: window.__AXE_STRUCTURE_V3__.getState(),
               globe: window.__AXE_GLOBE__.getState(),
               globeShellSize: document.querySelector('.hero__globe-shell').getBoundingClientRect().width,
+              orbitDepth: {
+                back: Number(getComputedStyle(document.querySelector('.hero__globe-orbits--back')).zIndex),
+                globe: Number(getComputedStyle(document.querySelector('.hero__globe-canvas')).zIndex),
+                front: Number(getComputedStyle(document.querySelector('.hero__globe-orbits--front')).zIndex)
+              },
               map: window.__AXE_COUNTRIES_MAP__.getState(),
               bodyFont: getComputedStyle(document.body).fontFamily,
               titleFont: getComputedStyle(document.querySelector('h1')).fontFamily,
@@ -127,8 +132,9 @@ jobs:
             if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
-            if (desktop.globe.renderer !== 'dense-real-continent-dots-only' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
-            if (desktop.globeShellSize < 715 || desktop.globeShellSize > 725 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globeShellSize: desktop.globeShellSize, canvasSize: desktop.globe.size, monthSize: desktop.monthSize })}`);
+            if (desktop.globe.renderer !== 'real-continent-relaxed-dot-cloud' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
+            if (desktop.globeShellSize < 635 || desktop.globeShellSize > 645 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globeShellSize: desktop.globeShellSize, canvasSize: desktop.globe.size, monthSize: desktop.monthSize })}`);
+            if (!(desktop.orbitDepth.back < desktop.orbitDepth.globe && desktop.orbitDepth.globe < desktop.orbitDepth.front)) throw new Error(`orbit depth ${JSON.stringify(desktop.orbitDepth)}`);
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
             if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
             if (desktop.header.parent !== 'BODY' || desktop.header.position !== 'fixed' || !desktop.header.visible || Math.abs(desktop.header.top - 39) > 2) throw new Error(`header at top ${JSON.stringify(desktop.header)}`);
