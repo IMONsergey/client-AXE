@@ -49,7 +49,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
       globeShell.style.removeProperty('height');
       return;
     }
-    const size = Math.min(771, Math.round(window.innerWidth * 0.5356));
+    const size = Math.min(720, Math.round(window.innerWidth * 0.55));
     if (size > 0) {
       globeShell.style.width = `${size}px`;
       globeShell.style.height = `${size}px`;
