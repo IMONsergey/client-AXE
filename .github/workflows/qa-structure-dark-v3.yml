@@ -35,6 +35,7 @@ jobs:
           css = Path('assets/css/structure-dark-v3.css').read_text(encoding='utf-8')
           js = Path('assets/js/structure-dark-v3.js').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          globe_model = Path('assets/js/globe-model.js').read_text(encoding='utf-8')
           globe_data = Path('assets/js/globe-land-data.js').read_text(encoding='utf-8')
           smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
           assert 'family=Inter' in html and 'family=Oswald' in html
@@ -56,8 +57,10 @@ jobs:
           assert 'WORLD_BOUNDARIES_URL' not in globe and 'boundaryRings' not in globe
           assert 'context.stroke()' not in globe
           assert 'Math.min(640, Math.round(window.innerWidth * 0.49))' in globe
-          assert "globe-model.js?v=relaxed-dot-cloud-2026-08-21" in globe
-          assert "globe-land-data.js?v=relaxed-real-geography-2026-08-21" in globe
+          assert "globe-model.js?v=stable-geodesic-grid-2026-08-21" in globe
+          assert "globe-land-data.js?v=fixed-geodesic-land-grid-2026-08-21" in globe
+          assert 'frequency-44 icosahedral grid' in globe_data
+          assert 'Math.sin((index + 1)' not in globe_model and '.map((point, index)' not in globe_model
           encoded = re.search(r"'([^']+)'", globe_data).group(1)
           raw = base64.b64decode(encoded)
           points = [struct.unpack_from('<hh', raw, offset) for offset in range(0, len(raw), 4)]
@@ -132,7 +135,7 @@ jobs:
             if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
-            if (desktop.globe.renderer !== 'real-continent-relaxed-dot-cloud' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
+            if (desktop.globe.renderer !== 'fixed-icosahedral-land-grid' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
             if (desktop.globeShellSize < 635 || desktop.globeShellSize > 645 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globeShellSize: desktop.globeShellSize, canvasSize: desktop.globe.size, monthSize: desktop.monthSize })}`);
             if (!(desktop.orbitDepth.back < desktop.orbitDepth.globe && desktop.orbitDepth.globe < desktop.orbitDepth.front)) throw new Error(`orbit depth ${JSON.stringify(desktop.orbitDepth)}`);
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
