@@ -512,22 +512,27 @@ body.structure-dark-v3 {
   font-size: 19px;
 }
 .hero--v3 .hero__visual { position: relative; z-index: 1; align-items: start; margin-top: -134px; transform: translateX(-80px); }
-.hero__globe-shell--clean { width: min(55vw, 720px); max-width: 720px; max-height: 720px; }
+.hero__globe-shell--clean { width: min(49vw, 640px); max-width: 640px; max-height: 640px; }
+.structure-dark-v3 .hero__globe-canvas { transform: none; }
 .structure-dark-v3 .hero__globe-orbits {
   display: block !important;
-  z-index: 3;
-  inset: -2.5%;
-  width: 105%;
-  height: 105%;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
   pointer-events: none;
 }
-.structure-dark-v3 .hero__globe-orbit {
+.structure-dark-v3 .hero__globe-orbits--back { z-index: 0; }
+.structure-dark-v3 .hero__globe-orbits--front { z-index: 2; }
+.structure-dark-v3 .orbit__line {
   fill: none;
   stroke: rgba(58, 231, 241, .78);
   stroke-width: 1.1;
+  stroke-linecap: round;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 4px rgba(51, 231, 241, .72)) drop-shadow(0 0 10px rgba(24, 191, 208, .38));
 }
+.structure-dark-v3 .orbit__line--back { stroke: rgba(45, 205, 220, .52); }
+.structure-dark-v3 .orbit__line--front { stroke: rgba(62, 232, 242, .82); }
 .content-lower--v3 { margin-top: 0; }
 .structure-dark-v3 .metrics {
   display: grid;
