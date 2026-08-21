@@ -181,12 +181,12 @@ jobs:
               menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
               structure: window.__AXE_STRUCTURE_V3__.getState(),
               map: window.__AXE_COUNTRIES_MAP__.getState(),
-              metrics: [...document.querySelectorAll('.metrics > :not(.metric-cell--empty)')].map(el => { const rect = el.getBoundingClientRect(); return { className: el.className, top: rect.top, left: rect.left, width: rect.width }; })
+              metrics: [...document.querySelectorAll('.metrics > :not(.metric-cell--empty)')].map(el => ({ className: el.className, row: el.offsetTop, column: el.offsetLeft, width: el.offsetWidth }))
             }));
             if (mobile.width > mobile.viewport + 2) throw new Error(`mobile horizontal overflow ${JSON.stringify(mobile)}`);
             if (mobile.menu === 'none') throw new Error('mobile menu hidden');
             if (mobile.structure.quotes !== 5 || mobile.map.loaded !== 7) throw new Error(`mobile inventory ${JSON.stringify(mobile)}`);
-            if (mobile.metrics.length !== 4 || Math.abs(mobile.metrics[2].top - mobile.metrics[3].top) > 2 || mobile.metrics[2].left >= mobile.metrics[3].left) throw new Error(`mobile metric grid ${JSON.stringify(mobile.metrics)}`);
+            if (mobile.metrics.length !== 4 || mobile.metrics[2].row !== mobile.metrics[3].row || mobile.metrics[2].column >= mobile.metrics[3].column) throw new Error(`mobile metric grid ${JSON.stringify(mobile.metrics)}`);
             await page.screenshot({ path: 'structure-dark-390.png', fullPage: true });
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
