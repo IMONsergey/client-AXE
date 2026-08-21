@@ -1,4 +1,4 @@
-import LAND_DATA from './globe-land-data.js?v=real-geography-2026-08-21';
+import LAND_DATA from './globe-land-data.js?v=dense-real-geography-2026-08-21';
 import {
   GLOBE_STYLE,
   GLOBE_VIEW,
@@ -7,13 +7,12 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js?v=client-review-boundaries-2026-08-21';
+} from './globe-model.js?v=dense-dots-only-2026-08-21';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
 const heroContent = document.querySelector('.hero__content');
 const heroVisual = document.querySelector('.hero__visual');
-const WORLD_BOUNDARIES_URL = 'https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json';
 
 if (canvas && globeShell && heroContent && heroVisual) {
   const context = canvas.getContext('2d', { alpha: true });
@@ -22,8 +21,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const desktopQuery = window.matchMedia('(min-width: 1200px)');
   const landModel = prepareLandPoints(LAND_DATA);
   const landPoints = landModel.points;
-  let boundaryRings = [];
-  let boundariesReady = false;
 
   let phi = GLOBE_VIEW.phi;
   let theta = GLOBE_VIEW.theta;
@@ -45,39 +42,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const AUTO_RESUME_DELAY = 1600;
   const AUTO_SPEED = reducedMotion ? 0 : 0.067;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
-
-  function collectBoundaryRings(geojson) {
-    const rings = [];
-    const addPolygon = (polygon) => {
-      const outerRing = polygon?.[0];
-      if (!Array.isArray(outerRing) || outerRing.length < 3) return;
-      const step = Math.max(1, Math.ceil(outerRing.length / 180));
-      const sampled = outerRing
-        .filter((_, index) => index % step === 0 || index === outerRing.length - 1)
-        .map(([lon, lat]) => ({ lat: lat * Math.PI / 180, lon: lon * Math.PI / 180 }));
-      if (sampled.length > 2) rings.push(sampled);
-    };
-
-    for (const feature of geojson?.features || []) {
-      const geometry = feature?.geometry;
-      if (geometry?.type === 'Polygon') addPolygon(geometry.coordinates);
-      if (geometry?.type === 'MultiPolygon') geometry.coordinates.forEach(addPolygon);
-    }
-    return rings;
-  }
-
-  fetch(WORLD_BOUNDARIES_URL)
-    .then((response) => {
-      if (!response.ok) throw new Error(`World boundaries request failed: ${response.status}`);
-      return response.json();
-    })
-    .then((geojson) => {
-      boundaryRings = collectBoundaryRings(geojson);
-      boundariesReady = true;
-    })
-    .catch(() => {
-      boundariesReady = true;
-    });
 
   function syncGlobeToHero() {
     if (!desktopQuery.matches) {
@@ -148,38 +112,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
       context.fill();
     }
 
-    context.save();
-    context.strokeStyle = GLOBE_STYLE.boundary;
-    context.lineWidth = Math.max(0.9, size / 760);
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
-    for (const ring of boundaryRings) {
-      let drawing = false;
-      let previousLon = null;
-      context.beginPath();
-      for (const point of ring) {
-        const projected = projectPoint(point, phi, theta);
-        const crossesDateline = previousLon !== null && Math.abs(point.lon - previousLon) > Math.PI;
-        previousLon = point.lon;
-        if (projected.z <= 0.015 || crossesDateline) {
-          drawing = false;
-          continue;
-        }
-        const px = cx + radius * projected.x;
-        const py = cy - radius * projected.y;
-        if (!drawing) context.moveTo(px, py);
-        else context.lineTo(px, py);
-        drawing = true;
-      }
-      context.stroke();
-    }
-    context.restore();
-
-    context.strokeStyle = GLOBE_STYLE.outline;
-    context.lineWidth = Math.max(0.65, size / 1000);
-    context.beginPath();
-    context.arc(cx, cy, radius, 0, Math.PI * 2);
-    context.stroke();
   }
 
   function markReadyAfterPaint() {
@@ -278,10 +210,8 @@ if (canvas && globeShell && heroContent && heroVisual) {
           size: canvasSize(),
           sourceSamples: landModel.sourceCount,
           samples: landPoints.length,
-          boundaries: boundaryRings.length,
-          boundariesReady,
           autoSpeed: AUTO_SPEED,
-          renderer: 'real-continent-blue-noise'
+          renderer: 'dense-real-continent-dots-only'
         };
       }
     }

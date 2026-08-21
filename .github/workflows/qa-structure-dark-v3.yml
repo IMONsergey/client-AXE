@@ -44,21 +44,24 @@ jobs:
           assert html.count('class="direction-row') == 5
           assert html.count('class="quote-v3') == 5
           assert html.count('class="about-nav__icon"') == 3
+          assert html.count('class="metric-link__icon"') == 1
           assert 'hero__continents-reference' not in html
+          assert 'hero__globe-orbits' not in html
           assert html.index('<header class="site-header">') < html.index('<main class="site-shell">')
           assert 'direction-featured-background.webp' in css
           assert '.timeline-v3__viewport' in css and 'overflow: visible' in css
           assert "for (const point of landPoints)" in globe
-          assert 'WORLD_BOUNDARIES_URL' in globe and 'boundaryRings' in globe
-          assert "globe-model.js?v=client-review-boundaries-2026-08-21" in globe
-          assert "globe-land-data.js?v=real-geography-2026-08-21" in globe
+          assert 'WORLD_BOUNDARIES_URL' not in globe and 'boundaryRings' not in globe
+          assert 'context.stroke()' not in globe
+          assert "globe-model.js?v=dense-dots-only-2026-08-21" in globe
+          assert "globe-land-data.js?v=dense-real-geography-2026-08-21" in globe
           encoded = re.search(r"'([^']+)'", globe_data).group(1)
           raw = base64.b64decode(encoded)
           points = [struct.unpack_from('<hh', raw, offset) for offset in range(0, len(raw), 4)]
-          assert 3500 <= len(points) <= 4000
+          assert 5200 <= len(points) <= 6200
           assert all(abs(lat / 100) <= 90 and abs(lon / 100) <= 180 for lat, lon in points)
           assert not list(Path('.').glob('node-12-2-*'))
-          for name in ('about-icon-directions.png', 'about-icon-timeline.png', 'about-icon-members.png', 'direction-featured-background.webp'):
+          for name in ('about-icon-directions.png', 'about-icon-timeline.png', 'about-icon-members.png', 'metric-icon-goals.png', 'direction-featured-background.webp'):
             assert (Path('assets/images/figma') / name).is_file()
           assert 'Открыть Trade Requests' in html
           assert 'Ключевые события' in html
@@ -96,7 +99,6 @@ jobs:
             await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
             await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
             await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
-            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().boundariesReady === true, null, { timeout: 20000 });
             await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
             await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
             await page.waitForTimeout(700);
@@ -111,6 +113,7 @@ jobs:
               header: (() => { const el = document.querySelector('.site-header'); const rect = el.getBoundingClientRect(); return { parent: el.parentElement.tagName, position: getComputedStyle(el).position, top: rect.top, visible: rect.height > 0 && getComputedStyle(el).display !== 'none' }; })(),
               contentWidth: document.querySelector('.layout-container').getBoundingClientRect().width,
               iconCount: [...document.querySelectorAll('.about-nav__icon')].filter(img => img.complete && img.naturalWidth > 0).length,
+              metricIcon: (() => { const img = document.querySelector('.metric-link__icon'); return Boolean(img?.complete && img.naturalWidth > 0); })(),
               introBorder: getComputedStyle(document.querySelector('.about-v3__intro')).borderTopWidth,
               timelineOverflow: getComputedStyle(document.querySelector('.timeline-v3__viewport')).overflow,
               directionBackground: getComputedStyle(document.querySelector('.direction-row--featured')).backgroundImage,
@@ -119,12 +122,12 @@ jobs:
             if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
-            if (desktop.globe.renderer !== 'real-continent-blue-noise' || desktop.globe.samples < 2500 || desktop.globe.samples > 4000 || desktop.globe.boundaries < 150) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
+            if (desktop.globe.renderer !== 'dense-real-continent-dots-only' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
             if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
             if (desktop.header.parent !== 'BODY' || desktop.header.position !== 'fixed' || !desktop.header.visible || Math.abs(desktop.header.top - 39) > 2) throw new Error(`header at top ${JSON.stringify(desktop.header)}`);
             if (desktop.contentWidth < 1338 || desktop.contentWidth > 1350) throw new Error(`content width ${desktop.contentWidth}`);
-            if (desktop.iconCount !== 3 || desktop.introBorder !== '1px') throw new Error(`about nav details ${JSON.stringify(desktop)}`);
+            if (desktop.iconCount !== 3 || !desktop.metricIcon || desktop.introBorder !== '1px') throw new Error(`navigation details ${JSON.stringify(desktop)}`);
             if (desktop.timelineOverflow !== 'visible' || !desktop.directionBackground.includes('direction-featured-background')) throw new Error(`assets/layout ${JSON.stringify(desktop)}`);
 
             const globeBefore = await page.evaluate(() => window.__AXE_GLOBE__.getState().phi);
@@ -144,6 +147,8 @@ jobs:
 
             await page.evaluate(() => document.querySelector('#timeline').scrollIntoView({ behavior:'auto', block:'start' }));
             await page.waitForTimeout(300);
+            const timelineInitial = await page.evaluate(() => { const viewport = document.querySelector('.timeline-v3__viewport').getBoundingClientRect(); const cards = [...document.querySelectorAll('.timeline-item')].slice(0, 3).map(card => card.getBoundingClientRect()); return { viewport: { left: viewport.left, right: viewport.right, width: viewport.width }, cards: cards.map(card => ({ left: card.left, right: card.right, width: card.width })) }; });
+            if (Math.abs(timelineInitial.cards[0].left - timelineInitial.viewport.left) > 2 || Math.abs(timelineInitial.cards[1].right - timelineInitial.viewport.right) > 2 || timelineInitial.cards[2].left < timelineInitial.viewport.right - 2) throw new Error(`timeline two-card grid ${JSON.stringify(timelineInitial)}`);
             await page.click('[data-timeline-next]');
             await page.waitForTimeout(760);
             const timeline = await page.evaluate(() => { const viewport = document.querySelector('.timeline-v3__viewport').getBoundingClientRect(); const first = document.querySelector('.timeline-item').getBoundingClientRect(); return { index: window.__AXE_STRUCTURE_V3__.getState().timelineIndex, viewportLeft: viewport.left, firstLeft: first.left, firstRight: first.right }; });
@@ -175,11 +180,13 @@ jobs:
               viewport: innerWidth,
               menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
               structure: window.__AXE_STRUCTURE_V3__.getState(),
-              map: window.__AXE_COUNTRIES_MAP__.getState()
+              map: window.__AXE_COUNTRIES_MAP__.getState(),
+              metrics: [...document.querySelectorAll('.metrics > :not(.metric-cell--empty)')].map(el => { const rect = el.getBoundingClientRect(); return { className: el.className, top: rect.top, left: rect.left, width: rect.width }; })
             }));
             if (mobile.width > mobile.viewport + 2) throw new Error(`mobile horizontal overflow ${JSON.stringify(mobile)}`);
             if (mobile.menu === 'none') throw new Error('mobile menu hidden');
             if (mobile.structure.quotes !== 5 || mobile.map.loaded !== 7) throw new Error(`mobile inventory ${JSON.stringify(mobile)}`);
+            if (mobile.metrics.length !== 4 || Math.abs(mobile.metrics[2].top - mobile.metrics[3].top) > 2 || mobile.metrics[2].left >= mobile.metrics[3].left) throw new Error(`mobile metric grid ${JSON.stringify(mobile.metrics)}`);
             await page.screenshot({ path: 'structure-dark-390.png', fullPage: true });
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
