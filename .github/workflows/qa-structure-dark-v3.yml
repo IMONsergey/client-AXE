@@ -110,6 +110,7 @@ jobs:
               viewport: innerWidth,
               structure: window.__AXE_STRUCTURE_V3__.getState(),
               globe: window.__AXE_GLOBE__.getState(),
+              globeShellSize: document.querySelector('.hero__globe-shell').getBoundingClientRect().width,
               map: window.__AXE_COUNTRIES_MAP__.getState(),
               bodyFont: getComputedStyle(document.body).fontFamily,
               titleFont: getComputedStyle(document.querySelector('h1')).fontFamily,
@@ -127,7 +128,7 @@ jobs:
             if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
             if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
             if (desktop.globe.renderer !== 'dense-real-continent-dots-only' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
-            if (desktop.globe.size < 715 || desktop.globe.size > 725 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globe: desktop.globe, monthSize: desktop.monthSize })}`);
+            if (desktop.globeShellSize < 715 || desktop.globeShellSize > 725 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globeShellSize: desktop.globeShellSize, canvasSize: desktop.globe.size, monthSize: desktop.monthSize })}`);
             if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
             if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
             if (desktop.header.parent !== 'BODY' || desktop.header.position !== 'fixed' || !desktop.header.visible || Math.abs(desktop.header.top - 39) > 2) throw new Error(`header at top ${JSON.stringify(desktop.header)}`);
