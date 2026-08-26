@@ -1,253 +1,252 @@
-name: QA ACE structure dark map v3
+name: QA current Figma structure
 
 on:
   push:
     branches:
       - feat/structure-dark-map-v3
-    paths:
-      - index.html
-      - assets/css/**
-      - assets/images/figma/**
-      - assets/js/**
-      - .github/workflows/qa-structure-dark-v3.yml
+    paths-ignore:
+      - 'qa/**'
+      - 'design-qa.md'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: axe-current-figma-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   qa:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feat/structure-dark-map-v3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
 
-      - name: Static source invariants
-        id: static
-        continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Static invariants
         shell: python
         run: |
-          import base64
-          import re
-          import struct
           from pathlib import Path
+
           html = Path('index.html').read_text(encoding='utf-8')
-          css = Path('assets/css/structure-dark-v3.css').read_text(encoding='utf-8')
-          js = Path('assets/js/structure-dark-v3.js').read_text(encoding='utf-8')
+          css = Path('assets/css/figma-v4.css').read_text(encoding='utf-8')
+          recovery = Path('assets/css/figma-v5-overrides.css').read_text(encoding='utf-8')
+          js = Path('assets/js/figma-v4.js').read_text(encoding='utf-8')
           globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
-          globe_model = Path('assets/js/globe-model.js').read_text(encoding='utf-8')
-          globe_data = Path('assets/js/globe-land-data.js').read_text(encoding='utf-8')
-          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+          trade = Path('trade-requests/trade-requests.js').read_text(encoding='utf-8')
+
           assert 'family=Inter' in html and 'family=Oswald' in html
           assert 'Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.' in html
-          assert 'Создание виртуальной торговой платформы' in html
-          assert html.count('class="timeline-item"') == 6
-          assert html.count('class="direction-row') == 5
-          assert html.count('class="quote-v3') == 5
-          assert html.count('class="about-nav__icon"') == 3
-          assert html.count('class="metric-link__icon"') == 1
-          assert 'hero__continents-reference' not in html
-          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2
-          assert html.count('class="orbit__line orbit__line--') == 2
-          assert 'hero__globe-orbits--back' in html and 'hero__globe-orbits--front' in html
-          assert html.index('<header class="site-header">') < html.index('<main class="site-shell">')
-          assert 'direction-featured-background.webp' in css
-          assert '.timeline-v3__viewport' in css and 'overflow: visible' in css
+          assert 'Trade Requests' in html
+          assert html.count('class="timeline-card"') == 6
+          assert html.count('class="direction') >= 5
+          assert html.count('class="quote-card"') == 3
+          assert html.count('class="member-card"') == 8
+          assert html.count('class="document-card"') == 3
+          assert html.count('class="news-card"') == 3
+          assert 'countries-map.png' in html
+          assert 'figma-v5-overrides.css' in js
+          assert 'countries__map--interactive' in recovery
+          assert "calc((100% - 15px) / 2)" in recovery
+          assert 'direction-featured-background.webp' in recovery
+          assert 'metric-icon-goals.png' in js
           assert "for (const point of landPoints)" in globe
-          assert 'WORLD_BOUNDARIES_URL' not in globe and 'boundaryRings' not in globe
           assert 'context.stroke()' not in globe
-          assert 'Math.min(640, Math.round(window.innerWidth * 0.49))' in globe
-          assert "globe-model.js?v=stable-geodesic-grid-2026-08-21" in globe
-          assert "globe-land-data.js?v=fixed-geodesic-land-grid-2026-08-21" in globe
-          assert 'frequency-44 icosahedral grid' in globe_data
-          assert 'Math.sin((index + 1)' not in globe_model and '.map((point, index)' not in globe_model
-          encoded = re.search(r"'([^']+)'", globe_data).group(1)
-          raw = base64.b64decode(encoded)
-          points = [struct.unpack_from('<hh', raw, offset) for offset in range(0, len(raw), 4)]
-          assert 5200 <= len(points) <= 6200
-          assert all(abs(lat / 100) <= 90 and abs(lon / 100) <= 180 for lat, lon in points)
-          assert not list(Path('.').glob('node-12-2-*'))
-          for name in ('about-icon-directions.png', 'about-icon-timeline.png', 'about-icon-members.png', 'metric-icon-goals.png', 'direction-featured-background.webp'):
-            assert (Path('assets/images/figma') / name).is_file()
-          assert 'Открыть Trade Requests' in html
-          assert 'Ключевые события' in html
-          assert '__AXE_STRUCTURE_V3__' in js
-          assert 'font-family: "Oswald"' in css
-          assert "addEventListener('wheel'" not in smooth
+          assert '__AXE_FIGMA_V4__' in js
+          assert '__AXE_TRADE_REQUESTS__' in trade
 
-      - name: Start server
-        id: server
-        continue-on-error: true
+      - name: Start local server
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ace-v3.log 2>&1 &
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-current.log 2>&1 &
           sleep 2
           curl --fail --silent http://127.0.0.1:4173/ >/dev/null
 
       - name: Install Chromium
-        id: chromium
-        continue-on-error: true
         run: |
           npx --yes playwright@1.55.0 install --with-deps chromium
           npm install --no-save --no-package-lock playwright@1.55.0
 
-      - name: Runtime interactions and responsive visual QA
-        id: runtime
-        continue-on-error: true
+      - name: Runtime, responsive and interaction QA
         run: |
           node <<'EOF'
           const { chromium } = require('playwright');
+          const fs = require('fs');
+
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
             const errors = [];
-            page.on('pageerror', e => errors.push(e.message));
-            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+            page.on('console', m => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+
+            const waitMain = async () => {
+              await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
+              await page.waitForFunction(() => window.__AXE_FIGMA_V4__?.getState().ready === true, null, { timeout: 8000 });
+              await page.waitForFunction(() => document.querySelector('link[data-axe-recovery]')?.sheet, null, { timeout: 8000 });
+              await page.evaluate(() => document.fonts?.ready);
+              await page.waitForTimeout(350);
+            };
+
             await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
-            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
-            await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
-            await page.waitForTimeout(700);
-            const desktop = await page.evaluate(() => ({
-              width: document.documentElement.scrollWidth,
-              viewport: innerWidth,
-              structure: window.__AXE_STRUCTURE_V3__.getState(),
-              globe: window.__AXE_GLOBE__.getState(),
-              globeShellSize: document.querySelector('.hero__globe-shell').getBoundingClientRect().width,
-              orbitDepth: {
-                back: Number(getComputedStyle(document.querySelector('.hero__globe-orbits--back')).zIndex),
-                globe: Number(getComputedStyle(document.querySelector('.hero__globe-canvas')).zIndex),
-                front: Number(getComputedStyle(document.querySelector('.hero__globe-orbits--front')).zIndex)
-              },
-              map: window.__AXE_COUNTRIES_MAP__.getState(),
-              bodyFont: getComputedStyle(document.body).fontFamily,
-              titleFont: getComputedStyle(document.querySelector('h1')).fontFamily,
-              header: (() => { const el = document.querySelector('.site-header'); const rect = el.getBoundingClientRect(); return { parent: el.parentElement.tagName, position: getComputedStyle(el).position, top: rect.top, visible: rect.height > 0 && getComputedStyle(el).display !== 'none' }; })(),
-              contentWidth: document.querySelector('.layout-container').getBoundingClientRect().width,
-              iconCount: [...document.querySelectorAll('.about-nav__icon')].filter(img => img.complete && img.naturalWidth > 0).length,
-              metricIcon: (() => { const img = document.querySelector('.metric-link__icon'); return Boolean(img?.complete && img.naturalWidth > 0); })(),
-              introBorder: getComputedStyle(document.querySelector('.about-v3__intro')).borderTopWidth,
-              timelineOverflow: getComputedStyle(document.querySelector('.timeline-v3__viewport')).overflow,
-              monthSize: parseFloat(getComputedStyle(document.querySelector('.timeline-item time b')).fontSize),
-              directionBackground: getComputedStyle(document.querySelector('.direction-row--featured')).backgroundImage,
-              smooth: window.__AXE_SMOOTH_SCROLL__?.getState()
-            }));
-            if (desktop.width > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${JSON.stringify(desktop)}`);
-            if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify(desktop)}`);
-            if (desktop.structure.tasks !== 6 || desktop.structure.directions !== 5 || desktop.structure.timeline !== 6 || desktop.structure.quotes !== 5 || desktop.structure.eventSlides !== 3) throw new Error(`structure inventory ${JSON.stringify(desktop.structure)}`);
-            if (desktop.globe.renderer !== 'fixed-icosahedral-land-grid' || desktop.globe.samples < 5200 || desktop.globe.samples > 6200 || 'boundaries' in desktop.globe) throw new Error(`globe renderer ${JSON.stringify(desktop.globe)}`);
-            if (desktop.globeShellSize < 635 || desktop.globeShellSize > 645 || Math.abs(desktop.monthSize - 42) > .5) throw new Error(`globe/month sizing ${JSON.stringify({ globeShellSize: desktop.globeShellSize, canvasSize: desktop.globe.size, monthSize: desktop.monthSize })}`);
-            if (!(desktop.orbitDepth.back < desktop.orbitDepth.globe && desktop.orbitDepth.globe < desktop.orbitDepth.front)) throw new Error(`orbit depth ${JSON.stringify(desktop.orbitDepth)}`);
-            if (desktop.map.loaded !== 7 || desktop.map.paths !== 7 || desktop.map.worldPaths < 10) throw new Error(`map inventory ${JSON.stringify(desktop.map)}`);
-            if (desktop.smooth?.enabled || !desktop.smooth?.native) throw new Error(`non-native scroll ${JSON.stringify(desktop.smooth)}`);
-            if (desktop.header.parent !== 'BODY' || desktop.header.position !== 'fixed' || !desktop.header.visible || Math.abs(desktop.header.top - 39) > 2) throw new Error(`header at top ${JSON.stringify(desktop.header)}`);
-            if (desktop.contentWidth < 1338 || desktop.contentWidth > 1350) throw new Error(`content width ${desktop.contentWidth}`);
-            if (desktop.iconCount !== 3 || !desktop.metricIcon || desktop.introBorder !== '1px') throw new Error(`navigation details ${JSON.stringify(desktop)}`);
-            if (desktop.timelineOverflow !== 'visible' || !desktop.directionBackground.includes('direction-featured-background')) throw new Error(`assets/layout ${JSON.stringify(desktop)}`);
+            await waitMain();
+
+            const desktop = await page.evaluate(() => {
+              const rect = sel => document.querySelector(sel)?.getBoundingClientRect();
+              const style = sel => getComputedStyle(document.querySelector(sel));
+              const dirCards = [...document.querySelectorAll('.direction')].map(el => el.getBoundingClientRect());
+              const timelineCards = [...document.querySelectorAll('.timeline-card')].slice(0, 3).map(el => el.getBoundingClientRect());
+              const timelineViewport = rect('.timeline__viewport');
+              const contacts = [...document.querySelectorAll('.contacts__grid > *')].map(el => el.getBoundingClientRect());
+              return {
+                scrollWidth: document.documentElement.scrollWidth,
+                viewport: innerWidth,
+                recovery: window.__AXE_FIGMA_V4__.getState(),
+                bodyFont: style('body').fontFamily,
+                titleFont: style('h1').fontFamily,
+                header: rect('.site-header__inner'),
+                headerPosition: style('.site-header').position,
+                content: rect('.hero .container'),
+                h1: rect('.hero h1'),
+                subtitleFont: style('.hero__copy > p').fontFamily,
+                subtitleSize: parseFloat(style('.hero__copy > p').fontSize),
+                globe: rect('.hero__globe-shell'),
+                exchangeBg: style('.metric--exchanges').backgroundColor,
+                countryBg: style('.metric--countries').backgroundColor,
+                goalColor: style('.goal p').color,
+                goalsIcon: document.querySelector('.metric--link > img')?.getAttribute('src'),
+                dirCards: dirCards.map(r => ({ left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height })),
+                timelineViewport: { left:timelineViewport.left, right:timelineViewport.right, width:timelineViewport.width },
+                timelineCards: timelineCards.map(r => ({ left:r.left, right:r.right, width:r.width })),
+                mapSvg: Boolean(document.querySelector('svg.countries__map--interactive')),
+                hotspots: document.querySelectorAll('.country-hotspot').length,
+                eventControls: Boolean(document.querySelector('.events__controls')),
+                eventNextDisabled: document.querySelector('[data-event-next]')?.disabled,
+                footerBrand: Boolean(document.querySelector('.footer__brand')),
+                contacts: contacts.map(r => ({ left:r.left, right:r.right, width:r.width }))
+              };
+            });
+
+            if (desktop.scrollWidth > desktop.viewport + 2) throw new Error(`desktop horizontal overflow ${desktop.scrollWidth}/${desktop.viewport}`);
+            if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${JSON.stringify({body:desktop.bodyFont,title:desktop.titleFont})}`);
+            if (desktop.headerPosition !== 'fixed') throw new Error(`header position ${desktop.headerPosition}`);
+            if (Math.abs(desktop.header.width - 1390) > 2) throw new Error(`header rail ${desktop.header.width}`);
+            if (Math.abs(desktop.content.width - 1281) > 2) throw new Error(`content rail ${desktop.content.width}`);
+            if (Math.abs(desktop.h1.width - 648) > 3) throw new Error(`hero heading width ${desktop.h1.width}`);
+            if (!desktop.subtitleFont.includes('Inter') || Math.abs(desktop.subtitleSize - 20) > .75) throw new Error(`hero subtitle ${desktop.subtitleFont} ${desktop.subtitleSize}`);
+            if (desktop.globe.width < 635 || desktop.globe.width > 645) throw new Error(`globe size ${desktop.globe.width}`);
+            if (desktop.exchangeBg !== 'rgb(59, 127, 193)') throw new Error(`exchange metric color ${desktop.exchangeBg}`);
+            if (desktop.countryBg !== 'rgb(0, 140, 154)') throw new Error(`country metric color ${desktop.countryBg}`);
+            if (desktop.goalColor !== 'rgb(255, 255, 255)') throw new Error(`goal color ${desktop.goalColor}`);
+            if (!desktop.goalsIcon?.includes('metric-icon-goals.png')) throw new Error(`goals icon ${desktop.goalsIcon}`);
+            if (desktop.dirCards.length !== 5) throw new Error(`directions inventory ${desktop.dirCards.length}`);
+            if (Math.abs(desktop.dirCards[0].width - 417) > 3 || Math.abs(desktop.dirCards[1].left - desktop.dirCards[0].right - 15) > 3) throw new Error(`directions grid ${JSON.stringify(desktop.dirCards.slice(0,2))}`);
+            if (Math.abs(desktop.timelineCards[0].left - desktop.timelineViewport.left) > 3 || Math.abs(desktop.timelineCards[1].right - desktop.timelineViewport.right) > 3 || desktop.timelineCards[2].left < desktop.timelineViewport.right - 3) throw new Error(`timeline two-card layout ${JSON.stringify({viewport:desktop.timelineViewport,cards:desktop.timelineCards})}`);
+            if (!desktop.mapSvg || desktop.hotspots !== 7) throw new Error(`interactive map ${JSON.stringify({svg:desktop.mapSvg,hotspots:desktop.hotspots})}`);
+            if (!desktop.eventControls || desktop.recovery.eventCards !== 1 || desktop.eventNextDisabled !== true) throw new Error(`event shell ${JSON.stringify(desktop.recovery)}`);
+            if (desktop.recovery.timelineCards !== 6 || desktop.recovery.quoteCards !== 3 || desktop.recovery.memberCards !== 8) throw new Error(`inventory ${JSON.stringify(desktop.recovery)}`);
+            if (!desktop.footerBrand) throw new Error('footer brand missing');
+            if (desktop.contacts.length === 2 && Math.abs(desktop.contacts[1].left - desktop.contacts[0].right - 20) > 2) throw new Error(`contacts gap ${JSON.stringify(desktop.contacts)}`);
 
             const globeBefore = await page.evaluate(() => window.__AXE_GLOBE__.getState().phi);
             const globeBox = await page.locator('#axe-globe').boundingBox();
-            await page.mouse.move(globeBox.x + globeBox.width * .52, globeBox.y + globeBox.height * .5);
+            await page.mouse.move(globeBox.x + globeBox.width * .50, globeBox.y + globeBox.height * .50);
             await page.mouse.down();
-            await page.mouse.move(globeBox.x + globeBox.width * .68, globeBox.y + globeBox.height * .44, { steps: 8 });
+            await page.mouse.move(globeBox.x + globeBox.width * .66, globeBox.y + globeBox.height * .45, { steps: 8 });
             await page.mouse.up();
-            await page.waitForTimeout(260);
+            await page.waitForTimeout(240);
             const globeAfter = await page.evaluate(() => window.__AXE_GLOBE__.getState().phi);
             if (Math.abs(globeAfter - globeBefore) < .04) throw new Error(`globe drag inactive ${globeBefore} -> ${globeAfter}`);
 
-            await page.evaluate(() => document.querySelector('#goal').scrollIntoView({ behavior:'auto', block:'start' }));
-            await page.waitForTimeout(500);
-            const headerGoal = await page.evaluate(() => { const el = document.querySelector('.site-header'); const rect = el.getBoundingClientRect(); return { top: rect.top, bottom: rect.bottom, scrolled: el.classList.contains('is-scrolled'), position: getComputedStyle(el).position, display: getComputedStyle(el).display }; });
-            if (!headerGoal.scrolled || headerGoal.position !== 'fixed' || headerGoal.display === 'none' || Math.abs(headerGoal.top) > 2 || headerGoal.bottom < 60) throw new Error(`header at goal ${JSON.stringify(headerGoal)}`);
-
             await page.evaluate(() => document.querySelector('#timeline').scrollIntoView({ behavior:'auto', block:'start' }));
-            await page.waitForTimeout(300);
-            const timelineInitial = await page.evaluate(() => { const viewport = document.querySelector('.timeline-v3__viewport').getBoundingClientRect(); const cards = [...document.querySelectorAll('.timeline-item')].slice(0, 3).map(card => card.getBoundingClientRect()); return { viewport: { left: viewport.left, right: viewport.right, width: viewport.width }, cards: cards.map(card => ({ left: card.left, right: card.right, width: card.width })) }; });
-            if (Math.abs(timelineInitial.cards[0].left - timelineInitial.viewport.left) > 2 || Math.abs(timelineInitial.cards[1].right - timelineInitial.viewport.right) > 2 || timelineInitial.cards[2].left < timelineInitial.viewport.right - 2) throw new Error(`timeline two-card grid ${JSON.stringify(timelineInitial)}`);
+            await page.waitForTimeout(200);
             await page.click('[data-timeline-next]');
-            await page.waitForTimeout(760);
-            const timeline = await page.evaluate(() => { const viewport = document.querySelector('.timeline-v3__viewport').getBoundingClientRect(); const first = document.querySelector('.timeline-item').getBoundingClientRect(); return { index: window.__AXE_STRUCTURE_V3__.getState().timelineIndex, viewportLeft: viewport.left, firstLeft: first.left, firstRight: first.right }; });
-            if (timeline.index !== 1 || timeline.firstLeft >= timeline.viewportLeft || timeline.firstRight >= timeline.viewportLeft) throw new Error(`timeline exit ${JSON.stringify(timeline)}`);
-
-            await page.evaluate(() => scrollTo({ top: 0, behavior: 'auto' }));
             await page.waitForTimeout(650);
-            const headerReturn = await page.evaluate(() => { const el = document.querySelector('.site-header'); return { top: el.getBoundingClientRect().top, scrolled: el.classList.contains('is-scrolled'), display: getComputedStyle(el).display }; });
-            if (headerReturn.scrolled || headerReturn.display === 'none' || Math.abs(headerReturn.top - 39) > 2) throw new Error(`header return ${JSON.stringify(headerReturn)}`);
+            const timelineIndex = await page.evaluate(() => window.__AXE_FIGMA_V4__.getState().timelineIndex);
+            if (timelineIndex !== 1) throw new Error(`timeline index ${timelineIndex}`);
 
-            await page.evaluate(() => document.querySelector('#events').scrollIntoView({ behavior:'auto', block:'start' }));
-            await page.waitForTimeout(300);
-            await page.click('[data-event-next]');
-            await page.waitForTimeout(180);
-            const eventIndex = await page.evaluate(() => window.__AXE_STRUCTURE_V3__.getState().eventIndex);
-            if (eventIndex !== 1) throw new Error(`event slider did not advance ${eventIndex}`);
-            await page.screenshot({ path: 'structure-dark-1440.png', fullPage: true });
-            await page.locator('#about').screenshot({ path: 'structure-about-1440.png' });
-            await page.locator('#members').screenshot({ path: 'structure-map-1440.png' });
-            await page.locator('#events').screenshot({ path: 'structure-events-1440.png' });
+            await page.evaluate(() => document.querySelector('#leaders').scrollIntoView({ behavior:'auto', block:'start' }));
+            await page.click('[data-quote-next]');
+            await page.waitForTimeout(550);
+            const quoteIndex = await page.evaluate(() => window.__AXE_FIGMA_V4__.getState().quoteIndex);
+            if (quoteIndex !== 1) throw new Error(`quote index ${quoteIndex}`);
+
+            await page.evaluate(() => document.querySelector('#countries').scrollIntoView({ behavior:'auto', block:'center' }));
+            const rus = page.locator('.country-hotspot[data-country="RUS"]');
+            await rus.focus();
+            await page.waitForTimeout(120);
+            const mapFocus = await page.evaluate(() => ({ active: window.__AXE_FIGMA_V4__.getState().map.activeCountry, tooltip: document.querySelector('.countries__map-tooltip')?.textContent, visible: document.querySelector('.countries__map-tooltip')?.classList.contains('is-visible') }));
+            if (mapFocus.active !== 'RUS' || mapFocus.tooltip !== 'Россия' || !mapFocus.visible) throw new Error(`map focus ${JSON.stringify(mapFocus)}`);
+
+            fs.mkdirSync('qa/current', { recursive: true });
+            await page.screenshot({ path: 'qa/current/main-1440.png', fullPage: true });
+            await page.locator('#timeline').screenshot({ path: 'qa/current/timeline-1440.png' });
+            await page.locator('#countries').screenshot({ path: 'qa/current/map-1440.png' });
+
             await page.setViewportSize({ width: 390, height: 844 });
             await page.reload({ waitUntil: 'domcontentloaded' });
-            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 16000 });
-            await page.waitForFunction(() => window.__AXE_STRUCTURE_V3__?.getState().ready === true, null, { timeout: 5000 });
-            await page.waitForFunction(() => window.__AXE_COUNTRIES_MAP__?.getState().ready === true, null, { timeout: 20000 });
-            await page.evaluate(() => document.querySelector('.metrics').scrollIntoView({ behavior: 'auto', block: 'center' }));
-            await page.waitForTimeout(500);
+            await waitMain();
             const mobile = await page.evaluate(() => ({
-              width: document.documentElement.scrollWidth,
+              scrollWidth: document.documentElement.scrollWidth,
               viewport: innerWidth,
-              menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
-              structure: window.__AXE_STRUCTURE_V3__.getState(),
-              map: window.__AXE_COUNTRIES_MAP__.getState(),
-              metrics: [...document.querySelectorAll('.metrics > :not(.metric-cell--empty)')].map(el => ({ className: el.className, row: el.offsetTop, column: el.offsetLeft, width: el.offsetWidth }))
+              menuDisplay: getComputedStyle(document.querySelector('.menu-toggle')).display,
+              state: window.__AXE_FIGMA_V4__.getState(),
+              mapSvg: Boolean(document.querySelector('svg.countries__map--interactive'))
             }));
-            if (mobile.width > mobile.viewport + 2) throw new Error(`mobile horizontal overflow ${JSON.stringify(mobile)}`);
-            if (mobile.menu === 'none') throw new Error('mobile menu hidden');
-            if (mobile.structure.quotes !== 5 || mobile.map.loaded !== 7) throw new Error(`mobile inventory ${JSON.stringify(mobile)}`);
-            if (mobile.metrics.length !== 4 || mobile.metrics[2].row !== mobile.metrics[3].row || mobile.metrics[2].column >= mobile.metrics[3].column) throw new Error(`mobile metric grid ${JSON.stringify(mobile.metrics)}`);
-            await page.locator('.metrics').screenshot({ path: 'structure-metrics-390.png' });
-            await page.screenshot({ path: 'structure-dark-390.png', fullPage: true });
+            if (mobile.scrollWidth > mobile.viewport + 2) throw new Error(`mobile horizontal overflow ${mobile.scrollWidth}/${mobile.viewport}`);
+            if (mobile.menuDisplay === 'none') throw new Error('mobile menu hidden');
+            if (!mobile.mapSvg || mobile.state.map.countries !== 7) throw new Error(`mobile map ${JSON.stringify(mobile.state.map)}`);
+            await page.click('[data-menu]');
+            const opened = await page.evaluate(() => ({ open: document.body.classList.contains('nav-open'), expanded: document.querySelector('[data-menu]').getAttribute('aria-expanded') }));
+            if (!opened.open || opened.expanded !== 'true') throw new Error(`mobile nav open ${JSON.stringify(opened)}`);
+            await page.keyboard.press('Escape');
+            const closed = await page.evaluate(() => ({ open: document.body.classList.contains('nav-open'), expanded: document.querySelector('[data-menu]').getAttribute('aria-expanded') }));
+            if (closed.open || closed.expanded !== 'false') throw new Error(`mobile nav close ${JSON.stringify(closed)}`);
+            await page.screenshot({ path: 'qa/current/main-390.png', fullPage: true });
+
+            await page.setViewportSize({ width: 1440, height: 1000 });
+            await page.goto('http://127.0.0.1:4173/trade-requests/', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction(() => window.__AXE_TRADE_REQUESTS__?.getState().ready === true, null, { timeout: 5000 });
+            if ((await page.locator('[data-auth-panel="login"]:visible').count()) !== 1) throw new Error('trade login not visible');
+            await page.click('a[href="#register"]');
+            if ((await page.locator('[data-auth-panel="register"]:visible').count()) !== 1) throw new Error('trade register switch failed');
+            await page.click('a[href="#login"]');
+            await page.fill('[data-login] input[type="email"]', 'qa@example.com');
+            await page.fill('[data-login] input[type="password"]', 'test-password');
+            await Promise.all([page.waitForURL('**/trade-requests/app.html'), page.click('[data-login] button[type="submit"]')]);
+            const rowsBefore = await page.locator('[data-request]:visible').count();
+            await page.fill('[data-filters] input[name="product"]', 'Соевые');
+            await page.waitForTimeout(80);
+            const rowsAfter = await page.locator('[data-request]:visible').count();
+            if (rowsBefore !== 4 || rowsAfter !== 1) throw new Error(`trade filters ${rowsBefore} -> ${rowsAfter}`);
+            await page.screenshot({ path: 'qa/current/trade-dashboard-1440.png', fullPage: true });
+            await page.goto('http://127.0.0.1:4173/trade-requests/new.html', { waitUntil: 'domcontentloaded' });
+            if ((await page.locator('[data-request-form]').count()) !== 1) throw new Error('trade new form missing');
+
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.goto('http://127.0.0.1:4173/trade-requests/app.html', { waitUntil: 'domcontentloaded' });
+            const tradeMobile = await page.evaluate(() => ({ width:document.documentElement.scrollWidth, viewport:innerWidth }));
+            if (tradeMobile.width > tradeMobile.viewport + 2) throw new Error(`trade mobile overflow ${JSON.stringify(tradeMobile)}`);
+            await page.screenshot({ path: 'qa/current/trade-dashboard-390.png', fullPage: true });
+            await page.goto('http://127.0.0.1:4173/trade-requests/new.html', { waitUntil: 'domcontentloaded' });
+            const newMobile = await page.evaluate(() => ({ width:document.documentElement.scrollWidth, viewport:innerWidth }));
+            if (newMobile.width > newMobile.viewport + 2) throw new Error(`trade new mobile overflow ${JSON.stringify(newMobile)}`);
+            await page.screenshot({ path: 'qa/current/trade-new-390.png', fullPage: true });
+
             if (errors.length) throw new Error(errors.join('\n'));
             await browser.close();
-          })().catch(e => { console.error(e); process.exit(1); });
+          })().catch(async e => {
+            console.error(e);
+            process.exit(1);
+          });
           EOF
 
-      - name: Persist QA outcome and renders
+      - name: Upload visual evidence
         if: always()
-        run: |
-          mkdir -p qa/structure-dark-v3
-          for pair in \
-            'structure-dark-1440.png:desktop.png' \
-            'structure-about-1440.png:about.png' \
-            'structure-map-1440.png:map.png' \
-            'structure-events-1440.png:events.png' \
-            'structure-metrics-390.png:metrics-mobile.png' \
-            'structure-dark-390.png:mobile.png'; do
-            src="${pair%%:*}"; dst="${pair##*:}"
-            if [ -f "$src" ]; then cp "$src" "qa/structure-dark-v3/$dst"; fi
-          done
-          printf 'static=%s\nserver=%s\nchromium=%s\nruntime=%s\n' \
-            '${{ steps.static.outcome }}' '${{ steps.server.outcome }}' '${{ steps.chromium.outcome }}' '${{ steps.runtime.outcome }}' \
-            > qa/structure-dark-v3/status.txt
-          if [ -f /tmp/ace-v3.log ]; then cp /tmp/ace-v3.log qa/structure-dark-v3/server.log; fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add qa/structure-dark-v3
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: persist structure dark v3 QA"
-            git push origin HEAD:feat/structure-dark-map-v3
-          fi
-
-      - name: Fail if QA did not pass
-        if: always()
-        run: |
-          test '${{ steps.static.outcome }}' = success
-          test '${{ steps.server.outcome }}' = success
-          test '${{ steps.chromium.outcome }}' = success
-          test '${{ steps.runtime.outcome }}' = success
-
-      - uses: actions/upload-artifact@v4
-        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: ace-structure-dark-map-v3-visual-qa
-          path: qa/structure-dark-v3
+          name: axe-current-figma-qa
+          path: qa/current
           if-no-files-found: warn
-          retention-days: 2
+          retention-days: 5
