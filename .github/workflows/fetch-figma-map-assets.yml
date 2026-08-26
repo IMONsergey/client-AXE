@@ -1,0 +1,43 @@
+name: Capture Figma map vectors
+
+on:
+  push:
+    branches:
+      - feat/structure-dark-map-v3
+    paths:
+      - '.github/workflows/fetch-figma-map-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download current Figma vector layers
+        run: |
+          set -euo pipefail
+          mkdir -p qa/figma-map-vectors
+          curl -fL --retry 3 -o qa/figma-map-vectors/neutral-land-silhouette.svg 'https://www.figma.com/api/mcp/asset/e6751c0b-8ee2-449e-b580-d3093578e7a6.svg'
+          curl -fL --retry 3 -o qa/figma-map-vectors/digital-dot-field.svg 'https://www.figma.com/api/mcp/asset/e61d3a03-46a6-4a52-96ea-fb057018e7ba.svg'
+          curl -fL --retry 3 -o qa/figma-map-vectors/digital-network-lines.svg 'https://www.figma.com/api/mcp/asset/0920ce32-537b-49df-9f12-1294a9f3aec7.svg'
+          curl -fL --retry 3 -o qa/figma-map-vectors/digital-network-nodes.svg 'https://www.figma.com/api/mcp/asset/4fbe8efa-cb47-4a9c-909d-407daf41886e.svg'
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('qa/figma-map-vectors').glob('*.svg'):
+              text = path.read_text(encoding='utf-8')
+              assert '<svg' in text, path
+              print(path, len(text))
+          PY
+
+      - name: Upload vector layers
+        uses: actions/upload-artifact@v4
+        with:
+          name: figma-map-vectors
+          path: qa/figma-map-vectors
+          retention-days: 2
