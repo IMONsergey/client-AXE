@@ -12,6 +12,11 @@
   text-transform: none;
 }
 
+/* Two large cards stay inside the desktop slider frame; no fade/edge masks. */
+.timeline__viewport {
+  overflow: hidden;
+}
+
 .countries__map--final {
   display: block;
   width: min(1880px, 130vw);
