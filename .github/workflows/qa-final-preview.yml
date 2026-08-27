@@ -1,0 +1,260 @@
+name: QA final AXE preview
+
+on:
+  push:
+    branches:
+      - feat/structure-dark-map-v3
+    paths-ignore:
+      - 'qa/**'
+      - 'design-qa.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: axe-final-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Static invariants
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          final_js = Path('assets/js/figma-v5-final.js').read_text(encoding='utf-8')
+          final_css = Path('assets/css/figma-v6-final.css').read_text(encoding='utf-8')
+          globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          trade = Path('trade-requests/trade-requests.js').read_text(encoding='utf-8')
+          assert 'figma-v6-final.css?v=2026-08-27' in html
+          assert 'figma-v5-final.js?v=2026-08-27' in html
+          assert html.count('class="timeline-card"') == 6
+          assert html.count('class="direction') >= 5
+          assert 'neutral-land-silhouette.svg' in final_js
+          assert 'digital-dot-field.svg' in final_js
+          assert 'digital-network-lines.svg' in final_js
+          assert 'digital-network-nodes.svg' in final_js
+          assert final_js.count("code: '") == 7
+          assert 'countries-map.png' not in final_js
+          assert '<title' not in final_js
+          assert Path('assets/images/figma-v4/map/neutral-land-silhouette.svg').exists()
+          assert Path('assets/images/figma-v4/map/digital-dot-field.svg').exists()
+          assert Path('assets/images/figma-v4/map/digital-network-lines.svg').exists()
+          assert Path('assets/images/figma-v4/map/digital-network-nodes.svg').exists()
+          assert '.js-axe-reveal .axe-reveal' in final_css
+          assert 'for (const point of landPoints)' in globe
+          assert 'context.stroke()' not in globe
+          assert '__AXE_TRADE_REQUESTS__' in trade
+          PY
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-final.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Playwright Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Runtime, responsive and interaction QA
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
+            page.on('console', message => {
+              if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+            });
+
+            const waitMain = async () => {
+              await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 16000 });
+              await page.waitForFunction(() => window.__AXE_FIGMA_V4__?.getState().ready === true, null, { timeout: 8000 });
+              await page.waitForFunction(() => window.__AXE_FINAL__?.getState().ready === true, null, { timeout: 8000 });
+              await page.evaluate(() => document.fonts?.ready);
+              await page.waitForTimeout(300);
+            };
+
+            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+            await waitMain();
+
+            const desktop = await page.evaluate(() => {
+              const rect = selector => document.querySelector(selector)?.getBoundingClientRect();
+              const style = selector => getComputedStyle(document.querySelector(selector));
+              const timelineViewport = rect('.timeline__viewport');
+              const timelineCards = [...document.querySelectorAll('.timeline-card')].slice(0, 3).map(el => el.getBoundingClientRect());
+              const vectorHrefs = [...document.querySelectorAll('.countries__map--final > image.countries__map-layer')].map(el => el.getAttribute('href'));
+              const flagHrefs = [...document.querySelectorAll('.country-hotspot--final .country-hotspot__flag')].map(el => el.getAttribute('href'));
+              return {
+                scrollWidth: document.documentElement.scrollWidth,
+                viewport: innerWidth,
+                bodyFont: style('body').fontFamily,
+                titleFont: style('h1').fontFamily,
+                header: rect('.site-header__inner'),
+                headerPosition: style('.site-header').position,
+                content: rect('.hero .container'),
+                h1: rect('.hero h1'),
+                globe: rect('.hero__globe-shell'),
+                exchangeBg: style('.metric--exchanges').backgroundColor,
+                countryBg: style('.metric--countries').backgroundColor,
+                goalColor: style('.goal p').color,
+                timelineViewport: { left: timelineViewport.left, right: timelineViewport.right, width: timelineViewport.width },
+                timelineCards: timelineCards.map(r => ({ left: r.left, right: r.right, width: r.width })),
+                vectorHrefs,
+                flagHrefs,
+                hotspots: document.querySelectorAll('.country-hotspot--final').length,
+                nativeTitles: document.querySelectorAll('.country-hotspot--final title').length,
+                rasterInsideFinal: Boolean(document.querySelector('.countries__map--final image[href*="countries-map.png"]')),
+                membersOpacity: style('.members').opacity,
+                footerBrand: Boolean(document.querySelector('.footer__brand')),
+                finalState: window.__AXE_FINAL__.getState()
+              };
+            });
+
+            if (desktop.scrollWidth > desktop.viewport + 2) throw new Error(`desktop overflow ${desktop.scrollWidth}/${desktop.viewport}`);
+            if (!desktop.bodyFont.includes('Inter') || !desktop.titleFont.includes('Oswald')) throw new Error(`font system ${desktop.bodyFont} / ${desktop.titleFont}`);
+            if (desktop.headerPosition !== 'fixed') throw new Error(`header position ${desktop.headerPosition}`);
+            if (Math.abs(desktop.header.width - 1390) > 2) throw new Error(`header rail ${desktop.header.width}`);
+            if (Math.abs(desktop.content.width - 1281) > 2) throw new Error(`content rail ${desktop.content.width}`);
+            if (Math.abs(desktop.h1.width - 648) > 3) throw new Error(`hero heading ${desktop.h1.width}`);
+            if (desktop.globe.width < 635 || desktop.globe.width > 645) throw new Error(`globe size ${desktop.globe.width}`);
+            if (desktop.exchangeBg !== 'rgb(59, 127, 193)') throw new Error(`exchange metric ${desktop.exchangeBg}`);
+            if (desktop.countryBg !== 'rgb(0, 140, 154)') throw new Error(`country metric ${desktop.countryBg}`);
+            if (desktop.goalColor !== 'rgb(255, 255, 255)') throw new Error(`goal color ${desktop.goalColor}`);
+            if (Math.abs(desktop.timelineCards[0].left - desktop.timelineViewport.left) > 3) throw new Error('timeline first card not aligned');
+            if (Math.abs(desktop.timelineCards[1].right - desktop.timelineViewport.right) > 3) throw new Error('timeline second card not aligned');
+            if (desktop.timelineCards[2].left < desktop.timelineViewport.right - 3) throw new Error('timeline shows more than two desktop cards');
+            if (desktop.vectorHrefs.length !== 4 || desktop.finalState.vectorLayers !== 4) throw new Error(`vector layers ${JSON.stringify(desktop.vectorHrefs)}`);
+            if (!desktop.vectorHrefs.every(href => href?.endsWith('.svg'))) throw new Error(`non-svg map layer ${JSON.stringify(desktop.vectorHrefs)}`);
+            if (desktop.hotspots !== 7 || desktop.flagHrefs.length !== 7 || desktop.finalState.countries !== 7) throw new Error('country markers incomplete');
+            if (desktop.nativeTitles !== 0 || desktop.rasterInsideFinal) throw new Error(`map tooltip/raster regression ${JSON.stringify({titles:desktop.nativeTitles,raster:desktop.rasterInsideFinal})}`);
+            if (desktop.membersOpacity !== '1') throw new Error(`hidden lower content ${desktop.membersOpacity}`);
+            if (!desktop.footerBrand) throw new Error('footer brand missing');
+
+            const globeBefore = await page.evaluate(() => window.__AXE_GLOBE__.getState().phi);
+            const globeBox = await page.locator('#axe-globe').boundingBox();
+            await page.mouse.move(globeBox.x + globeBox.width * .50, globeBox.y + globeBox.height * .50);
+            await page.mouse.down();
+            await page.mouse.move(globeBox.x + globeBox.width * .66, globeBox.y + globeBox.height * .45, { steps: 8 });
+            await page.mouse.up();
+            await page.waitForTimeout(250);
+            const globeAfter = await page.evaluate(() => window.__AXE_GLOBE__.getState().phi);
+            if (Math.abs(globeAfter - globeBefore) < .04) throw new Error(`globe drag inactive ${globeBefore} -> ${globeAfter}`);
+
+            await page.evaluate(() => document.querySelector('#timeline').scrollIntoView({ behavior: 'auto', block: 'start' }));
+            await page.click('[data-timeline-next]');
+            await page.waitForTimeout(650);
+            if ((await page.evaluate(() => window.__AXE_FIGMA_V4__.getState().timelineIndex)) !== 1) throw new Error('timeline next inactive');
+
+            await page.evaluate(() => document.querySelector('#countries').scrollIntoView({ behavior: 'auto', block: 'center' }));
+            const rus = page.locator('.country-hotspot--final[data-country="RUS"]');
+            await rus.focus();
+            await page.waitForTimeout(100);
+            const mapFocus = await page.evaluate(() => ({
+              state: window.__AXE_FINAL__.getState().activeCountry,
+              text: document.querySelector('.countries__map-tooltip--final')?.textContent,
+              visible: document.querySelector('.countries__map-tooltip--final')?.classList.contains('is-visible')
+            }));
+            if (mapFocus.state !== 'RUS' || mapFocus.text !== 'Россия' || !mapFocus.visible) throw new Error(`map focus ${JSON.stringify(mapFocus)}`);
+            await page.keyboard.press('ArrowRight');
+            const keyboardCountry = await page.evaluate(() => document.activeElement?.dataset?.country || null);
+            if (keyboardCountry !== 'BLR') throw new Error(`map keyboard navigation ${keyboardCountry}`);
+
+            fs.mkdirSync('qa/current', { recursive: true });
+            await page.screenshot({ path: 'qa/current/main-1440.png', fullPage: true });
+            await page.locator('#timeline').screenshot({ path: 'qa/current/timeline-1440.png' });
+            await page.locator('#countries').screenshot({ path: 'qa/current/map-1440.png' });
+
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await waitMain();
+            const mobile = await page.evaluate(() => ({
+              scrollWidth: document.documentElement.scrollWidth,
+              viewport: innerWidth,
+              menuDisplay: getComputedStyle(document.querySelector('.menu-toggle')).display,
+              flags: document.querySelectorAll('.country-hotspot--final .country-hotspot__flag').length,
+              layers: document.querySelectorAll('.countries__map--final > image.countries__map-layer').length
+            }));
+            if (mobile.scrollWidth > mobile.viewport + 2) throw new Error(`mobile overflow ${mobile.scrollWidth}/${mobile.viewport}`);
+            if (mobile.menuDisplay === 'none') throw new Error('mobile menu hidden');
+            if (mobile.flags !== 7 || mobile.layers !== 4) throw new Error(`mobile map ${JSON.stringify(mobile)}`);
+            await page.click('[data-menu]');
+            if (!(await page.evaluate(() => document.body.classList.contains('nav-open')))) throw new Error('mobile menu did not open');
+            await page.keyboard.press('Escape');
+            if (await page.evaluate(() => document.body.classList.contains('nav-open'))) throw new Error('mobile menu did not close');
+            await page.screenshot({ path: 'qa/current/main-390.png', fullPage: true });
+
+            await page.setViewportSize({ width: 1440, height: 1000 });
+            await page.goto('http://127.0.0.1:4173/trade-requests/#register', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction(() => window.__AXE_TRADE_REQUESTS__?.getState().panel === 'register', null, { timeout: 5000 });
+            if ((await page.locator('[data-auth-panel="register"]:visible').count()) !== 1) throw new Error('trade register panel failed');
+            await page.goto('http://127.0.0.1:4173/trade-requests/#login', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction(() => window.__AXE_TRADE_REQUESTS__?.getState().panel === 'login', null, { timeout: 5000 });
+            await page.fill('[data-login] input[type="email"]', 'qa@example.com');
+            await page.fill('[data-login] input[type="password"]', 'test-password');
+            await Promise.all([
+              page.waitForURL('**/trade-requests/app.html'),
+              page.click('[data-login] button[type="submit"]')
+            ]);
+            const rowsBefore = await page.locator('[data-request]:visible').count();
+            await page.fill('[data-filters] input[name="product"]', 'Соевые');
+            await page.waitForTimeout(100);
+            const rowsAfter = await page.locator('[data-request]:visible').count();
+            if (rowsBefore !== 4 || rowsAfter !== 1) throw new Error(`trade filters ${rowsBefore} -> ${rowsAfter}`);
+            await page.screenshot({ path: 'qa/current/trade-dashboard-1440.png', fullPage: true });
+
+            await page.goto('http://127.0.0.1:4173/trade-requests/new.html', { waitUntil: 'domcontentloaded' });
+            if ((await page.locator('[data-request-form]').count()) !== 1) throw new Error('trade new form missing');
+
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.goto('http://127.0.0.1:4173/trade-requests/app.html', { waitUntil: 'domcontentloaded' });
+            const tradeMobile = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth }));
+            if (tradeMobile.width > tradeMobile.viewport + 2) throw new Error(`trade mobile overflow ${JSON.stringify(tradeMobile)}`);
+            await page.screenshot({ path: 'qa/current/trade-dashboard-390.png', fullPage: true });
+            await page.goto('http://127.0.0.1:4173/trade-requests/new.html', { waitUntil: 'domcontentloaded' });
+            const newMobile = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth }));
+            if (newMobile.width > newMobile.viewport + 2) throw new Error(`trade new mobile overflow ${JSON.stringify(newMobile)}`);
+            await page.screenshot({ path: 'qa/current/trade-new-390.png', fullPage: true });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Persist QA screenshots
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add qa/current
+          if git diff --cached --quiet; then
+            echo 'QA screenshots unchanged.'
+          else
+            git commit -m 'chore: update final preview QA screenshots'
+            git push origin HEAD:feat/structure-dark-map-v3
+          fi
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axe-final-preview-qa
+          path: qa/current
+          if-no-files-found: warn
+          retention-days: 7
