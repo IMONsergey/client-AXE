@@ -1,0 +1,256 @@
+name: Finalize AXE preview
+
+on:
+  push:
+    branches:
+      - feat/structure-dark-map-v3
+    paths:
+      - '.github/workflows/finalize-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/structure-dark-map-v3
+          fetch-depth: 0
+
+      - name: Apply final Figma and QA fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          js_path = Path('assets/js/figma-v4.js')
+          js = js_path.read_text(encoding='utf-8')
+
+          js = js.replace(
+              "link.href = 'assets/css/figma-v5-overrides.css?v=2026-08-26';",
+              "link.href = 'assets/css/figma-v5-overrides.css?v=2026-08-27';"
+          )
+
+          marker_pattern = re.compile(r"    const markers = \[\n.*?\n    \];", re.S)
+          marker_replacement = """    const markers = [
+      { code: 'RUS', name: 'Россия', cx: 1296.746, cy: 192.487, flag: 'assets/images/flag-russia.png' },
+      { code: 'BLR', name: 'Беларусь', cx: 1056.435, cy: 234.229, flag: 'assets/images/flag-belarus.png' },
+      { code: 'KAZ', name: 'Казахстан', cx: 1256.482, cy: 260.237, flag: 'assets/images/flag-kazakhstan.png' },
+      { code: 'UZB', name: 'Узбекистан', cx: 1222.431, cy: 311.197, flag: 'assets/images/flag-uzbekistan.png' },
+      { code: 'CHN', name: 'Китай', cx: 1434.033, cy: 334.705, flag: 'assets/images/flag-china.png' },
+      { code: 'IRN', name: 'Иран', cx: 1196.589, cy: 354.843, flag: 'assets/images/flag-iran.png' },
+      { code: 'EGY', name: 'Египет', cx: 1088.410, cy: 387.076, flag: 'assets/images/flag-egypt.png' }
+    ];"""
+          js, count = marker_pattern.subn(marker_replacement, js, count=1)
+          assert count == 1, 'markers block not patched'
+
+          image_pattern = re.compile(r"\n    const image = doc\.createElementNS\(NS, 'image'\);.*?svg\.appendChild\(image\);\n", re.S)
+          layer_replacement = """
+    const mapLayers = [
+      { href: 'assets/images/figma-v4/map/neutral-land-silhouette.svg', x: 32.9, y: 92.48110961914062, width: 1814.199951171875, height: 787.037841796875 },
+      { href: 'assets/images/figma-v4/map/digital-dot-field.svg', x: 275.08316802978516, y: 97.65464639663696, width: 1439.9310302734375, height: 742.90576171875 },
+      { href: 'assets/images/figma-v4/map/digital-network-lines.svg', x: 289.7001419067383, y: 102.06784343719482, width: 1386.3824462890625, height: 734.7930297851562 },
+      { href: 'assets/images/figma-v4/map/digital-network-nodes.svg', x: 288.4076614379883, y: 99.98274421691895, width: 1485.309814453125, height: 738.1712646484375 }
+    ];
+    mapLayers.forEach((item) => {
+      const vector = doc.createElementNS(NS, 'image');
+      vector.classList.add('countries__map-layer');
+      vector.setAttribute('href', item.href);
+      vector.setAttribute('x', String(item.x));
+      vector.setAttribute('y', String(item.y));
+      vector.setAttribute('width', String(item.width));
+      vector.setAttribute('height', String(item.height));
+      vector.setAttribute('preserveAspectRatio', 'none');
+      vector.setAttribute('aria-hidden', 'true');
+      vector.setAttribute('pointer-events', 'none');
+      svg.appendChild(vector);
+    });
+"""
+          js, count = image_pattern.subn(layer_replacement, js, count=1)
+          assert count == 1, 'raster map block not patched'
+
+          js = js.replace(
+              "    const layer = doc.createElementNS(NS, 'g');\n    layer.setAttribute('aria-label', 'Маркеры стран');\n    svg.appendChild(layer);",
+              "    const defs = doc.createElementNS(NS, 'defs');\n    svg.appendChild(defs);\n\n    const layer = doc.createElementNS(NS, 'g');\n    layer.setAttribute('aria-label', 'Маркеры стран');\n    svg.appendChild(layer);"
+          )
+
+          js = re.sub(
+              r"\n      const title = doc\.createElementNS\(NS, 'title'\);\n      title\.textContent = marker\.name;\n      group\.appendChild\(title\);",
+              "",
+              js,
+              count=1
+          )
+
+          old_ring = """      const circle = doc.createElementNS(NS, 'circle');
+      circle.classList.add('country-hotspot__ring');
+      circle.setAttribute('r', '37');
+      group.appendChild(circle);"""
+          new_ring = """      const clip = doc.createElementNS(NS, 'clipPath');
+      clip.id = `country-clip-${marker.code}`;
+      clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+      const clipCircle = doc.createElementNS(NS, 'circle');
+      clipCircle.setAttribute('r', '28');
+      clip.appendChild(clipCircle);
+      defs.appendChild(clip);
+
+      const shell = doc.createElementNS(NS, 'circle');
+      shell.classList.add('country-hotspot__shell');
+      shell.setAttribute('r', '32.9');
+      shell.setAttribute('fill', '#ffffff');
+      group.appendChild(shell);
+
+      const flag = doc.createElementNS(NS, 'image');
+      flag.classList.add('country-hotspot__flag');
+      flag.setAttribute('href', marker.flag);
+      flag.setAttribute('x', '-28');
+      flag.setAttribute('y', '-28');
+      flag.setAttribute('width', '56');
+      flag.setAttribute('height', '56');
+      flag.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      flag.setAttribute('clip-path', `url(#country-clip-${marker.code})`);
+      flag.setAttribute('pointer-events', 'none');
+      group.appendChild(flag);
+
+      const circle = doc.createElementNS(NS, 'circle');
+      circle.classList.add('country-hotspot__ring');
+      circle.setAttribute('r', '37');
+      group.appendChild(circle);"""
+          assert old_ring in js, 'marker visual block not found'
+          js = js.replace(old_ring, new_ring, 1)
+
+          old_key = """      group.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        setActive(marker);
+      });"""
+          new_key = """      group.addEventListener('keydown', (event) => {
+        const position = markers.findIndex((item) => item.code === marker.code);
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          hotspots[(position + 1) % markers.length]?.focus();
+          return;
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          hotspots[(position - 1 + markers.length) % markers.length]?.focus();
+          return;
+        }
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        setActive(marker);
+      });"""
+          assert old_key in js, 'marker keyboard block not found'
+          js = js.replace(old_key, new_key, 1)
+
+          final_guard = """
+
+  /* Final QA guard: content must never remain hidden below the fold. */
+  root.classList.remove('js-axe-reveal');
+  doc.querySelectorAll('.axe-reveal').forEach((node) => {
+    node.classList.add('is-visible');
+    node.style.opacity = '';
+    node.style.transform = '';
+  });
+"""
+          assert js.rstrip().endswith('})();'), 'unexpected figma-v4.js ending'
+          js = js.rstrip()[:-4] + final_guard + '\n})();\n'
+          js_path.write_text(js, encoding='utf-8')
+
+          css_path = Path('assets/css/figma-v5-overrides.css')
+          css = css_path.read_text(encoding='utf-8')
+          css += """
+
+/* Final map/title and full-page visibility corrections. */
+.countries .section-title {
+  margin: 0;
+  color: #fff;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.countries__map-layer,
+.country-hotspot__flag,
+.country-hotspot__shell {
+  pointer-events: none;
+}
+.country-hotspot__shell {
+  transition: filter .2s ease;
+}
+.country-hotspot:hover .country-hotspot__shell,
+.country-hotspot:focus .country-hotspot__shell,
+.country-hotspot.is-active .country-hotspot__shell {
+  filter: drop-shadow(0 0 10px rgba(43,217,232,.5));
+}
+.js-axe-reveal .axe-reveal,
+.js-axe-reveal .axe-reveal.is-visible,
+.axe-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+"""
+          css_path.write_text(css, encoding='utf-8')
+
+          index_path = Path('index.html')
+          index = index_path.read_text(encoding='utf-8')
+          index = index.replace('assets/js/figma-v4.js?v=2026-08-25', 'assets/js/figma-v4.js?v=2026-08-27')
+          index_path.write_text(index, encoding='utf-8')
+
+          qa_path = Path('.github/workflows/qa-structure-dark-v3.yml')
+          qa = qa_path.read_text(encoding='utf-8')
+          qa = qa.replace('permissions:\n  contents: read', 'permissions:\n  contents: write')
+          qa = qa.replace(
+              "          assert 'countries__map--interactive' in recovery\n",
+              "          assert 'countries__map--interactive' in recovery\n          assert 'neutral-land-silhouette.svg' in js\n          assert 'digital-network-nodes.svg' in js\n          assert Path('assets/images/figma-v4/map/neutral-land-silhouette.svg').exists()\n"
+          )
+          qa = qa.replace(
+              "                hotspots: document.querySelectorAll('.country-hotspot').length,\n",
+              "                hotspots: document.querySelectorAll('.country-hotspot').length,\n                vectorLayers: document.querySelectorAll('svg.countries__map--interactive .countries__map-layer').length,\n                rasterLayer: Boolean(document.querySelector('svg.countries__map--interactive image[href*=\"countries-map.png\"]')),\n                nativeTitles: document.querySelectorAll('.country-hotspot title').length,\n"
+          )
+          qa = qa.replace(
+              "            if (!desktop.mapSvg || desktop.hotspots !== 7) throw new Error(`interactive map ${JSON.stringify({svg:desktop.mapSvg,hotspots:desktop.hotspots})}`);",
+              "            if (!desktop.mapSvg || desktop.hotspots !== 7 || desktop.vectorLayers !== 4 || desktop.rasterLayer || desktop.nativeTitles !== 0) throw new Error(`interactive vector map ${JSON.stringify({svg:desktop.mapSvg,hotspots:desktop.hotspots,layers:desktop.vectorLayers,raster:desktop.rasterLayer,titles:desktop.nativeTitles})}`);"
+          )
+          qa = qa.replace(
+              "            await page.click('a[href=\"#register\"]');\n            if ((await page.locator('[data-auth-panel=\"register\"]:visible').count()) !== 1) throw new Error('trade register switch failed');\n            await page.click('a[href=\"#login\"]');",
+              "            await page.goto('http://127.0.0.1:4173/trade-requests/#register', { waitUntil: 'domcontentloaded' });\n            await page.waitForFunction(() => window.__AXE_TRADE_REQUESTS__?.getState().panel === 'register', null, { timeout: 3000 });\n            if ((await page.locator('[data-auth-panel=\"register\"]:visible').count()) !== 1) throw new Error('trade register switch failed');\n            await page.goto('http://127.0.0.1:4173/trade-requests/#login', { waitUntil: 'domcontentloaded' });\n            await page.waitForFunction(() => window.__AXE_TRADE_REQUESTS__?.getState().panel === 'login', null, { timeout: 3000 });"
+          )
+          upload_marker = """      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4"""
+          persist_step = """      - name: Persist current QA screenshots
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add qa/current
+          if git diff --cached --quiet; then
+            echo 'QA screenshots unchanged.'
+          else
+            git commit -m 'chore: update current Figma QA screenshots'
+            git push origin HEAD:feat/structure-dark-map-v3
+          fi
+
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4"""
+          assert upload_marker in qa, 'upload marker not found'
+          qa = qa.replace(upload_marker, persist_step, 1)
+          qa_path.write_text(qa, encoding='utf-8')
+
+      - name: Remove temporary workflows and commit
+        run: |
+          set -euo pipefail
+          git rm -f .github/workflows/fetch-figma-map-assets.yml .github/workflows/finalize-preview.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets/js/figma-v4.js assets/css/figma-v5-overrides.css .github/workflows/qa-structure-dark-v3.yml
+          git commit -m 'fix: finalize Figma map and preview QA'
+          git push origin HEAD:feat/structure-dark-map-v3
