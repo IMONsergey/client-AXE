@@ -48,11 +48,11 @@
         <form class="bo-auth-form" data-next-view="requests">
           <label class="bo-field">
             <span>E-mail</span>
-            <input type="email" value="example@mail.com" autocomplete="email">
+            <input name="email" type="email" value="example@mail.com" autocomplete="email" required>
           </label>
           <label class="bo-field">
             <span>Пароль</span>
-            <input type="password" value="example-password" autocomplete="current-password">
+            <input name="password" type="password" value="example-password" autocomplete="current-password" required minlength="6">
           </label>
           <button class="bo-link-button" type="button" data-view-target="forgot">Забыли пароль? Восстановить</button>
           <button class="bo-primary" type="submit">Войти</button>
@@ -73,15 +73,15 @@
         <form class="bo-auth-form" data-next-view="confirm">
           <label class="bo-field">
             <span>E-mail*</span>
-            <input type="email" value="example@mail.com" autocomplete="email">
+            <input name="email" type="email" value="example@mail.com" autocomplete="email" required>
           </label>
           <label class="bo-field">
             <span>Пароль*</span>
-            <input type="password" value="example-password" autocomplete="new-password">
+            <input name="password" type="password" value="example-password" autocomplete="new-password" required minlength="6">
           </label>
           <label class="bo-field">
             <span>Подтвердить пароль*</span>
-            <input type="password" value="example-password" autocomplete="new-password">
+            <input name="password_confirm" type="password" value="example-password" autocomplete="new-password" required minlength="6">
           </label>
           <button class="bo-primary" type="submit">Зарегистрироваться</button>
           <button class="bo-link-button bo-auth-switch" type="button" data-view-target="login">Уже зарегистрированы? Войти</button>
@@ -101,11 +101,13 @@
       <div class="bo-message-card bo-message-card--wide">
         <h1 id="forgot-title">Восстановить пароль</h1>
         <p>На вашу электронную почту будет отправлена ссылка для сброса пароля. Если вы не получите письмо в течение нескольких минут, пожалуйста, повторите попытку.</p>
-        <label class="bo-field">
-          <span>E-mail</span>
-          <input type="email" value="example@mail.com" autocomplete="email">
-        </label>
-        <button class="bo-primary" type="button" data-view-target="reset">Подтвердить</button>
+        <form class="bo-auth-form" data-next-view="reset">
+          <label class="bo-field">
+            <span>E-mail</span>
+            <input name="email" type="email" value="example@mail.com" autocomplete="email" required>
+          </label>
+          <button class="bo-primary" type="submit">Подтвердить</button>
+        </form>
       </div>
     </section>
 
@@ -121,7 +123,7 @@
       <div class="bo-page-title">
         <div>
           <h1 id="requests-title">Bids &amp; Offers</h1>
-          <p>Тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест...</p>
+          <p>Актуальные заявки на покупку и продажу биржевых товаров с быстрым поиском по участнику, товару, условиям поставки и статусу.</p>
         </div>
         <button class="bo-add-button" type="button" data-view-target="form">
           <span>+</span>
@@ -129,41 +131,41 @@
         </button>
       </div>
 
-      <section class="bo-filters" aria-label="Фильтры">
+      <form class="bo-filters" data-filters aria-label="Фильтры" aria-controls="requests-table">
         <label>
           <span>ТИП</span>
-          <select>
-            <option>Все</option>
-            <option>Продажа</option>
-            <option>Покупка</option>
+          <select name="type">
+            <option value="">Все</option>
+            <option value="Продажа">Продажа</option>
+            <option value="Покупка">Покупка</option>
           </select>
         </label>
         <label>
           <span>УЧАСТНИК</span>
-          <input type="search" placeholder="Поиск участника...">
+          <input name="participant" type="search" placeholder="Поиск участника..." autocomplete="off">
         </label>
         <label>
           <span>ТОВАР</span>
-          <input type="search" placeholder="Поиск товара...">
+          <input name="product" type="search" placeholder="Поиск товара..." autocomplete="off">
         </label>
         <label>
           <span>УСЛОВИЯ ПОСТАВКИ</span>
-          <input type="search" placeholder="Поиск условий...">
+          <input name="delivery" type="search" placeholder="Поиск условий..." autocomplete="off">
         </label>
         <label>
           <span>СТАТУС</span>
-          <select>
-            <option>Все</option>
-            <option>Активна</option>
-            <option>Исполнена</option>
-            <option>Отменена</option>
+          <select name="status">
+            <option value="">Все</option>
+            <option value="Активна">Активна</option>
+            <option value="Исполнена">Исполнена</option>
+            <option value="Отменена">Отменена</option>
           </select>
         </label>
-      </section>
+      </form>
 
       <section class="bo-table-card" aria-label="Заявки">
         <div class="bo-table-wrap">
-          <table class="bo-table">
+          <table class="bo-table" id="requests-table">
             <thead>
               <tr>
                 <th>ДАТА ЗАЯВКИ</th>
@@ -176,83 +178,42 @@
                 <th>СТАТУС</th>
               </tr>
             </thead>
-            <tbody>
-              <tr data-open-drawer>
-                <td>01.08.2026</td>
-                <td><strong class="bo-type bo-type--sell">Продажа</strong></td>
-                <td>Петербургская Биржа</td>
-                <td>Пшеница 3 класса, урожай 2026</td>
-                <td>5000 т <small>(мин. партия 500 т)</small></td>
-                <td>320 USD/т, <small>предоплата 30%</small></td>
-                <td>FOB, порт Новороссийск</td>
-                <td><span class="bo-status bo-status--active">Активна</span></td>
-              </tr>
-              <tr>
-                <td>30.07.2026</td>
-                <td><strong class="bo-type bo-type--buy">Покупка</strong></td>
-                <td>ETC (Казахстан)</td>
-                <td>Металлопрокат г/к</td>
-                <td>1200 т</td>
-                <td>по договорённости, <small>KZT/USD</small></td>
-                <td>DAP, склад покупателя</td>
-                <td><span class="bo-status bo-status--active">Активна</span></td>
-              </tr>
-              <tr>
-                <td>25.07.2026</td>
-                <td><strong class="bo-type bo-type--sell">Продажа</strong></td>
-                <td>БУТБ (Беларусь)</td>
-                <td>Пиломатериалы хвойных пород</td>
-                <td>800 куб. м</td>
-                <td>190 USD/куб.м, <small>отсрочка 14 дней</small></td>
-                <td>Самовывоз со склада</td>
-                <td><span class="bo-status bo-status--done">Исполнена</span></td>
-              </tr>
-              <tr>
-                <td>18.07.2026</td>
-                <td><strong class="bo-type bo-type--buy">Покупка</strong></td>
-                <td>NCDEX (Индия)</td>
-                <td>Соевые бобы</td>
-                <td>от 2000 т</td>
-                <td>Тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест...</td>
-                <td>Любой способ, порт назначения - по согласованию</td>
-                <td><span class="bo-status bo-status--canceled">Отменена</span></td>
-              </tr>
-            </tbody>
+            <tbody data-requests-body></tbody>
           </table>
         </div>
       </section>
 
       <aside class="bo-drawer" hidden aria-hidden="true" aria-labelledby="drawer-title">
         <div class="bo-drawer__head">
-          <p><span>Заявка от:</span> 01.08.2026</p>
+          <p><span>Заявка от:</span> <b data-drawer-date></b></p>
           <button class="bo-icon-button" type="button" data-close-drawer aria-label="Закрыть">
             <img src="assets/icon-close.svg" alt="">
           </button>
         </div>
-        <h2 id="drawer-title">Пшеница 3 класса, урожай 2026</h2>
+        <h2 id="drawer-title" data-drawer-product></h2>
         <div class="bo-drawer__meta">
-          <p><span>ТИП:</span> <strong class="bo-type bo-type--sell">Продажа</strong></p>
-          <span class="bo-status bo-status--active">Активна</span>
+          <p><span>ТИП:</span> <strong class="bo-type" data-drawer-type></strong></p>
+          <span class="bo-status" data-drawer-status></span>
         </div>
         <div class="bo-drawer__participant">
           <div>
             <span>Участник</span>
-            <p><img src="assets/russia-flag.png" alt="">Петербургская Биржа</p>
+            <p><img data-drawer-flag src="assets/russia-flag.png" alt=""><b data-drawer-participant></b></p>
           </div>
-          <img class="bo-drawer__exchange" src="assets/spimex-logo.png" alt="">
+          <img class="bo-drawer__exchange" data-drawer-logo src="assets/spimex-logo.png" alt="">
         </div>
         <dl class="bo-drawer__details">
           <div>
             <dt>ОБЪЁМ</dt>
-            <dd>5000 т (мин. партия 500 т)</dd>
+            <dd data-drawer-volume></dd>
           </div>
           <div>
             <dt>Условия поставки</dt>
-            <dd>FOB, порт Новороссийск</dd>
+            <dd data-drawer-delivery></dd>
           </div>
           <div>
             <dt>ЦЕНА И УСЛОВИЯ</dt>
-            <dd>тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест.</dd>
+            <dd data-drawer-price></dd>
           </div>
         </dl>
         <div class="bo-drawer__actions">
@@ -269,31 +230,31 @@
         <button class="bo-secondary" type="button" data-view-target="requests">Отменить</button>
       </div>
 
-      <form class="bo-form-card" data-next-view="requests">
+      <form class="bo-form-card" data-request-form data-next-view="requests">
         <section class="bo-form-section">
           <h2>Основные параметры</h2>
           <div class="bo-form-grid">
             <label class="bo-field">
               <span>Дата заявки <b>*</b></span>
-              <span class="bo-input-shell"><input type="text" placeholder="дд.мм.гггг"><img src="assets/icon-calendar.svg" alt=""></span>
+              <span class="bo-input-shell"><input name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}"><img src="assets/icon-calendar.svg" alt=""></span>
             </label>
             <label class="bo-field">
               <span>Тип заявки <b>*</b></span>
-              <select>
-                <option>Покупка</option>
-                <option>Продажа</option>
+              <select name="type" required>
+                <option value="Покупка">Покупка</option>
+                <option value="Продажа">Продажа</option>
               </select>
             </label>
             <label class="bo-field">
               <span>Участник (Биржа-участник) <b>*</b></span>
-              <input type="text" placeholder="Название биржи-участника">
+              <input name="participant" type="text" placeholder="Название биржи-участника" autocomplete="organization" required maxlength="80">
             </label>
             <label class="bo-field">
               <span>Статус заявки <b>*</b></span>
-              <select>
-                <option>Активна</option>
-                <option>Исполнена</option>
-                <option>Отменена</option>
+              <select name="status" required>
+                <option value="Активна">Активна</option>
+                <option value="Исполнена">Исполнена</option>
+                <option value="Отменена">Отменена</option>
               </select>
             </label>
           </div>
@@ -303,16 +264,16 @@
           <h2>Спецификация товара и объемы</h2>
           <label class="bo-field">
             <span>Товар <b>*</b></span>
-            <textarea placeholder="Описание товара в произвольном формате"></textarea>
+            <textarea name="product" placeholder="Описание товара в произвольном формате" required maxlength="260"></textarea>
           </label>
           <div class="bo-form-grid">
             <label class="bo-field">
               <span>Объём</span>
-              <input type="text" placeholder="Например: 1000 тонн, мин. партия 100 тонн">
+              <input name="volume" type="text" placeholder="Например: 1000 тонн, мин. партия 100 тонн" maxlength="100">
             </label>
             <label class="bo-field">
               <span>Цена и условия оплаты</span>
-              <input type="text" placeholder="Цена за единицу, валюта, условия оплаты">
+              <input name="price" type="text" placeholder="Цена за единицу, валюта, условия оплаты" maxlength="220">
             </label>
           </div>
         </section>
@@ -321,7 +282,7 @@
           <h2>Логистика и доставка</h2>
           <label class="bo-field">
             <span>Условия поставки</span>
-            <input type="text" placeholder="Бизнес поставки, способ доставки">
+            <input name="delivery" type="text" placeholder="Бизнес поставки, способ доставки" maxlength="160">
           </label>
         </section>
 
