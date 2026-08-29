@@ -42,7 +42,7 @@ Visual constraints for this standalone page:
 - the page gradient stays light at the top and moves into color toward the bottom;
 - the ACE logo asset must not include exported Figma frame backgrounds;
 - the request details drawer is viewport-fixed and must cover the full browser height;
-- the request details drawer is mounted at the app root, outside animated view panels;
+- the request details drawer is mounted at the document body root, outside the app shell and animated view panels;
 - the back icon in `На главную` points left;
 - the authenticated header actions stay in one row on desktop and supported narrow widths.
 - the auth and workspace states share the same page gradient;

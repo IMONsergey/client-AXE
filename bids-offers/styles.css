@@ -31,6 +31,10 @@ body {
   margin: 0;
 }
 
+body.is-drawer-open {
+  overflow: hidden;
+}
+
 button,
 input,
 select,
@@ -1034,7 +1038,7 @@ button {
 .bo-drawer-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 1000;
   border: 0;
   background: rgba(31, 50, 63, .1);
   opacity: 0;
@@ -1044,7 +1048,7 @@ button {
 .bo-drawer {
   position: fixed;
   inset: 0 0 0 auto;
-  z-index: 90;
+  z-index: 1010;
   width: min(620px, 100vw);
   display: flex;
   flex-direction: column;
@@ -1057,12 +1061,12 @@ button {
   transition: transform .22s ease, opacity .22s ease;
 }
 
-.bo-app.is-drawer-open .bo-drawer {
+body.is-drawer-open .bo-drawer {
   transform: translateX(0);
   opacity: 1;
 }
 
-.bo-app.is-drawer-open .bo-drawer-backdrop {
+body.is-drawer-open .bo-drawer-backdrop {
   opacity: 1;
 }
 

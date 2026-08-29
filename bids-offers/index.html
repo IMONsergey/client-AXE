@@ -265,46 +265,6 @@
       </form>
     </section>
 
-    <aside class="bo-drawer" hidden aria-hidden="true" aria-labelledby="drawer-title">
-      <div class="bo-drawer__head">
-        <p><span>Заявка от:</span> <b data-drawer-date></b></p>
-        <button class="bo-icon-button" type="button" data-close-drawer aria-label="Закрыть">
-          <img src="assets/icon-close.svg" alt="">
-        </button>
-      </div>
-      <h2 id="drawer-title" data-drawer-product></h2>
-      <div class="bo-drawer__meta">
-        <p><span>ТИП:</span> <strong class="bo-type" data-drawer-type></strong></p>
-        <span class="bo-status" data-drawer-status></span>
-      </div>
-      <div class="bo-drawer__participant">
-        <div>
-          <span>Участник</span>
-          <p><img data-drawer-flag src="assets/russia-flag.png" alt=""><b data-drawer-participant></b></p>
-        </div>
-        <img class="bo-drawer__exchange" data-drawer-logo src="assets/spimex-logo.png" alt="">
-      </div>
-      <dl class="bo-drawer__details">
-        <div>
-          <dt>ОБЪЁМ</dt>
-          <dd data-drawer-volume></dd>
-        </div>
-        <div>
-          <dt>Условия поставки</dt>
-          <dd data-drawer-delivery></dd>
-        </div>
-        <div>
-          <dt>ЦЕНА И УСЛОВИЯ</dt>
-          <dd data-drawer-price></dd>
-        </div>
-      </dl>
-      <div class="bo-drawer__actions">
-        <button class="bo-primary" type="button">Откликнуться на заявку</button>
-        <button class="bo-secondary" type="button" data-close-drawer>Закрыть</button>
-      </div>
-    </aside>
-    <button class="bo-drawer-backdrop" hidden type="button" data-close-drawer aria-label="Закрыть"></button>
-
     <div class="bo-success-modal" data-success-modal hidden role="dialog" aria-modal="true" aria-labelledby="success-title">
       <button class="bo-success-modal__backdrop" type="button" data-close-success aria-label="Закрыть"></button>
       <div class="bo-success-card">
@@ -319,6 +279,47 @@
       </div>
     </div>
   </main>
+
+  <aside class="bo-drawer" hidden aria-hidden="true" aria-labelledby="drawer-title">
+    <div class="bo-drawer__head">
+      <p><span>Заявка от:</span> <b data-drawer-date></b></p>
+      <button class="bo-icon-button" type="button" data-close-drawer aria-label="Закрыть">
+        <img src="assets/icon-close.svg" alt="">
+      </button>
+    </div>
+    <h2 id="drawer-title" data-drawer-product></h2>
+    <div class="bo-drawer__meta">
+      <p><span>ТИП:</span> <strong class="bo-type" data-drawer-type></strong></p>
+      <span class="bo-status" data-drawer-status></span>
+    </div>
+    <div class="bo-drawer__participant">
+      <div>
+        <span>Участник</span>
+        <p><img data-drawer-flag src="assets/russia-flag.png" alt=""><b data-drawer-participant></b></p>
+      </div>
+      <img class="bo-drawer__exchange" data-drawer-logo src="assets/spimex-logo.png" alt="">
+    </div>
+    <dl class="bo-drawer__details">
+      <div>
+        <dt>ОБЪЁМ</dt>
+        <dd data-drawer-volume></dd>
+      </div>
+      <div>
+        <dt>Условия поставки</dt>
+        <dd data-drawer-delivery></dd>
+      </div>
+      <div>
+        <dt>ЦЕНА И УСЛОВИЯ</dt>
+        <dd data-drawer-price></dd>
+      </div>
+    </dl>
+    <div class="bo-drawer__actions">
+      <button class="bo-primary" type="button">Откликнуться на заявку</button>
+      <button class="bo-secondary" type="button" data-close-drawer>Закрыть</button>
+    </div>
+  </aside>
+  <button class="bo-drawer-backdrop" hidden type="button" data-close-drawer aria-label="Закрыть"></button>
+
   <script src="script.js"></script>
 </body>
 </html>
