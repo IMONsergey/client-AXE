@@ -45,7 +45,7 @@ button {
   position: relative;
   overflow-x: hidden;
   background:
-    linear-gradient(180deg, rgba(119, 222, 233, .86) 0%, rgba(227, 241, 255, .72) 42%, var(--bo-bg) 76%),
+    linear-gradient(180deg, #f8fbfd 0%, #f1f4f6 34%, rgba(138, 224, 233, .72) 100%),
     var(--bo-bg);
 }
 
@@ -73,6 +73,7 @@ button {
 .bo-header__actions {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 
@@ -134,8 +135,8 @@ button {
 }
 
 .bo-small-primary {
-  min-height: 34px;
-  padding: 0 14px;
+  min-height: 36px;
+  padding: 0 18px;
   border-radius: 4px;
   background: var(--bo-teal);
   color: #fff;
@@ -820,11 +821,9 @@ button {
 @keyframes bo-view-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -858,7 +857,7 @@ button {
   }
 
   .bo-header__actions {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-end;
   }
 
@@ -906,21 +905,32 @@ button {
   }
 
   .bo-header {
-    gap: 16px;
+    gap: 12px;
   }
 
   .bo-header__actions {
-    max-width: 178px;
+    gap: 6px;
+    max-width: none;
   }
 
   .bo-outline {
     min-height: 32px;
-    padding: 0 10px;
+    gap: 6px;
+    padding: 0 8px;
   }
 
   .bo-outline span,
   .bo-small-primary {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .bo-brand__full {
+    width: 96px;
+  }
+
+  .bo-small-primary {
+    min-height: 32px;
+    padding: 0 10px;
   }
 
   .bo-language {

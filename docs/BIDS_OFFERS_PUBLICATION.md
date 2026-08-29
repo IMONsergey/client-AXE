@@ -27,3 +27,11 @@ Publication target: GitHub Pages subpath `/client-AXE/bids-offers/`.
 The page is intentionally standalone because the repository `main` branch currently contains project documentation but no application build system. The `gh-pages` branch is the active Pages source.
 
 The current implementation is a frontend-only static system. New requests are not persisted after reload until a backend/API storage layer is connected.
+
+Visual constraints for this standalone page:
+
+- the page gradient stays light at the top and moves into color toward the bottom;
+- the ACE logo asset must not include exported Figma frame backgrounds;
+- the request details drawer is viewport-fixed and must cover the full browser height;
+- the back icon in `На главную` points left;
+- the authenticated header actions stay in one row on desktop and supported narrow widths.
