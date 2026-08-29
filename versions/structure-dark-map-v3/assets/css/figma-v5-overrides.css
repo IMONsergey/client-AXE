@@ -1,0 +1,503 @@
+/* Recovery layer 2026-08-26.
+   Keeps the Figma-v4 markup and restores the approved interaction/layout decisions
+   that were lost during the 2026-08-25 rebuild. */
+
+:root {
+  --axe-metric-blue: #3b7fc1;
+  --axe-grid-light: rgba(0, 111, 129, .24);
+  --axe-grid-dark: rgba(47, 224, 253, .24);
+}
+
+/* Header: Figma uses a wider rail than the 1281px content grid. */
+@media (min-width: 1181px) {
+  .site-header .site-header__inner {
+    width: min(1390px, calc(100% - 50px));
+  }
+  .site-header {
+    padding-top: 20px;
+  }
+  .site-header.is-scrolled {
+    padding: 10px 0;
+  }
+}
+
+.site-header a:focus-visible,
+.site-header button:focus-visible,
+.button:focus-visible,
+.text-link:focus-visible,
+.slider-controls button:focus-visible,
+.country-hotspot:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+/* Hero: geometry from the current Figma frame, interaction from the retained globe. */
+@media (min-width: 1181px) {
+  .hero__inner {
+    grid-template-columns: 648px minmax(0, 1fr);
+  }
+  .hero__copy {
+    padding-top: 153px;
+  }
+  .hero h1 {
+    width: 648px;
+    max-width: 648px;
+    margin-bottom: 60px;
+    font-size: 63px;
+    line-height: .99;
+    letter-spacing: -.02em;
+  }
+  .hero__copy > p {
+    width: 648px;
+    max-width: 648px;
+    margin-bottom: 148px;
+    color: #61ddea;
+    font-family: "Inter", Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 600;
+    text-transform: none;
+  }
+  .hero .text-link {
+    min-height: 56px;
+    padding: 0 23px;
+    gap: 14px;
+    background: var(--teal);
+    color: #fff;
+    font-size: 19px;
+    line-height: 1;
+  }
+  .hero .text-link:hover {
+    background: #09a5b3;
+  }
+  .hero__globe-shell {
+    top: 84px;
+    right: -6px;
+    width: min(640px, 46vw);
+    height: min(640px, 46vw);
+  }
+}
+
+/* Metrics and about. */
+.metric--exchanges {
+  background: var(--axe-metric-blue) !important;
+}
+.metric--countries {
+  background: var(--teal) !important;
+}
+.metric--link > img {
+  opacity: .82;
+}
+
+/* Goal-to-tasks transition stays continuous instead of snapping to white. */
+.goal {
+  color: #fff;
+  background: linear-gradient(180deg, #027c89 0%, #008290 11%, rgba(201,228,255,.94) 78%, rgba(201,228,255,.58) 100%);
+}
+.goal::before {
+  opacity: .72;
+}
+.goal h2,
+.goal p {
+  color: #fff;
+}
+.goal p {
+  font-weight: 500;
+}
+.tasks {
+  position: relative;
+  background: linear-gradient(180deg, rgba(201,228,255,.58) 0, rgba(226,239,246,.42) 125px, var(--paper) 300px);
+}
+.task-card p {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.task-card--logo {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(125deg, #0a87a8, #008290 72%, #c9e4ff 138%);
+}
+.task-card--logo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .56;
+  background-image: radial-gradient(circle, rgba(72,225,236,.78) 0 1px, transparent 1.25px);
+  background-size: 7px 7px;
+  mask-image: radial-gradient(ellipse 90% 105% at 0 0, #000 0%, rgba(0,0,0,.72) 46%, transparent 80%);
+}
+.task-card--logo .brand {
+  position: relative;
+  z-index: 1;
+}
+
+/* Directions: the approved 417 / 15 / 417 / 15 / 417 rhythm. */
+@media (min-width: 901px) {
+  .directions__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 185px);
+    gap: 15px;
+    border: 0;
+  }
+  .direction {
+    min-height: 185px;
+    padding: 34px 32px 28px;
+    border: 0;
+    background: #fff;
+  }
+  .direction--featured {
+    grid-row: 1 / 3;
+    min-height: 385px;
+    background: #fff url("../images/figma/direction-featured-background.webp") center / cover no-repeat;
+  }
+  .direction p {
+    max-width: 353px;
+    font-size: 23px;
+    line-height: 1.42;
+    font-weight: 500;
+  }
+  .direction span {
+    font-size: 11px;
+  }
+}
+
+/* Timeline: explicit client override — two large cards on desktop. */
+.timeline__track {
+  gap: 15px;
+}
+@media (min-width: 1181px) {
+  .timeline-card {
+    grid-template-columns: 31.9% 68.1%;
+    flex: 0 0 calc((100% - 15px) / 2);
+    height: 366px;
+    min-height: 366px;
+    border: 0;
+    background: transparent;
+  }
+  .timeline-card > div:first-child {
+    height: 366px;
+    min-height: 366px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-light);
+    background: #fff;
+  }
+  .timeline-card time {
+    display: flex;
+    min-height: 114px;
+    flex-direction: column;
+    padding: 23px 20px;
+    border-bottom: 1px solid var(--line-light);
+  }
+  .timeline-card time b {
+    font-size: 42px;
+    line-height: .86;
+  }
+  .timeline-card time span {
+    margin-top: 12px;
+    font-size: 20px;
+  }
+  .timeline-card p {
+    flex: 1;
+    margin: 0;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  .timeline-card__media {
+    display: block;
+    height: 366px;
+    min-height: 366px;
+    border: 1px solid var(--line-light);
+    border-left: 0;
+    background:
+      radial-gradient(circle at 18% 78%, rgba(43,217,232,.28), transparent 24%),
+      radial-gradient(circle at 72% 28%, rgba(59,127,193,.32), transparent 30%),
+      linear-gradient(145deg, #0b2638, #087483 66%, #0a5369);
+  }
+}
+
+/* Interactive Figma map: preserve the exact render and use SVG as the hit/interaction layer.
+   No country-border hit areas are introduced, so disputed borders remain non-determinable. */
+.countries__map--interactive {
+  width: min(1880px, 130vw);
+  max-width: none;
+  overflow: visible;
+}
+.country-hotspot {
+  cursor: pointer;
+  outline: none;
+}
+.country-hotspot__ring {
+  fill: rgba(7,27,43,0);
+  stroke: rgba(255,255,255,0);
+  stroke-width: 3;
+  transition: fill .2s ease, stroke .2s ease, filter .2s ease;
+}
+.country-hotspot:hover .country-hotspot__ring,
+.country-hotspot:focus .country-hotspot__ring,
+.country-hotspot.is-active .country-hotspot__ring {
+  fill: rgba(43,217,232,.08);
+  stroke: rgba(255,255,255,.92);
+  filter: drop-shadow(0 0 10px rgba(43,217,232,.72));
+}
+.countries__map-tooltip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, calc(-100% - 17px));
+  padding: 8px 10px;
+  border: 1px solid rgba(255,255,255,.24);
+  background: rgba(7,27,43,.94);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+.countries__map-tooltip.is-visible {
+  opacity: 1;
+}
+
+/* Events: controls are restored even while the current Figma contains one populated event. */
+.events__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 34px;
+}
+.events__head .section-title {
+  margin-bottom: 0;
+}
+.events__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+.events__controls > span {
+  min-width: 54px;
+  margin-right: 6px;
+  text-align: center;
+  font-size: 13px;
+}
+.events__controls button {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.28);
+  background: transparent;
+  cursor: pointer;
+}
+.events__controls button img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+}
+.events__controls button:first-of-type img {
+  transform: rotate(180deg);
+}
+.events__controls button:disabled {
+  opacity: .32;
+  cursor: default;
+}
+.events__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+.events__track {
+  display: flex;
+  width: 100%;
+  transition: transform .55s cubic-bezier(.16,.84,.24,1);
+  will-change: transform;
+}
+.events__track > .event-card {
+  flex: 0 0 100%;
+}
+
+/* The content placeholder is visibly a separate plane in Figma. */
+.join__placeholder {
+  background: #26394b;
+}
+
+/* Contacts use 630 + 20 + 630 inside the 1280px rail. */
+@media (min-width: 901px) {
+  .contacts__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Footer: restore the brand and the three-part rail. */
+.footer .container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.footer__brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 7px;
+}
+.footer__brand img:first-child {
+  width: 58px;
+  filter: brightness(0) invert(1);
+}
+.footer__brand img:last-child {
+  width: 92px;
+  filter: brightness(0) invert(1);
+}
+.footer .container > span:not(.footer__brand) {
+  justify-self: center;
+  text-align: center;
+}
+.footer nav {
+  justify-self: end;
+}
+
+/* Lightweight reveal polish, without bringing the old animation stack back wholesale. */
+.js-axe-reveal .axe-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .55s ease, transform .65s cubic-bezier(.22,.7,.2,1);
+}
+.js-axe-reveal .axe-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 1180px) {
+  .site-header .site-header__inner {
+    width: min(100% - 40px, 1040px);
+  }
+  .hero__copy > p {
+    color: #61ddea;
+    font-family: "Inter", Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 600;
+    text-transform: none;
+  }
+  .hero .text-link {
+    min-height: 54px;
+    padding: 0 20px;
+    background: var(--teal);
+  }
+  .timeline-card {
+    flex-basis: 72%;
+  }
+  .timeline-card__media {
+    display: block;
+    background: linear-gradient(145deg, #0b2638, #087483 66%, #0a5369);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero__copy > p {
+    max-width: 520px;
+    margin-bottom: 28px;
+    font-size: 18px;
+  }
+  .hero .text-link {
+    min-height: 52px;
+    font-size: 14px;
+  }
+  .directions__grid {
+    gap: 12px;
+    border: 0;
+  }
+  .direction {
+    border: 0;
+    background: #fff;
+  }
+  .timeline-card {
+    grid-template-columns: 36% 64%;
+    flex-basis: 86%;
+    height: 340px;
+    min-height: 340px;
+  }
+  .timeline-card__media {
+    display: block;
+  }
+  .countries__map--interactive {
+    width: 1180px;
+  }
+  .events__head {
+    align-items: flex-end;
+  }
+  .contacts__grid {
+    gap: 0;
+  }
+  .footer .container {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+  .footer__brand,
+  .footer .container > span:not(.footer__brand),
+  .footer nav {
+    justify-self: start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero__copy > p {
+    max-width: 330px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .hero .text-link {
+    min-height: 48px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+  .task-card p {
+    font-size: 12px;
+  }
+  .directions__grid {
+    gap: 10px;
+  }
+  .timeline-card {
+    grid-template-columns: 1fr;
+    flex-basis: 92%;
+    height: 330px;
+    min-height: 330px;
+  }
+  .timeline-card__media {
+    display: none;
+  }
+  .countries__map--interactive {
+    width: 820px;
+  }
+  .events__head {
+    gap: 16px;
+  }
+  .events__controls > span {
+    display: none;
+  }
+  .events__controls button {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country-hotspot__ring,
+  .countries__map-tooltip,
+  .events__track,
+  .js-axe-reveal .axe-reveal {
+    transition: none !important;
+  }
+  .js-axe-reveal .axe-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

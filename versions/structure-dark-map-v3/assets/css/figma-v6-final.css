@@ -1,0 +1,98 @@
+/* Final preview corrections based on the current Figma map frame. */
+.countries .section-title {
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Two large cards stay inside the desktop slider frame; no fade/edge masks. */
+.timeline__viewport {
+  overflow: hidden;
+}
+
+.countries__map--final {
+  display: block;
+  width: min(1880px, 130vw);
+  max-width: none;
+  overflow: visible;
+}
+
+.countries__map-layer,
+.country-hotspot__flag,
+.country-hotspot__shell {
+  pointer-events: none;
+}
+
+.country-hotspot--final {
+  cursor: pointer;
+  outline: none;
+}
+
+.country-hotspot__shell {
+  fill: #fff;
+  stroke: rgba(255,255,255,.68);
+  stroke-width: 1;
+  transition: filter .2s ease;
+}
+
+.country-hotspot__ring {
+  fill: rgba(7,27,43,0);
+  stroke: rgba(255,255,255,0);
+  stroke-width: 3;
+  transition: fill .2s ease, stroke .2s ease, filter .2s ease;
+}
+
+.country-hotspot--final:hover .country-hotspot__ring,
+.country-hotspot--final:focus .country-hotspot__ring,
+.country-hotspot--final.is-active .country-hotspot__ring {
+  fill: rgba(43,217,232,.07);
+  stroke: rgba(255,255,255,.94);
+  filter: drop-shadow(0 0 10px rgba(43,217,232,.72));
+}
+
+.country-hotspot--final:hover .country-hotspot__shell,
+.country-hotspot--final:focus .country-hotspot__shell,
+.country-hotspot--final.is-active .country-hotspot__shell {
+  filter: drop-shadow(0 0 9px rgba(43,217,232,.52));
+}
+
+.countries__map-tooltip--final {
+  z-index: 7;
+}
+
+/* Never leave document sections hidden when a user jumps, reloads or captures the page. */
+.js-axe-reveal .axe-reveal,
+.js-axe-reveal .axe-reveal.is-visible,
+.axe-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (max-width: 900px) {
+  .countries__map--final {
+    width: 1180px;
+  }
+}
+
+@media (max-width: 600px) {
+  .countries .section-title {
+    font-size: 15px;
+  }
+  .countries__map--final {
+    width: 820px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country-hotspot__shell,
+  .country-hotspot__ring {
+    transition: none;
+  }
+}
