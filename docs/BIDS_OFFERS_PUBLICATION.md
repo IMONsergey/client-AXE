@@ -48,7 +48,7 @@ Visual constraints for this standalone page:
 - the auth and workspace states share the same page gradient;
 - the requests workspace uses a fluid flex layout instead of a fixed narrow frame;
 - below desktop width, request rows become readable cards instead of a horizontally clipped table;
-- on phone width, the header gives the full logo its own row and keeps actions grouped below it;
+- on phone width, the header stays compact: the logo remains readable, while language and actions stay grouped on the right without overlap;
 - on mobile request-form width, the top cancel action is hidden and bottom form actions stretch to the form width;
 - `ТИП` and `СТАТУС` table headers expose column filters;
 - `ДАТА ЗАЯВКИ`, `ОБЪЁМ`, and `ЦЕНА И УСЛОВИЯ` table headers expose sorting.
