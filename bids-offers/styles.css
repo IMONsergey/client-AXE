@@ -138,12 +138,17 @@ button {
 .bo-small-primary {
   height: 36px;
   min-height: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 18px;
   border-radius: 4px;
   background: var(--bo-teal);
   color: #fff;
   font-size: 14px;
   font-weight: 500;
+  line-height: 1;
+  text-align: center;
 }
 
 .bo-auth-only,
@@ -221,6 +226,7 @@ button {
   margin: 24px 0 26px;
   font-size: 14px;
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .bo-message-card--wide {
@@ -256,7 +262,7 @@ button {
 
 .bo-auth-form {
   display: grid;
-  gap: 19px;
+  gap: 16px;
   margin-top: 10px;
 }
 
@@ -270,6 +276,7 @@ button {
 
 .bo-field > span:first-child {
   line-height: 1.2;
+  text-wrap: pretty;
 }
 
 .bo-field b {
@@ -319,6 +326,23 @@ button {
   color: #72808b;
 }
 
+.bo-field__hint,
+.bo-field__error {
+  margin-top: -2px;
+  font-size: 12px;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.bo-field__hint {
+  color: rgba(31, 50, 63, .56);
+}
+
+.bo-field__error {
+  color: var(--bo-red);
+  font-weight: 500;
+}
+
 .bo-field input:hover,
 .bo-field select:hover,
 .bo-field textarea:hover,
@@ -340,9 +364,17 @@ button {
   box-shadow: 0 0 0 3px rgba(0, 137, 152, .12);
 }
 
-.bo-field input:invalid:not(:placeholder-shown),
-.bo-field textarea:invalid:not(:placeholder-shown) {
+.bo-field.is-invalid input,
+.bo-field.is-invalid select,
+.bo-field.is-invalid textarea,
+.bo-field.is-invalid .bo-input-shell {
   border-color: var(--bo-red);
+  background-color: #fff8f8;
+  box-shadow: 0 0 0 3px rgba(217, 77, 77, .1);
+}
+
+.bo-field.is-invalid .bo-input-shell input {
+  box-shadow: none;
 }
 
 .bo-input-shell {
@@ -449,6 +481,7 @@ button {
   margin: 18px 0 28px;
   font-size: 14px;
   line-height: 1.45;
+  text-wrap: pretty;
 }
 
 .bo-add-button {
@@ -541,10 +574,15 @@ button {
   position: relative;
   padding: 0;
   background: var(--bo-ink);
+  border-right: 1px solid rgba(255, 255, 255, .16);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
   text-align: left;
+}
+
+.bo-table th:last-child {
+  border-right: 0;
 }
 
 .bo-table th:not(:has(.bo-th-control)) {
@@ -553,48 +591,57 @@ button {
 
 .bo-th-control {
   width: 100%;
-  min-height: 48px;
+  height: 48px;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 12px;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
   background: transparent;
   color: inherit;
+  outline: 0;
   text-align: left;
   font: inherit;
 }
 
-.bo-th-control:hover,
-.bo-th-control.is-active {
-  background: rgba(255, 255, 255, .09);
+.bo-th-control:hover {
+  background: rgba(255, 255, 255, .045);
+}
+
+.bo-table .bo-th-control:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 -2px 0 rgba(255, 255, 255, .48);
 }
 
 .bo-sort-icon {
-  width: 10px;
-  height: 14px;
+  width: 8px;
+  height: 12px;
   flex: 0 0 auto;
   position: relative;
-  opacity: .56;
+  color: rgba(255, 255, 255, .48);
 }
 
 .bo-sort-icon::before,
 .bo-sort-icon::after {
   content: "";
   position: absolute;
-  left: 2px;
-  border-right: 4px solid transparent;
-  border-left: 4px solid transparent;
+  left: 1px;
+  border-right: 3px solid transparent;
+  border-left: 3px solid transparent;
 }
 
 .bo-sort-icon::before {
   top: 0;
-  border-bottom: 5px solid currentColor;
+  border-bottom: 4px solid currentColor;
 }
 
 .bo-sort-icon::after {
   bottom: 0;
-  border-top: 5px solid currentColor;
+  border-top: 4px solid currentColor;
 }
 
 [data-sort-state="asc"] .bo-sort-icon::before,
@@ -608,11 +655,11 @@ button {
 }
 
 .bo-filter-icon {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   flex: 0 0 auto;
   position: relative;
-  opacity: .72;
+  color: rgba(255, 255, 255, .58);
 }
 
 .bo-filter-icon::before {
@@ -650,6 +697,11 @@ button {
   font-size: 13px;
   font-weight: 500;
   text-align: left;
+}
+
+.bo-column-menu button:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 0 0 2px rgba(0, 137, 152, .28);
 }
 
 .bo-column-menu button:hover,
@@ -896,7 +948,7 @@ button {
 
 .bo-form-card {
   display: grid;
-  gap: 32px;
+  gap: 28px;
   margin-top: 33px;
   padding: 40px;
   border: 1px solid #e2e5e9;
@@ -908,6 +960,17 @@ button {
 .bo-form-section {
   display: grid;
   gap: 20px;
+}
+
+.bo-form-feedback {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 137, 152, .2);
+  border-radius: 5px;
+  background: rgba(0, 137, 152, .08);
+  color: var(--bo-teal);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .bo-form-section h2 {
