@@ -10,6 +10,11 @@
   --bo-line: #d4e0e7;
   --bo-field: #eef2f5;
   --bo-radius: 8px;
+  --bo-motion-fast: 180ms;
+  --bo-motion-standard: 280ms;
+  --bo-motion-emphasis: 360ms;
+  --bo-ease-standard: cubic-bezier(.4, 0, .2, 1);
+  --bo-ease-enter: cubic-bezier(.16, 1, .3, 1);
   font-family: Inter, Arial, sans-serif;
   color: var(--bo-ink);
   background: var(--bo-bg);
@@ -112,7 +117,7 @@ button {
 .bo-add-button,
 .bo-tab,
 .bo-icon-button {
-  transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
+  transition: background-color var(--bo-motion-fast) var(--bo-ease-standard), border-color var(--bo-motion-fast) var(--bo-ease-standard), color var(--bo-motion-fast) var(--bo-ease-standard), box-shadow var(--bo-motion-fast) var(--bo-ease-standard), transform var(--bo-motion-fast) var(--bo-ease-standard);
 }
 
 .bo-outline {
@@ -157,7 +162,6 @@ button {
 }
 
 .bo-app[data-view="login"] .bo-auth-only,
-.bo-app[data-view="register"] .bo-auth-only,
 .bo-app[data-view="confirm"] .bo-auth-only,
 .bo-app[data-view="forgot"] .bo-auth-only,
 .bo-app[data-view="reset"] .bo-auth-only,
@@ -171,14 +175,13 @@ button {
 }
 
 .bo-app[data-view="login"] [data-view-panel="login"],
-.bo-app[data-view="register"] [data-view-panel="register"],
 .bo-app[data-view="confirm"] [data-view-panel="confirm"],
 .bo-app[data-view="forgot"] [data-view-panel="forgot"],
 .bo-app[data-view="reset"] [data-view-panel="reset"],
 .bo-app[data-view="requests"] [data-view-panel="requests"],
 .bo-app[data-view="form"] [data-view-panel="form"] {
   display: block;
-  animation: bo-view-in .24s ease both;
+  animation: bo-view-in var(--bo-motion-standard) var(--bo-ease-enter) both;
 }
 
 .bo-auth-view {
@@ -189,7 +192,6 @@ button {
 }
 
 .bo-app[data-view="login"] [data-view-panel="login"],
-.bo-app[data-view="register"] [data-view-panel="register"],
 .bo-app[data-view="confirm"] [data-view-panel="confirm"],
 .bo-app[data-view="forgot"] [data-view-panel="forgot"],
 .bo-app[data-view="reset"] [data-view-panel="reset"] {
@@ -203,10 +205,6 @@ button {
   border-radius: var(--bo-radius);
   background: #fff;
   box-shadow: 0 10px 32px rgba(31, 50, 63, .08);
-}
-
-.bo-auth-card--register {
-  transform: translateY(-10px);
 }
 
 .bo-auth-card h1,
@@ -239,6 +237,7 @@ button {
 }
 
 .bo-tabs {
+  position: relative;
   height: 40px;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -248,7 +247,25 @@ button {
   background: var(--bo-field);
 }
 
+.bo-tabs::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: 50%;
+  border-radius: 3px;
+  background: var(--bo-teal);
+  transform: translateX(0);
+  transition: transform var(--bo-motion-emphasis) var(--bo-ease-enter);
+}
+
+.bo-auth-card[data-auth-mode="register"] .bo-tabs::before {
+  transform: translateX(100%);
+}
+
 .bo-tab {
+  position: relative;
+  z-index: 1;
   background: transparent;
   color: rgba(31, 50, 63, .45);
   font-size: 14px;
@@ -256,14 +273,38 @@ button {
 }
 
 .bo-tab.is-active {
-  background: var(--bo-teal);
   color: #fff;
+}
+
+.bo-auth-stage {
+  position: relative;
+  min-height: 228px;
+  margin-top: 10px;
+  overflow: hidden;
+  transition: height var(--bo-motion-emphasis) var(--bo-ease-enter);
 }
 
 .bo-auth-form {
   display: grid;
   gap: 16px;
-  margin-top: 10px;
+  margin-top: 0;
+}
+
+.bo-auth-pane {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity var(--bo-motion-standard) var(--bo-ease-standard), transform var(--bo-motion-emphasis) var(--bo-ease-enter);
+}
+
+.bo-auth-pane.is-active {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .bo-field {
@@ -326,16 +367,11 @@ button {
   color: #72808b;
 }
 
-.bo-field__hint,
 .bo-field__error {
   margin-top: -2px;
   font-size: 12px;
   line-height: 1.35;
   text-wrap: pretty;
-}
-
-.bo-field__hint {
-  color: rgba(31, 50, 63, .56);
 }
 
 .bo-field__error {
@@ -441,15 +477,29 @@ button {
 
 .bo-link-button {
   width: fit-content;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   padding: 0;
   background: transparent;
   color: var(--bo-ink);
   font-size: 14px;
   text-align: left;
+  transition: color var(--bo-motion-fast) var(--bo-ease-standard);
+}
+
+.bo-inline-link {
+  color: var(--bo-teal);
+  font-weight: 500;
+  transition: color var(--bo-motion-fast) var(--bo-ease-standard);
 }
 
 .bo-link-button:hover {
-  color: var(--bo-teal);
+  color: var(--bo-ink);
+}
+
+.bo-link-button:hover .bo-inline-link {
+  color: var(--bo-teal-dark);
 }
 
 .bo-auth-switch {

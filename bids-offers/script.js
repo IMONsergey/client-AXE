@@ -1,6 +1,10 @@
 const app = document.querySelector(".bo-app");
 const viewButtons = document.querySelectorAll("[data-view-target]");
 const forms = document.querySelectorAll("form[data-next-view]");
+const authCard = document.querySelector("[data-auth-card]");
+const authStage = document.querySelector("[data-auth-stage]");
+const authModeButtons = document.querySelectorAll("[data-auth-target]");
+const authPanes = document.querySelectorAll("[data-auth-pane]");
 const filters = document.querySelector("[data-filters]");
 const requestsBody = document.querySelector("[data-requests-body]");
 const requestForm = document.querySelector("[data-request-form]");
@@ -88,15 +92,20 @@ let requests = [
 
 function setView(view) {
   closeDrawer(false);
+  if (view === "register") {
+    setAuthMode("register");
+    view = "login";
+  }
   app.dataset.view = view;
   app.classList.remove("is-view-ready");
   requestAnimationFrame(() => {
     applyTypography(app);
+    updateAuthStageHeight();
     app.classList.add("is-view-ready");
   });
-  document.querySelectorAll(".bo-tab").forEach((tab) => {
-    tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
-  });
+  if (view === "login") {
+    setAuthMode("login");
+  }
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -134,6 +143,46 @@ function applyTypography(root) {
   }
   nodes.forEach((node) => {
     node.nodeValue = typographText(node.nodeValue);
+  });
+}
+
+function getActiveAuthPane() {
+  return document.querySelector(".bo-auth-pane.is-active");
+}
+
+function updateAuthStageHeight() {
+  if (!authStage) {
+    return;
+  }
+  const activePane = getActiveAuthPane();
+  if (activePane) {
+    authStage.style.height = `${activePane.offsetHeight}px`;
+  }
+}
+
+function setAuthMode(mode) {
+  if (!authCard || !authStage) {
+    return;
+  }
+  const currentPane = getActiveAuthPane();
+  const currentHeight = currentPane ? currentPane.offsetHeight : authStage.getBoundingClientRect().height;
+  authStage.style.height = `${currentHeight}px`;
+  authCard.dataset.authMode = mode;
+  authModeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.authTarget === mode);
+  });
+  authPanes.forEach((pane) => {
+    const active = pane.dataset.authPane === mode;
+    pane.classList.toggle("is-active", active);
+    pane.setAttribute("aria-hidden", active ? "false" : "true");
+    pane.inert = !active;
+    if (!active) {
+      clearFormErrors(pane);
+    }
+  });
+  requestAnimationFrame(() => {
+    updateAuthStageHeight();
+    applyTypography(authCard);
   });
 }
 
@@ -355,6 +404,9 @@ function setFieldError(field, message) {
     error.textContent = message;
     error.hidden = !message;
   }
+  if (field.closest(".bo-auth-pane.is-active")) {
+    requestAnimationFrame(updateAuthStageHeight);
+  }
 }
 
 function validateField(field) {
@@ -371,6 +423,7 @@ function validateForm(form) {
       firstInvalid = field;
     }
   });
+  updateAuthStageHeight();
   if (firstInvalid) {
     firstInvalid.focus({ preventScroll: true });
     firstInvalid.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -422,6 +475,10 @@ function syncControlState() {
 
 viewButtons.forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.viewTarget));
+});
+
+authModeButtons.forEach((button) => {
+  button.addEventListener("click", () => setAuthMode(button.dataset.authTarget));
 });
 
 forms.forEach((form) => {
@@ -530,5 +587,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 renderRequests();
+setAuthMode("login");
 applyTypography(app);
 app.classList.add("is-view-ready");
+window.addEventListener("resize", updateAuthStageHeight);
