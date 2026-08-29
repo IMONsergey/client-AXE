@@ -1457,7 +1457,7 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-brand__full {
-    width: 112px;
+    width: 150px;
   }
 
   .bo-header__actions {
@@ -1472,9 +1472,12 @@ body.is-drawer-open .bo-drawer-backdrop {
     align-items: stretch;
   }
 
-  .bo-add-button,
-  .bo-form-head .bo-secondary {
+  .bo-add-button {
     width: 100%;
+  }
+
+  .bo-form-head .bo-secondary {
+    display: none;
   }
 
   .bo-filters,
@@ -1627,6 +1630,11 @@ body.is-drawer-open .bo-drawer-backdrop {
     display: grid;
     gap: 12px;
   }
+
+  .bo-form-actions > button {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 @media (max-width: 560px) {
@@ -1644,10 +1652,16 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-header {
-    gap: 12px;
+    gap: 14px 12px;
+    flex-wrap: wrap;
+  }
+
+  .bo-brand {
+    flex: 0 0 100%;
   }
 
   .bo-header__actions {
+    width: 100%;
     gap: 6px;
     max-width: none;
   }
@@ -1665,7 +1679,7 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-brand__full {
-    width: 96px;
+    width: 150px;
   }
 
   .bo-small-primary {
