@@ -19,6 +19,7 @@ const columnFilterValueButtons = document.querySelectorAll("[data-column-filter-
 const columnMenus = document.querySelectorAll("[data-column-menu]");
 const typographWordPattern = /(^|[\s([{"'«„])((?:а|в|и|к|о|с|у|во|да|до|за|из|ли|на|не|но|об|от|по|со|то|же|бы|без|для|или|как|над|под|при|про))\s+([^\s])/giu;
 const typographSkipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
+const authSwitchDelay = 140;
 const successCloseDelay = 280;
 
 const statusClasses = {
@@ -43,6 +44,7 @@ let sortState = {
   direction: "asc",
 };
 
+let authSwitchTimer = null;
 let lastSubmittedRequestId = null;
 
 let requests = [
@@ -97,9 +99,12 @@ let requests = [
 
 function setView(view) {
   closeDrawer(false);
+  let authMode = null;
   if (view === "register") {
-    setAuthMode("register");
+    authMode = "register";
     view = "login";
+  } else if (view === "login") {
+    authMode = "login";
   }
   app.dataset.view = view;
   app.classList.remove("is-view-ready");
@@ -108,8 +113,8 @@ function setView(view) {
     updateAuthStageHeight();
     app.classList.add("is-view-ready");
   });
-  if (view === "login") {
-    setAuthMode("login");
+  if (authMode) {
+    setAuthMode(authMode);
   }
   window.scrollTo({ top: 0, behavior: "auto" });
 }
@@ -155,6 +160,10 @@ function getActiveAuthPane() {
   return document.querySelector(".bo-auth-pane.is-active");
 }
 
+function getAuthPane(mode) {
+  return document.querySelector(`[data-auth-pane="${mode}"]`);
+}
+
 function updateAuthStageHeight() {
   if (!authStage) {
     return;
@@ -165,30 +174,59 @@ function updateAuthStageHeight() {
   }
 }
 
-function setAuthMode(mode) {
-  if (!authCard || !authStage) {
-    return;
-  }
-  const currentPane = getActiveAuthPane();
-  const currentHeight = currentPane ? currentPane.offsetHeight : authStage.getBoundingClientRect().height;
-  authStage.style.height = `${currentHeight}px`;
-  authCard.dataset.authMode = mode;
-  authModeButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.authTarget === mode);
-  });
+function activateAuthPane(mode) {
   authPanes.forEach((pane) => {
     const active = pane.dataset.authPane === mode;
+    pane.hidden = !active;
     pane.classList.toggle("is-active", active);
+    pane.classList.remove("is-leaving");
     pane.setAttribute("aria-hidden", active ? "false" : "true");
     pane.inert = !active;
     if (!active) {
       clearFormErrors(pane);
     }
   });
+  authModeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.authTarget === mode);
+  });
+  authCard.dataset.authMode = mode;
   requestAnimationFrame(() => {
     updateAuthStageHeight();
     applyTypography(authCard);
   });
+}
+
+function setAuthMode(mode, immediate = false) {
+  if (!authCard || !authStage) {
+    return;
+  }
+  window.clearTimeout(authSwitchTimer);
+  const targetPane = getAuthPane(mode);
+  const currentPane = getActiveAuthPane();
+  if (!targetPane || (currentPane === targetPane && authCard.dataset.authMode === mode)) {
+    updateAuthStageHeight();
+    return;
+  }
+  const currentHeight = currentPane ? currentPane.offsetHeight : authStage.getBoundingClientRect().height;
+  authStage.style.height = `${currentHeight}px`;
+  authCard.dataset.authMode = mode;
+  authModeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.authTarget === mode);
+  });
+  if (immediate || !currentPane) {
+    activateAuthPane(mode);
+    return;
+  }
+  currentPane.classList.remove("is-active");
+  currentPane.classList.add("is-leaving");
+  currentPane.setAttribute("aria-hidden", "true");
+  currentPane.inert = true;
+  clearFormErrors(currentPane);
+  authSwitchTimer = window.setTimeout(() => {
+    currentPane.hidden = true;
+    targetPane.hidden = false;
+    activateAuthPane(mode);
+  }, authSwitchDelay);
 }
 
 function splitDetail(value) {
@@ -658,7 +696,7 @@ document.addEventListener("keydown", (event) => {
 
 renderRequests();
 prepareValidationSlots();
-setAuthMode("login");
+setAuthMode("login", true);
 applyTypography(app);
 app.classList.add("is-view-ready");
 window.addEventListener("resize", updateAuthStageHeight);

@@ -282,6 +282,7 @@ button {
   margin-top: 10px;
   overflow: hidden;
   transition: height var(--bo-motion-emphasis) var(--bo-ease-enter);
+  will-change: height;
 }
 
 .bo-auth-form {
@@ -291,20 +292,27 @@ button {
 }
 
 .bo-auth-pane {
-  position: absolute;
-  inset: 0 0 auto;
   width: 100%;
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px);
-  transition: opacity var(--bo-motion-standard) var(--bo-ease-standard), transform var(--bo-motion-emphasis) var(--bo-ease-enter);
+}
+
+.bo-auth-pane.is-active,
+.bo-auth-pane.is-leaving {
+  display: grid;
 }
 
 .bo-auth-pane.is-active {
-  position: relative;
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+  animation: bo-auth-pane-in 220ms var(--bo-ease-enter) both;
+}
+
+.bo-auth-pane.is-leaving {
+  pointer-events: none;
+  animation: bo-auth-pane-out 140ms var(--bo-ease-standard) both;
 }
 
 .bo-field {
@@ -1154,6 +1162,28 @@ button {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes bo-auth-pane-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bo-auth-pane-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }
 
