@@ -53,6 +53,8 @@ let sortState = {
 
 let authSwitchTimer = null;
 let viewSwitchTimer = null;
+let viewReadyTimer = null;
+let viewReadyToken = 0;
 let lastSubmittedRequestId = null;
 let lastRegisterEmail = "test@test.ru";
 let lastForgotEmail = "test@test.ru";
@@ -206,6 +208,31 @@ function normalizeViewTarget(view) {
   return { view, authMode };
 }
 
+function cancelViewReady() {
+  viewReadyToken += 1;
+  window.clearTimeout(viewReadyTimer);
+}
+
+function scheduleViewReady(after) {
+  const token = viewReadyToken + 1;
+  viewReadyToken = token;
+  window.clearTimeout(viewReadyTimer);
+  const finish = () => {
+    if (token !== viewReadyToken) {
+      return;
+    }
+    window.clearTimeout(viewReadyTimer);
+    applyTypography(app);
+    updateAuthStageHeight();
+    app.classList.add("is-view-ready");
+    if (typeof after === "function") {
+      after();
+    }
+  };
+  requestAnimationFrame(finish);
+  viewReadyTimer = window.setTimeout(finish, 80);
+}
+
 function completeViewSwitch(view, authMode, after) {
   app.dataset.view = view;
   app.classList.remove("is-view-leaving");
@@ -213,14 +240,7 @@ function completeViewSwitch(view, authMode, after) {
   if (authMode) {
     setAuthMode(authMode);
   }
-  requestAnimationFrame(() => {
-    applyTypography(app);
-    updateAuthStageHeight();
-    app.classList.add("is-view-ready");
-    if (typeof after === "function") {
-      after();
-    }
-  });
+  scheduleViewReady(after);
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -229,6 +249,7 @@ function setView(nextView, options = {}) {
   const { view, authMode } = normalizeViewTarget(nextView);
   const sameView = app.dataset.view === view;
   window.clearTimeout(viewSwitchTimer);
+  cancelViewReady();
   closeDrawer(false);
   closeColumnMenus();
   closeDatePicker();
@@ -238,14 +259,7 @@ function setView(nextView, options = {}) {
     if (authMode) {
       setAuthMode(authMode);
     }
-    requestAnimationFrame(() => {
-      applyTypography(app);
-      updateAuthStageHeight();
-      app.classList.add("is-view-ready");
-      if (typeof settings.after === "function") {
-        settings.after();
-      }
-    });
+    scheduleViewReady(settings.after);
     return;
   }
 
