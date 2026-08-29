@@ -3,225 +3,323 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#071b2b">
   <title>Международная ассоциация товарных и фьючерсных бирж</title>
+  <link rel="icon" href="assets/images/logo-ace.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="stylesheet" href="assets/css/refinements.css">
-  <link rel="stylesheet" href="assets/css/enhancements.css">
-  <link rel="stylesheet" href="assets/css/motion.css">
-  <link rel="stylesheet" href="assets/css/motion-polish.css">
+  <link rel="stylesheet" href="assets/css/home-redesign.css?v=2026-08-29-2">
 </head>
 <body>
-  <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-    <div class="preloader__mark" aria-hidden="true">
-      <img src="assets/images/logo-ace.svg" alt="">
-    </div>
-    <span class="preloader__percent">0%</span>
-    <span class="preloader__track" aria-hidden="true"><span class="preloader__bar"></span></span>
-  </div>
-
   <svg class="svg-sprite" aria-hidden="true">
     <symbol id="icon-arrow" viewBox="0 0 24 24">
       <path d="M3.5 12H19M12.5 5.5L19 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
   </svg>
 
-  <main class="site-shell">
-    <section class="visual-stage" aria-labelledby="hero-title">
+  <main class="page">
+    <div class="visual-stage">
       <canvas class="visual-stage__dot-field" aria-hidden="true"></canvas>
 
-      <header class="site-header">
-        <div class="site-header__inner layout-container">
-          <a class="brand" href="#" aria-label="Международная ассоциация товарных и фьючерсных бирж">
-            <span class="brand__art" aria-hidden="true">
-              <img class="brand__ace" src="assets/images/logo-ace.svg" alt="">
-              <img class="brand__caption" src="assets/images/logo-caption.svg" alt="">
-            </span>
+      <header class="site-header" data-header>
+        <div class="container site-header__inner">
+          <a class="brand" href="#top" aria-label="Международная ассоциация товарных и фьючерсных бирж">
+            <img class="brand__ace" src="assets/images/logo-ace.svg" alt="">
+            <img class="brand__caption" src="assets/images/logo-caption.svg" alt="">
           </a>
-
-          <nav class="site-nav" id="site-navigation" aria-label="Навигация">
-            <a class="typo" href="#about">Об ассоциации</a>
-            <a class="typo" href="#media">Медиа</a>
-            <a class="typo" href="#management">Органы управления</a>
-            <a class="typo" href="#members">Члены ассоциации</a>
-            <a class="typo" href="#documents">Документы</a>
-            <a class="typo" href="#news">Новости</a>
-            <a class="typo" href="#join">Вступление</a>
-            <a class="typo" href="#contacts">Контакты</a>
+          <nav class="site-nav" id="site-navigation" data-nav aria-label="Навигация">
+            <a href="#about">Об Ассоциации</a>
+            <a href="#events">Ключевые события</a>
+            <a href="#governance">Органы управления</a>
+            <a href="#members">Члены Ассоциации</a>
+            <a href="#documents">Документы</a>
+            <a href="#news">Новости</a>
+            <a href="#contacts">Контакты</a>
           </nav>
-
-          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
-            <span class="menu-toggle__lines" aria-hidden="true"></span>
-          </button>
-
-          <a class="header-request" href="#trade-requests">
-            <span>Trade Requests</span>
-            <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
-          </a>
+          <div class="site-header__actions">
+            <span class="language"><b>RU</b><i>|</i><span>EN</span></span>
+            <a class="button button--header" href="bids-offers/">
+              <span>Bids &amp; Offers</span>
+              <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+            </a>
+            <button class="menu-toggle" type="button" data-menu aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
+              <span></span><span></span>
+            </button>
+          </div>
         </div>
       </header>
 
-      <section class="hero layout-container">
-        <div class="hero__content">
-          <h1 class="hero__title typo" id="hero-title">Международная ассоциация товарных и фьючерсных бирж</h1>
-
-          <div class="hero__copy">
-            <p class="hero__text typo">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
-            <a class="hero__request" id="trade-requests" href="#">
-              <span class="typo">Войти в Trade Requests</span>
+      <section class="hero section" id="top" aria-labelledby="hero-title">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <h1 class="title-xl" id="hero-title">Международная ассоциация товарных <br>и фьючерсных бирж</h1>
+            <p class="hero__lead">Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.</p>
+            <a class="button hero__button" href="#about">
+              <span>Подробнее об Ассоциации</span>
               <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
             </a>
           </div>
-        </div>
-
-        <div class="hero__visual">
-          <div class="hero__globe-shell">
-            <svg class="hero__globe-orbits hero__globe-orbits--back" viewBox="0 0 1000 1000" aria-hidden="true">
-              <path class="orbit__line orbit__line--back" d="M130 789A470 170 -38 0 1 870 211"/>
-              <path class="orbit__pulse-line orbit__pulse-line--back" d="M130 789A470 170 -38 0 1 870 211"/>
-            </svg>
-
-            <div class="hero__globe-canvas">
-              <canvas id="axe-globe" aria-label="Интерактивный глобус"></canvas>
+          <div class="hero__visual">
+            <div class="hero__globe-shell">
+              <svg class="hero__orbit hero__orbit--back" viewBox="0 0 1000 1000" aria-hidden="true"><path d="M130 789A470 170 -38 0 1 870 211"/></svg>
+              <div class="hero__globe-canvas"><canvas id="axe-globe" aria-label="Интерактивный глобус"></canvas></div>
+              <svg class="hero__orbit hero__orbit--front" viewBox="0 0 1000 1000" aria-hidden="true"><path d="M870 211A470 170 -38 0 1 130 789"/></svg>
             </div>
-
-            <svg class="hero__globe-orbits hero__globe-orbits--front" viewBox="0 0 1000 1000" aria-hidden="true">
-              <path class="orbit__line orbit__line--front" d="M870 211A470 170 -38 0 1 130 789"/>
-              <path class="orbit__pulse-line orbit__pulse-line--front" d="M870 211A470 170 -38 0 1 130 789"/>
-            </svg>
           </div>
         </div>
       </section>
 
-      <div class="content-lower layout-container">
-        <section class="metrics" aria-label="ЦИФРЫ">
-          <div class="metric-row">
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell metric-card metric-card--dark">
-              <strong>8</strong>
-              <span class="metric-label typo">бирж</span>
+      <section class="trade-promo section" id="trade-requests" aria-labelledby="trade-title">
+        <div class="container">
+          <article class="trade-card">
+            <div class="trade-card__content">
+              <h2 class="title-md" id="trade-title">Bids &amp; Offers</h2>
+              <ul class="trade-card__list">
+                <li>Подать/просмотреть заявки на межбиржевые сделки</li>
+                <li>Подача и просмотр заявок доступны только авторизованным представителям бирж-членов Ассоциации</li>
+                <li>Для выставления заявки обращайтесь на вашу национальную биржу, входящую в Ассоциацию</li>
+              </ul>
+              <a class="button button--light" href="bids-offers/">
+                <span>Открыть Bids &amp; Offers</span>
+                <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+              </a>
             </div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-          </div>
-
-          <div class="metric-row">
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell metric-card metric-card--teal">
-              <strong>7</strong>
-              <span class="metric-label typo">стран-участниц</span>
+            <div class="trade-card__media">
+              <img src="assets/images/figma-v4/trade-requests-earth.png" alt="">
             </div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-          </div>
-
-          <div class="metric-row">
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell metric-card metric-card--blue">
-              <strong><span class="metric-card__tilde">~</span>15</strong>
-              <span class="metric-label typo">стран рассматривают вступление</span>
-            </div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-            <div class="metric-cell" aria-hidden="true"></div>
-          </div>
-        </section>
-
-        <section class="about" id="about">
-          <div class="about__copy">
-            <h2 class="typo">Об ассоциации</h2>
-            <p class="typo">Международная ассоциация товарных и фьючерсных бирж создана на основании Декларации о намерении, подписанной на полях ПМЭФ-2025. Ассоциация служит ключевой площадкой для взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС.</p>
-            <a class="about__link" href="#">
-              <span class="typo">Читать полностью</span>
-              <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
-            </a>
-          </div>
-
-          <div class="about-grid" id="documents">
-            <div class="about-grid__cell" aria-hidden="true"></div>
-            <div class="about-grid__cell" aria-hidden="true"></div>
-            <div class="about-grid__cell" aria-hidden="true"></div>
-            <div class="about-grid__cell" aria-hidden="true"></div>
-            <div class="about-grid__cell" aria-hidden="true"></div>
-            <a class="document-card" href="#">
-              <img class="document-card__icon" src="assets/images/document-icon.svg" alt="" width="29" height="38">
-              <span class="document-card__title typo">Декларация о создании ассоциации</span>
-              <span class="document-card__footer">
-                <span class="document-card__meta typo">ДОКУМЕНТ | PDF</span>
-                <svg class="icon-arrow document-card__arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
-              </span>
-            </a>
-          </div>
-        </section>
-
-        <section class="directions" aria-label="Об ассоциации">
-          <article class="direction-card">
-            <div class="direction-card__body">
-              <div class="direction-card__copy">
-                <h3 class="typo">Межбиржевые линки</h3>
-                <p class="typo">Трансграничные технологические связи и взаимный допуск брокеров к торгам партнёрских бирж.</p>
-              </div>
-              <span class="direction-card__index">01</span>
-            </div>
-            <img class="direction-card__visual" src="assets/images/direction-links.png" alt="" width="417" height="150">
           </article>
+        </div>
+      </section>
 
-          <article class="direction-card">
-            <div class="direction-card__body">
-              <div class="direction-card__copy">
-                <h3 class="typo">Ценовое агентство</h3>
-                <p class="typo">Независимая система ценовых индикаторов по ключевым товарным группам.</p>
-              </div>
-              <span class="direction-card__index">02</span>
-            </div>
-            <img class="direction-card__visual" src="assets/images/direction-pricing.png" alt="" width="417" height="150">
-          </article>
+      <section class="association section content-lower" id="about" aria-labelledby="about-title">
+        <div class="container">
+          <div class="metric-mosaic" aria-label="ЦИФРЫ">
+            <div class="metric-tile metric-tile--image metric-tile--grain-a"></div>
+            <div class="metric-tile metric-tile--image metric-tile--grain-b"></div>
+            <div class="metric-tile metric-tile--number metric-tile--blue"><strong>8</strong><span>бирж</span></div>
+            <div class="metric-tile metric-tile--image metric-tile--grain-c"></div>
+            <div class="metric-tile metric-tile--image metric-tile--grain-d"></div>
+            <div class="metric-tile metric-tile--number metric-tile--red"><strong>100+</strong><b>млрд $</b><span>оборот торгов <br>на товарных рынках</span></div>
+            <div class="metric-tile metric-tile--image metric-tile--grain-e"></div>
+            <div class="metric-tile metric-tile--image metric-tile--grain-f"></div>
+            <a class="metric-tile metric-tile--link" href="#tasks"><span>Цели <br>и задачи</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+            <div class="metric-tile metric-tile--number metric-tile--teal"><strong>7</strong><span>стран-участниц</span></div>
+          </div>
 
-          <article class="direction-card">
-            <div class="direction-card__body">
-              <div class="direction-card__copy">
-                <h3 class="typo">Торговая платформа</h3>
-                <p class="typo">Единая цифровая платформа для проведения сделок и учёта контрагентов.</p>
-              </div>
-              <span class="direction-card__index">03</span>
+          <div class="association__body">
+            <div class="association__copy">
+              <h2 class="title-lg" id="about-title">Об ассоциации</h2>
+              <p>Международная ассоциация товарных и фьючерсных бирж создана для укрепления взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС. Это новая наднациональная площадка для выстраивания экономических мостов, которые соединят товарные потоки и рынки в интересах этих государств.</p>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-platform.png" alt="" width="417" height="150">
-          </article>
-        </section>
+            <div class="association-links" aria-label="Разделы об ассоциации">
+              <a href="#directions"><span>направления <br>деятельности</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+              <a href="#timeline"><span>этапы <br>развития</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+              <a href="#members"><span>участники <br>ассоциации</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="goal section" id="goal">
+        <div class="container goal__inner">
+          <p class="eyebrow">Наша цель</p>
+          <h2>Создание виртуальной торговой платформы, позволяющей связать биржи-члены Ассоциации в единую цифровую систему и существенно увеличить объемы трансграничной торговли.</h2>
+        </div>
+      </section>
+    </div>
+
+    <section class="tasks section section--light" id="tasks" aria-labelledby="tasks-title">
+      <div class="container task-board">
+        <article class="task-card task-card--title"><h2 class="title-lg" id="tasks-title">Наши <br>задачи</h2></article>
+        <article class="task-card"><span>01</span><p>Развивать межбиржевое взаимодействие и прямые торговые связей</p></article>
+        <article class="task-card task-card--accent"><span>02</span><p>Внедрять принципы недискриминационной торговли, развивать организованные товарные рынки на основе лучших практик</p></article>
+        <article class="task-card task-card--accent"><span>03</span><p>Содействовать гармонизации регламентов, стандартов и правил допуска к торгам</p></article>
+        <article class="task-card"><span>04</span><p>Содействовать формированию репрезентативных международных товарных индикаторов и бенчмарков на ключевые товарные группы</p></article>
+        <article class="task-card"><span>05</span><p>Создать единое коммуникационное пространство для практического взаимодействия профессиональных участников</p></article>
+        <article class="task-card"><span>06</span><p>Защищать общие интересы участников и представлять их на международном уровне</p></article>
+        <article class="task-card task-card--brand"><span class="brand brand--card"><img class="brand__ace" src="assets/images/logo-ace.svg" alt=""><img class="brand__caption" src="assets/images/logo-caption.svg" alt=""></span></article>
       </div>
     </section>
 
-    <section class="countries" id="members" aria-labelledby="countries-title">
-      <div class="countries__inner layout-container">
-        <h2 class="typo" id="countries-title">Страны—участники</h2>
-        <div class="countries__grid">
-          <div class="country"><img src="assets/images/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
-          <div class="country"><img src="assets/images/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
-          <div class="country"><img src="assets/images/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
-          <div class="country"><img src="assets/images/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
-          <div class="country"><img src="assets/images/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
-          <div class="country"><img src="assets/images/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
-          <div class="country"><img src="assets/images/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
+    <section class="directions section section--light" id="directions" aria-labelledby="directions-title">
+      <div class="container">
+        <h2 class="title-lg section-title" id="directions-title">Направления деятельности</h2>
+        <div class="direction-list">
+          <article class="direction-card direction-card--featured"><p>Межбиржевое сотрудничество с зарубежными партнерами, включая развитие трансграничной биржевой торговли</p><span>01</span></article>
+          <article class="direction-card"><p>Формирование совместных продуктов и услуг</p><span>02</span></article>
+          <article class="direction-card"><p>Гармонизация регулирования и устранение барьеров</p><span>03</span></article>
+          <article class="direction-card"><p>Создание базы для формирования ценовых показателей</p><span>04</span></article>
+          <article class="direction-card"><p>Защита интересов участников и экспертная деятельность</p><span>05</span></article>
         </div>
+      </div>
+    </section>
+
+    <section class="timeline section section--light" id="timeline" aria-labelledby="timeline-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="title-lg section-title" id="timeline-title">Этапы развития</h2>
+          <div class="slider-controls"><button type="button" data-scroll-prev="timeline-track" aria-label="Предыдущий этап"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button><button type="button" data-scroll-next="timeline-track" aria-label="Следующий этап"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+        </div>
+        <div class="horizontal-scroll" id="timeline-track">
+          <article class="timeline-card"><time><b>2025</b><span>Май</span></time><p>Петербургская Биржа выступила с инициативой создания Международной ассоциации товарных и фьючерсных бирж.</p></article>
+          <article class="timeline-card"><time><b>2025</b><span>Июнь</span></time><p>Декларации о создании Ассоциации подписана на ПМЭФ-2025 в Санкт-Петербурге, намерение присоединиться к Ассоциации выразили 7 стран: Россия, Индия, Иран, Китай, Беларусь, Узбекистан, Казахстан.</p></article>
+          <article class="timeline-card"><time><b>2026</b><span>Январь</span></time><p>Учреждение Ассоциации</p></article>
+          <article class="timeline-card"><time><b>2026</b><span>Февраль</span></time><p>Ассоциация официально зарегистрирована</p></article>
+          <article class="timeline-card"><time><b>2026</b><span>Март</span></time><p>Состоялась регистрация Ассоциации, прошло первое заседание. Египетская товарная биржа принята в Ассоциацию</p></article>
+          <article class="timeline-card"><time><b>2026</b><span>Июль</span></time><p>Началась разработка стратегии. В ассоциацию принята Иранская энергетическая биржа (IEE). Общее число участников — 8 бирж из 7 стран. Заинтересованность в участии в Ассоциации выразили товарные биржи Турции, Зимбабве, Танзании.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="countries-map section" id="countries" aria-labelledby="countries-title">
+      <div class="container">
+        <p class="eyebrow" id="countries-title">Страны—участники</p>
+      </div>
+      <div class="countries-map__stage">
+        <div class="container countries-map__inner">
+          <div class="country-list" aria-label="Страны—участники">
+            <article><b>РОССИЯ</b><span>АО «Санкт-Петербургская Международная Товарно-сырьевая Биржа» (Петербургская Биржа)</span></article>
+            <article><b>Беларусь</b><span>Белорусская универсальная товарная биржа (БУТБ)</span></article>
+            <article><b>Казахстан</b><span>АО «Товарная биржа „Евразийская торговая система“ (ЕТС)</span></article>
+            <article><b>Узбекистан</b><span>Узбекская республиканская товарно-сырьевая биржа (UzEx)</span></article>
+            <article><b>Египет</b><span>Egyptian Mercantile Exchange (EMX)</span></article>
+          <article><b>ИРАН</b><span>Иранская товарная биржа (Iran Mercantile Exchange, IME) <br>Иранская энергетическая биржа (Iran Energy Exchange, IRENEX)</span></article>
+            <article><b>КИТАЙ</b><span>Синьцзянский Азиатско-Европейский международный центр торговли материалами</span></article>
+          </div>
+          <img class="countries-map__image" src="assets/images/figma-v4/countries-map.png" alt="">
+        </div>
+      </div>
+    </section>
+
+    <section class="events section" id="events" aria-labelledby="events-title">
+      <div class="container">
+        <div class="section-head section-head--dark">
+          <h2 class="title-lg section-title" id="events-title">Ключевые события</h2>
+          <div class="slider-controls slider-controls--dark"><button type="button" disabled aria-label="Предыдущее событие"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button><button type="button" disabled aria-label="Следующее событие"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+        </div>
+        <article class="event-card">
+          <img src="assets/images/figma-v4/key-event.png" alt="">
+          <div class="event-card__overlay">
+            <time>03.04.2026</time>
+            <h3>Заголовок ключевого события</h3>
+            <p>Краткое описание ключевого события. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis,</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="quotes section" aria-labelledby="quotes-title">
+      <div class="container">
+        <div class="section-head section-head--dark">
+          <p class="eyebrow" id="quotes-title">Лидеры бирж — о целях Ассоциации</p>
+          <div class="slider-controls slider-controls--dark"><button type="button" data-scroll-prev="quotes-track" aria-label="Предыдущая цитата"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button><button type="button" data-scroll-next="quotes-track" aria-label="Следующая цитата"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+        </div>
+        <div class="horizontal-scroll quote-track" id="quotes-track">
+          <blockquote class="quote-card"><p>Главной задачей Ассоциации является формирование основ новой системы международной торговли, которая, в первую очередь, будет недискриминационной, - отметил Игорь Артемьев. - Участники организации и клиенты наших бирж должны иметь доступ к полной информации о товарах, что значительно упростит проведение сделок</p><footer><img src="assets/images/figma-v4/quote-igor.png" alt=""><div><b>Игорь Артемьев</b><span>Президент Петербургской Биржи</span></div></footer></blockquote>
+          <blockquote class="quote-card"><p>Эффективность работы реального сектора экономики и реализация экспортного потенциала белорусских предприятий всегда имели приоритетное значение для БУТБ. Поэтому подписание меморандума – это, прежде всего, новые возможности для участников биржевых торгов из Республики Беларусь. Устранение торговых барьеров, упрощенный доступ к перспективным рынкам, расширение круга деловых партнеров, дополнительные торговые и маркетинговые инструменты – вот что получат наши клиенты благодаря созданию нового межбиржевого объединения, которым планируется охватить страны ЕАЭС+, ШОС и БРИКС+. Иными словами, для нас это не просто декларация о намерениях, а стратегическое решение, направленное на достижение конкретных результатов, главными бенефициарами которых станут белорусские субъекты хозяйствования</p><footer><img src="assets/images/figma-v4/quote-alexander.png" alt=""><div><b>Александр Осмоловский</b><span>Председатель правления Белорусской универсальной товарной биржи</span></div></footer></blockquote>
+          <blockquote class="quote-card"><p>Казахстан, являясь экспортно ориентированной страной, придает большое значение выстраиванию эффективного взаимодействия с организаторами торговли физическими товарами. Это особенно важно, поскольку балансы как глобальных, так и региональных рынков зависят от казахстанской продукции — в первую очередь сельскохозяйственной, зерновых культур и нефтепродуктов. Как и многие страны в регионе, мы в Казахстане, как товарная биржа, стремимся расширять географию поставок и развивать торгово-экономические связи со странами дальнего зарубежья с целью выстраивания общих рынков</p><footer><img src="assets/images/figma-v4/quote-kazakhstan.png" alt=""><div><b>Игорь Артемьев</b><span>Президент Петербургской Биржи</span></div></footer></blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="governance section" id="governance" aria-labelledby="governance-title">
+      <div class="container governance__inner">
+        <div class="governance__copy">
+          <h2 class="title-lg" id="governance-title">Органы управления</h2>
+          <p>Общее собрание членов – высший орган управления, определяющий стратегию Ассоциации. Созывается не реже одного раза в год. Совет Ассоциации обеспечивает текущее руководство между собраниями и координирует профильные рабочие группы. Главный исполнительный орган – председатель Совета Ассоциации.</p>
+        </div>
+        <div class="person-list">
+          <article class="person-card"><img src="assets/images/figma-v4/igor-artemyev.png" alt=""><div><h3>Игорь Артемьев</h3><p>Председатель <br>Совета</p><span>избирается сроком на 2 года</span></div></article>
+          <article class="person-card"><img src="assets/images/figma-v4/samir-dadashov.png" alt=""><div><h3>Самир Дадашов</h3><p>Исполнительный директор</p><span>избирается сроком на 2 года</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="members section" id="members" aria-labelledby="members-title">
+      <div class="container">
+        <h2 class="title-lg section-title" id="members-title">Члены ассоциации</h2>
+        <div class="member-list">
+          <article class="member-card"><img src="assets/images/figma-v4/member-butb.png" alt=""><h3>Белорусская универсальная товарная биржа (БУТБ)</h3><p>БУТБ — крупнейшая спотовая биржа Восточной Европы</p><div class="member-meta"><span>Страна: Беларусь</span><span>Город: Минск</span><span>Год основания: 2004</span></div><p class="member-sections">Секции: металлопродукция, лесопродукция, сельскохозяйственная продукция, промышленные и строительные материалы, химическая и полимерная продукция</p><a href="https://butb.by">butb.by</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-emx.png" alt=""><h3>Egyptian Mercantile Exchange (EMX)</h3><p>Первые торги на египетской бирже стартовали с российской пшеницы</p><div class="member-meta"><span>Страна: Египет</span><span>Город: Каир</span><span>Год основания: 2020</span></div><p class="member-sections">Секции: сельскохозяйственная продукция</p><a href="https://emx.com.eg">emx.com.eg</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-ime.png" alt=""><h3>Иранская товарная биржа (Iran Mercantile Exchange, IME)</h3><p>IME — одна из четырёх крупнейших бирж на иранском рынке</p><div class="member-meta"><span>Страна: Иран</span><span>Город: Тегеран</span><span>Год основания: 2007</span></div><p class="member-sections">Секции: сельскохозяйственная продукция, металлы, нефтехимическая продукция</p><a href="https://ime.co.ir">ime.co.ir</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-irenex.png" alt=""><h3>Иранская энергетическая биржа (Iran Energy Exchange, IRENEX)</h3><p>Биржа работает на нескольких сегментах: помимо спот-сделок, там есть и производные инструменты</p><div class="member-meta"><span>Страна: Иран</span><span>Город: Тегеран</span><span>Год основания: 2012</span></div><p class="member-sections">Специализация: сырая нефть и газовый конденсат; нефтепродукты и нефтехимия; природный газ, электроэнергия</p><a href="https://newsite.iee.ir">newsite.iee.ir</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-ets.png" alt=""><h3>АО «Товарная биржа „Евразийская торговая система“ (ЕТС)</h3><p>ЕТС — лидер по обороту среди биржевых площадок страны</p><div class="member-meta"><span>Страна: Казахстан</span><span>Город: Алматы</span><span>Год основания: 2008</span></div><p class="member-sections">Секции: сельскохозяйственная продукция, нефтепродукты, металлы, промышленные и специализированные товары</p><a href="https://ets.kz">ets.kz</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-xinjiang.png" alt=""><h3>Синьцзянский Азиатско-Европейский международный центр торговли материалами</h3><p>Международный центр оказывает комплексные услуги: помогает с логистикой, подключает финансовые институты и организует деловые мероприятия</p><div class="member-meta"><span>Страна: Китай</span><span>Город: Куйтунь (провинция Синьцзян)</span><span>Год основания: 2010</span></div><p class="member-sections">Секции: промышленное сырьё и сельскохозяйственная продукция</p><a href="https://home.xjyo.net">home.xjyo.net</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-spimex.png" alt=""><h3>АО «Санкт-Петербургская Международная Товарно-сырьевая Биржа» (Петербургская Биржа)</h3><p>Петербургская Биржа — первая биржа в России</p><div class="member-meta"><span>Страна: Россия</span><span>Город: Москва</span><span>Год основания: 1703</span></div><p class="member-sections">Секции: нефтепродукты, нефть, газ, уголь, лесоматериалы, удобрения, сельскохозяйственная продукция, металлы</p><a href="https://spimex.com">spimex.com</a></article>
+          <article class="member-card"><img src="assets/images/figma-v4/member-uzex.png" alt=""><h3>Узбекская республиканская товарно-сырьевая биржа (UzEx)</h3><p>UzEx — одна из старейших товарных бирж в СНГ</p><div class="member-meta"><span>Страна: Узбекистан</span><span>Город: Ташкент</span><span>Год основания: 1994</span></div><p class="member-sections">Секции: металлы, нефтепродукты, хлопковое волокно, удобрения, сельскохозяйственная продукция, строительные материалы, химическая продукция</p><a href="https://uzex.uz">uzex.uz</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="documents section" id="documents" aria-labelledby="documents-title">
+      <div class="container">
+        <p class="eyebrow" id="documents-title">Документы</p>
+        <div class="document-list">
+          <a class="document-card" href="#"><h3>Устав ассоциации</h3><span>Скачать документ <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+          <a class="document-card" href="#"><h3>Декларация <br>о создании ассоциации</h3><span>Скачать документ <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+          <a class="document-card" href="#"><h3>Регламент подачи заявок в Trade Requests</h3><span>Скачать документ <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="news section" id="news" aria-labelledby="news-title">
+      <div class="container">
+        <div class="section-head section-head--dark">
+          <h2 class="title-lg section-title" id="news-title">Новости</h2>
+          <div class="slider-controls slider-controls--dark"><button type="button" data-scroll-prev="news-track" aria-label="Предыдущая новость"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button><button type="button" data-scroll-next="news-track" aria-label="Следующая новость"><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+        </div>
+        <div class="news-list horizontal-scroll" id="news-track">
+          <article class="news-card"><img src="assets/images/figma-v4/news-2026.png" alt=""><div><time>21.07.2026</time><h3>Ассоциация товарных и фьючерсных бирж приступила к разработке глобальной стратегии международной торговли</h3><a href="#">Читать <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a></div></article>
+          <article class="news-card"><img src="assets/images/figma-v4/news-2025-actions.png" alt=""><div><time>25.11.2025</time><h3>От деклараций к действиям: Международная ассоциация товарных и фьючерсных бирж начнет работу до конца 2025 года</h3><a href="#">Читать <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a></div></article>
+          <article class="news-card"><img src="assets/images/figma-v4/news-pmef.png" alt=""><div><time>19.06.2025</time><h3>Товарные биржи договорились о создании Международной ассоциации товарных и фьючерсных бирж – ПМЭФ-2025</h3><a href="#">Читать <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="join section" id="join" aria-labelledby="join-title">
+      <div class="container">
+        <article class="join-card">
+          <div>
+            <h2 class="title-lg" id="join-title">Вступление <br>в ассоциацию</h2>
+            <p>Развитие и прочные связи членов Ассоциации приведет к общим сдвигам на основании поддержки экономики не менее многочисленных дружных государств.</p>
+            <p>Заполненная заявочная информация направить на электронную почту association@spimex.com.</p>
+          </div>
+          <a class="join-card__document" href="#"><span>Заявление о намерении вступить в члены Ассоциации</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="contacts section" id="contacts" aria-labelledby="contacts-title">
+      <div class="container">
+        <h2 class="title-lg section-title" id="contacts-title">Связаться с Ассоциацией</h2>
+        <form class="feedback-form" data-feedback>
+          <h3>Форма обратной связи</h3>
+          <div class="feedback-form__row">
+            <label>Ваше имя*<input name="name" required></label>
+            <label>E-mail*<input type="email" name="email" required></label>
+          </div>
+          <label>Организация*<input name="company" required></label>
+          <label>Сообщение*<textarea name="message" required></textarea></label>
+          <label class="file-control"><input type="file" name="file"><span>Прикрепить файл</span></label>
+          <button class="button" type="submit">Отправить <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+        </form>
       </div>
     </section>
   </main>
 
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="brand brand--footer"><img class="brand__ace" src="assets/images/logo-ace.svg" alt=""><img class="brand__caption" src="assets/images/logo-caption.svg" alt=""></span>
+      <p>International Association of Commodity and Futures Exchanges © 2026</p>
+      <nav><a href="#documents">Документы</a><a href="#contacts">Контакты</a></nav>
+    </div>
+  </footer>
+
   <script src="assets/js/typograph.js"></script>
-  <script src="assets/js/navigation.js"></script>
-  <script src="assets/js/preloader.js"></script>
-  <script src="assets/js/smooth-scroll.js"></script>
-  <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>
+  <script src="assets/js/home-redesign.js?v=2026-08-29-2"></script>
 </body>
 </html>
