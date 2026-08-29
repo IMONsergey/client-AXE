@@ -574,9 +574,10 @@ function openDrawer(id) {
   drawer.hidden = false;
   drawerBackdrop.hidden = false;
   drawer.setAttribute("aria-hidden", "false");
+  drawer.getBoundingClientRect();
+  document.body.classList.add("is-drawer-open");
+  app.classList.add("is-drawer-open");
   requestAnimationFrame(() => {
-    document.body.classList.add("is-drawer-open");
-    app.classList.add("is-drawer-open");
     drawer.querySelector("[data-close-drawer]").focus({ preventScroll: true });
   });
 }
