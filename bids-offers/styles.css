@@ -528,9 +528,14 @@ button {
   justify-self: center;
 }
 
-.bo-requests-view,
-.bo-form-view {
+.bo-requests-view {
   width: min(1760px, calc(100vw - 112px));
+  margin: 0 auto;
+  padding: 34px 0 82px;
+}
+
+.bo-form-view {
+  width: min(1240px, calc(100vw - 112px));
   margin: 0 auto;
   padding: 34px 0 82px;
 }
