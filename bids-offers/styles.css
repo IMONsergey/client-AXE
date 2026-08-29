@@ -777,12 +777,15 @@ button {
   height: 48px;
   min-width: 0;
   position: relative;
+  display: flex;
+  align-items: center;
   padding: 0;
   background: var(--bo-ink);
   border-right: 1px solid rgba(255, 255, 255, .025);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.2;
   text-align: left;
 }
 
@@ -791,18 +794,26 @@ button {
 }
 
 .bo-table th:not(:has(.bo-th-control)) {
-  padding: 12px;
+  padding: 0 12px;
+}
+
+.bo-table th > span,
+.bo-th-control span {
+  display: flex;
+  align-items: center;
+  min-height: 16px;
+  white-space: nowrap;
 }
 
 .bo-th-control {
   width: 100%;
-  height: 48px;
+  height: 100%;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px;
+  padding: 0 12px;
   border: 0;
   border-radius: 0;
   appearance: none;
@@ -811,6 +822,7 @@ button {
   outline: 0;
   text-align: left;
   font: inherit;
+  line-height: inherit;
 }
 
 .bo-th-control:hover {
