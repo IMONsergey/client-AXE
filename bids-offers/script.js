@@ -13,6 +13,11 @@ const drawerBackdrop = document.querySelector(".bo-drawer-backdrop");
 const drawerClosers = document.querySelectorAll("[data-close-drawer]");
 const successModal = document.querySelector("[data-success-modal]");
 const successClosers = document.querySelectorAll("[data-close-success]");
+const confirmEmail = document.querySelector("[data-confirm-email]");
+const resetEmail = document.querySelector("[data-reset-email]");
+const dateInput = document.querySelector("[data-date-input]");
+const datePicker = document.querySelector("[data-date-picker]");
+const dateToggle = document.querySelector("[data-date-toggle]");
 const sortButtons = document.querySelectorAll("[data-sort-key]");
 const columnFilterButtons = document.querySelectorAll("[data-column-filter]");
 const columnFilterValueButtons = document.querySelectorAll("[data-column-filter-value]");
@@ -46,6 +51,8 @@ let sortState = {
 
 let authSwitchTimer = null;
 let lastSubmittedRequestId = null;
+let lastRegisterEmail = "test@test.ru";
+let lastForgotEmail = "test@test.ru";
 
 let requests = [
   {
@@ -61,6 +68,94 @@ let requests = [
     status: "Активна",
     flag: "assets/russia-flag.png",
     logo: "assets/spimex-logo.png",
+  },
+  {
+    id: "uzrtsb-cotton-2026",
+    date: "28.08.2026",
+    type: "Покупка",
+    participant: "УзРТСБ (Узбекистан)",
+    product: "Хлопок-волокно",
+    volume: "300 т",
+    price: "1450 USD/т, аккредитив",
+    delivery: "FCA, склад продавца",
+    status: "Активна",
+  },
+  {
+    id: "butb-sugar-2026",
+    date: "26.08.2026",
+    type: "Продажа",
+    participant: "Белорусская универсальная товарная биржа",
+    product: "Сахар белый",
+    volume: "1000 т",
+    price: "650 USD/т, предоплата 20%",
+    delivery: "DAP, Минск",
+    status: "Активна",
+  },
+  {
+    id: "ime-polyethylene-2026",
+    date: "24.08.2026",
+    type: "Покупка",
+    participant: "Iran Mercantile Exchange",
+    product: "Полиэтилен высокой плотности",
+    volume: "500 т",
+    price: "по договорённости, USD",
+    delivery: "FOB, порт Бендер-Аббас",
+    status: "Исполнена",
+  },
+  {
+    id: "egypt-corn-2026",
+    date: "22.08.2026",
+    type: "Продажа",
+    participant: "Egyptian Mercantile Exchange",
+    product: "Кукуруза фуражная",
+    volume: "2500 т",
+    price: "210 USD/т, постоплата 7 дней",
+    delivery: "CIF, порт Александрия",
+    status: "Активна",
+  },
+  {
+    id: "dce-soy-2026",
+    date: "20.08.2026",
+    type: "Покупка",
+    participant: "Dalian Commodity Exchange",
+    product: "Соя",
+    volume: "4000 т",
+    price: "Цена обсуждается после подтверждения качества.",
+    delivery: "CFR, порт Циндао",
+    status: "Отменена",
+  },
+  {
+    id: "etc-barley-2026",
+    date: "15.08.2026",
+    type: "Продажа",
+    participant: "ETC (Казахстан)",
+    product: "Ячмень кормовой",
+    volume: "1800 т",
+    price: "185 USD/т, предоплата 50%",
+    delivery: "FOB, порт Актау",
+    status: "Активна",
+  },
+  {
+    id: "butb-roundwood-2026",
+    date: "12.08.2026",
+    type: "Покупка",
+    participant: "БУТБ (Беларусь)",
+    product: "Лесоматериалы круглые",
+    volume: "600 куб. м",
+    price: "по договорённости, BYN/USD",
+    delivery: "Самовывоз со склада продавца",
+    status: "Исполнена",
+  },
+  {
+    id: "ncdex-sesame-2026",
+    date: "08.08.2026",
+    type: "Продажа",
+    participant: "NCDEX (Индия)",
+    product: "Кунжут",
+    volume: "350 т",
+    price: "1250 USD/т, предоплата 30%",
+    delivery: "FOB, порт Мумбаи",
+    status: "Активна",
   },
   {
     id: "etc-metal-2026",
@@ -154,6 +249,18 @@ function applyTypography(root) {
   nodes.forEach((node) => {
     node.nodeValue = typographText(node.nodeValue);
   });
+}
+
+function setDynamicEmail(target, value) {
+  const email = String(value || "").trim() || "test@test.ru";
+  if (target === "confirm" && confirmEmail) {
+    lastRegisterEmail = email;
+    confirmEmail.textContent = email;
+  }
+  if (target === "reset" && resetEmail) {
+    lastForgotEmail = email;
+    resetEmail.textContent = email;
+  }
 }
 
 function getActiveAuthPane() {
@@ -253,6 +360,26 @@ function parseDate(value) {
   return new Date(Number(year), Number(month) - 1, Number(day)).getTime();
 }
 
+function isValidDateString(value) {
+  const match = String(value || "").match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!match) {
+    return false;
+  }
+  const [, day, month, year] = match.map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year
+    && date.getMonth() === month - 1
+    && date.getDate() === day;
+}
+
+function formatDateInput(value) {
+  return String(value || "")
+    .replace(/\D/g, "")
+    .slice(0, 8)
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{2})(\d)/, "$1.$2.$3");
+}
+
 function parseNumber(value) {
   const match = String(value || "").replace(",", ".").match(/\d+(\.\d+)?/);
   return match ? Number(match[0]) : null;
@@ -309,6 +436,21 @@ function matchesFilters(request) {
 
 function renderRequests() {
   const filtered = sortRequests(requests.filter(matchesFilters));
+  if (!filtered.length) {
+    requestsBody.innerHTML = `
+      <tr class="bo-empty-row">
+        <td colspan="8">
+          <div class="bo-empty-state">
+            <strong>По выбранным фильтрам заявок нет.</strong>
+            <span>Измените параметры поиска или выберите другой статус.</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    syncControlState();
+    applyTypography(requestsBody);
+    return;
+  }
   requestsBody.innerHTML = filtered.map((request, index) => `
     <tr data-request-id="${escapeHtml(request.id)}" tabindex="0" style="--row-index: ${index}" aria-label="${escapeHtml(request.type)} ${escapeHtml(request.product)}">
       <td>${escapeHtml(request.date)}</td>
@@ -322,6 +464,7 @@ function renderRequests() {
     </tr>
   `).join("");
   syncControlState();
+  applyTypography(requestsBody);
 }
 
 function getRequestById(id) {
@@ -452,6 +595,9 @@ function getFieldErrorMessage(field) {
   if (field.pattern && value && !new RegExp(`^(?:${field.pattern})$`).test(value)) {
     return field.dataset.errorPattern || "Заполните обязательное поле.";
   }
+  if (field.dataset.dateInput !== undefined && value && !isValidDateString(value)) {
+    return field.dataset.errorPattern || "Укажите дату в формате дд.мм.гггг.";
+  }
   if (field.dataset.match) {
     const matchedField = field.form.elements[field.dataset.match];
     if (matchedField && value && value !== matchedField.value) {
@@ -562,6 +708,68 @@ function toggleColumnMenu(button) {
   });
 }
 
+function closeDatePicker() {
+  if (datePicker) {
+    datePicker.hidden = true;
+  }
+}
+
+function openDatePicker() {
+  if (!datePicker) {
+    return;
+  }
+  closeColumnMenus();
+  datePicker.hidden = false;
+}
+
+function selectDate(value) {
+  if (!dateInput) {
+    return;
+  }
+  dateInput.value = value;
+  validateField(dateInput);
+  closeDatePicker();
+  dateInput.focus({ preventScroll: true });
+}
+
+function buildDatePicker() {
+  if (!datePicker) {
+    return;
+  }
+  const days = Array.from({ length: 31 }, (_, index) => index + 1);
+  datePicker.innerHTML = `
+    <div class="bo-date-picker__head">Август 2026</div>
+    <div class="bo-date-picker__week" aria-hidden="true">
+      <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+    </div>
+    <div class="bo-date-picker__grid">
+      ${Array.from({ length: 5 }, () => "<span></span>").join("")}
+      ${days.map((day) => {
+        const date = `${String(day).padStart(2, "0")}.08.2026`;
+        return `<button type="button" data-date-value="${date}">${day}</button>`;
+      }).join("")}
+    </div>
+  `;
+  datePicker.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-date-value]");
+    if (button) {
+      selectDate(button.dataset.dateValue);
+    }
+  });
+}
+
+function syncTopFilters() {
+  [...filters.elements].forEach((field) => {
+    if (!field.name) {
+      return;
+    }
+    const label = field.closest("label");
+    if (label) {
+      label.classList.toggle("is-active-filter", Boolean(String(field.value || "").trim()));
+    }
+  });
+}
+
 function syncControlState() {
   sortButtons.forEach((button) => {
     const th = button.closest("th");
@@ -575,6 +783,13 @@ function syncControlState() {
     const value = filters.elements[menu.dataset.columnMenu].value;
     button.classList.toggle("is-active", button.dataset.columnFilterValue === value);
   });
+
+  columnFilterButtons.forEach((button) => {
+    const value = filters.elements[button.dataset.columnFilter].value;
+    button.classList.toggle("is-filtered", Boolean(value));
+  });
+
+  syncTopFilters();
 }
 
 viewButtons.forEach((button) => {
@@ -600,12 +815,21 @@ forms.forEach((form) => {
       openSuccessModal(request.id);
       return;
     }
+    if (form.dataset.nextView === "confirm") {
+      setDynamicEmail("confirm", form.elements.email.value);
+    }
+    if (form.dataset.nextView === "reset") {
+      setDynamicEmail("reset", form.elements.email.value);
+    }
     setView(form.dataset.nextView);
   });
 
   form.addEventListener("input", (event) => {
     if (!event.target.matches("input, select, textarea")) {
       return;
+    }
+    if (event.target.dataset.dateInput !== undefined) {
+      event.target.value = formatDateInput(event.target.value);
     }
     validateField(event.target);
     if (event.target.name === "password") {
@@ -625,6 +849,22 @@ forms.forEach((form) => {
 
 filters.addEventListener("input", renderRequests);
 filters.addEventListener("change", renderRequests);
+
+if (dateInput) {
+  dateInput.addEventListener("focus", openDatePicker);
+}
+
+if (dateToggle) {
+  dateToggle.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (datePicker && datePicker.hidden) {
+      openDatePicker();
+    } else {
+      closeDatePicker();
+    }
+  });
+}
 
 sortButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -658,7 +898,12 @@ columnFilterValueButtons.forEach((button) => {
   });
 });
 
-document.addEventListener("click", closeColumnMenus);
+document.addEventListener("click", (event) => {
+  closeColumnMenus();
+  if (datePicker && !event.target.closest("[data-date-field]")) {
+    closeDatePicker();
+  }
+});
 
 requestsBody.addEventListener("click", (event) => {
   const row = event.target.closest("[data-request-id]");
@@ -691,11 +936,15 @@ document.addEventListener("keydown", (event) => {
     closeSuccessModal();
     closeDrawer();
     closeColumnMenus();
+    closeDatePicker();
   }
 });
 
-renderRequests();
 prepareValidationSlots();
+buildDatePicker();
+setDynamicEmail("confirm", lastRegisterEmail);
+setDynamicEmail("reset", lastForgotEmail);
+renderRequests();
 setAuthMode("login", true);
 applyTypography(app);
 app.classList.add("is-view-ready");

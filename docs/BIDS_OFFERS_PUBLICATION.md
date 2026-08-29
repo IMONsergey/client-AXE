@@ -17,9 +17,14 @@ Implemented screens:
 Implemented behavior:
 
 - login, registration, confirmation, password reset, list, drawer, and form views are routed client-side;
+- email confirmation and password reset confirmation use the email entered by the user in the current demo flow;
 - table rows are rendered from a request dataset and all rows open the details drawer;
+- the table includes an empty state when selected filters return no requests;
 - filters work together by type, participant, product, delivery terms, and status;
+- active filters are highlighted both in the filter panel and in table column filter icons;
+- the request dataset includes twelve demo requests for sorting and filtering checks;
 - the new request form validates required fields, creates a request in the current browser session, prepends it to the table, and opens its details drawer;
+- the request date field validates real `дд.мм.гггг` dates and includes a compact demo calendar picker;
 - focus, hover, view transitions, row entrance, and drawer transitions are implemented with reduced-motion support.
 
 Publication target: GitHub Pages subpath `/client-AXE/bids-offers/`.

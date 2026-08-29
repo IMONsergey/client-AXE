@@ -89,7 +89,7 @@
     <section class="bo-view bo-auth-view" data-view-panel="confirm" aria-labelledby="confirm-title">
       <div class="bo-message-card">
         <h1 id="confirm-title">Подтверждение email</h1>
-        <p>Подтвердите ваш адрес электронной почты, нажав на ссылку, которую мы отправили на test@test.ru</p>
+        <p>Подтвердите ваш адрес электронной почты, нажав на ссылку, которую мы отправили на <span class="bo-email-accent" data-confirm-email>test@test.ru</span></p>
         <button class="bo-primary" type="button" data-view-target="requests">Продолжить</button>
       </div>
     </section>
@@ -104,7 +104,10 @@
             <input id="forgot-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="forgot-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
             <span class="bo-field__error" id="forgot-email-error" aria-live="polite" hidden></span>
           </label>
-          <button class="bo-primary" type="submit">Подтвердить</button>
+          <div class="bo-auth-actions">
+            <button class="bo-secondary" type="button" data-view-target="login">Назад</button>
+            <button class="bo-primary" type="submit">Подтвердить</button>
+          </div>
         </form>
       </div>
     </section>
@@ -112,7 +115,7 @@
     <section class="bo-view bo-auth-view" data-view-panel="reset" aria-labelledby="reset-title">
       <div class="bo-message-card">
         <h1 id="reset-title">Восстановить пароль</h1>
-        <p>На вашу электронную почту test@test.ru отправлена ссылка для сброса пароля. Если вы не получите письмо в течение нескольких минут, пожалуйста, повторите попытку.</p>
+        <p>На вашу электронную почту <span class="bo-email-accent" data-reset-email>test@test.ru</span> отправлена ссылка для сброса пароля. Если вы не получите письмо в течение нескольких минут, пожалуйста, повторите попытку.</p>
         <button class="bo-primary" type="button" data-view-target="login">Войти</button>
       </div>
     </section>
@@ -234,7 +237,10 @@
           <div class="bo-form-grid">
             <label class="bo-field">
               <span>Дата заявки <b>*</b></span>
-              <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-error-required="Укажите дату в формате дд.мм.гггг." data-error-pattern="Укажите дату в формате дд.мм.гггг."><img src="assets/icon-calendar.svg" alt=""></span>
+              <span class="bo-date-field" data-date-field>
+                <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-date-input data-error-required="Укажите дату в формате дд.мм.гггг." data-error-pattern="Укажите дату в формате дд.мм.гггг."><button class="bo-date-toggle" type="button" data-date-toggle aria-label="Открыть календарь"><img src="assets/icon-calendar.svg" alt=""></button></span>
+                <span class="bo-date-picker" data-date-picker hidden></span>
+              </span>
               <span class="bo-field__error" id="request-date-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
@@ -301,10 +307,13 @@
     <div class="bo-success-modal" data-success-modal hidden role="dialog" aria-modal="true" aria-labelledby="success-title">
       <button class="bo-success-modal__backdrop" type="button" data-close-success aria-label="Закрыть"></button>
       <div class="bo-success-card">
-        <button class="bo-icon-button bo-success-card__close" type="button" data-close-success aria-label="Закрыть">
-          <img src="assets/icon-close.svg" alt="">
-        </button>
-        <h2 id="success-title">Заявка сохранена в демо-режиме.</h2>
+        <div class="bo-success-card__head">
+          <h2 id="success-title">Заявка сохранена</h2>
+          <button class="bo-icon-button bo-success-card__close" type="button" data-close-success aria-label="Закрыть">
+            <img src="assets/icon-close.svg" alt="">
+          </button>
+        </div>
+        <p>Заявка добавлена в список и доступна в текущей демо-сессии.</p>
         <button class="bo-primary" type="button" data-close-success>Закрыть</button>
       </div>
     </div>

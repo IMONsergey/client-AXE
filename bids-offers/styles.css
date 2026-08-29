@@ -227,6 +227,11 @@ button {
   text-wrap: pretty;
 }
 
+.bo-email-accent {
+  color: var(--bo-teal);
+  font-weight: 600;
+}
+
 .bo-message-card--wide {
   width: min(540px, 100%);
 }
@@ -289,6 +294,12 @@ button {
   display: grid;
   gap: 16px;
   margin-top: 0;
+}
+
+.bo-auth-actions {
+  display: grid;
+  grid-template-columns: minmax(116px, .42fr) minmax(0, 1fr);
+  gap: 12px;
 }
 
 .bo-auth-pane {
@@ -435,6 +446,7 @@ button {
   height: 48px;
   flex: 1 1 auto;
   min-width: 0;
+  padding: 0 0 0 18px;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -453,6 +465,81 @@ button {
   width: 16px;
   height: 16px;
   opacity: .72;
+}
+
+.bo-date-field {
+  position: relative;
+  display: block;
+}
+
+.bo-date-toggle {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--bo-steel);
+}
+
+.bo-date-toggle:hover,
+.bo-date-toggle:focus-visible {
+  background: rgba(0, 137, 152, .08);
+}
+
+.bo-date-picker {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  width: min(292px, calc(100vw - 48px));
+  padding: 14px;
+  border: 1px solid rgba(107, 142, 165, .24);
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 18px 38px rgba(31, 50, 63, .14);
+}
+
+.bo-date-picker__head {
+  margin-bottom: 12px;
+  color: var(--bo-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bo-date-picker__week,
+.bo-date-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.bo-date-picker__week {
+  margin-bottom: 5px;
+  color: rgba(31, 50, 63, .42);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.bo-date-picker__grid button {
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--bo-ink);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bo-date-picker__grid button:hover,
+.bo-date-picker__grid button:focus-visible {
+  background: rgba(0, 137, 152, .1);
+  color: var(--bo-teal);
 }
 
 .bo-primary,
@@ -607,6 +694,17 @@ button {
   padding: 0 14px;
 }
 
+.bo-filters label.is-active-filter > span {
+  color: var(--bo-teal);
+}
+
+.bo-filters label.is-active-filter input,
+.bo-filters label.is-active-filter select {
+  border-color: rgba(0, 137, 152, .55);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 137, 152, .1);
+}
+
 .bo-filters input[type="search"] {
   padding-right: 36px;
   background-image: url("assets/icon-search.svg");
@@ -688,6 +786,10 @@ button {
 
 .bo-th-control:hover {
   background: rgba(255, 255, 255, .045);
+}
+
+.bo-th-control.is-filtered .bo-filter-icon {
+  color: #65dce6;
 }
 
 .bo-table .bo-th-control:focus-visible {
@@ -824,6 +926,30 @@ button {
 .bo-table tbody tr:focus-visible {
   outline: 2px solid var(--bo-teal);
   outline-offset: -2px;
+}
+
+.bo-empty-row td {
+  padding: 0;
+}
+
+.bo-empty-state {
+  min-height: 156px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 34px 18px;
+  color: var(--bo-ink);
+  text-align: center;
+}
+
+.bo-empty-state strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bo-empty-state span {
+  color: var(--bo-muted);
+  font-size: 14px;
 }
 
 .bo-table small {
@@ -1080,9 +1206,9 @@ button {
 .bo-success-card {
   position: relative;
   z-index: 1;
-  width: min(420px, 100%);
+  width: min(520px, 100%);
   display: grid;
-  gap: 24px;
+  gap: 18px;
   padding: 36px 32px 32px;
   border-radius: var(--bo-radius);
   background: #fff;
@@ -1095,19 +1221,35 @@ button {
   transform: translateY(0);
 }
 
+.bo-success-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
 .bo-success-card__close {
-  justify-self: end;
-  margin: -12px -8px -4px 0;
+  flex: 0 0 auto;
+  margin: -4px -4px 0 0;
 }
 
 .bo-success-card h2 {
   margin: 0;
   font-family: Oswald, Arial, sans-serif;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.16;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0;
+}
+
+.bo-success-card p {
+  max-width: 390px;
+  margin: -4px 0 2px;
+  color: var(--bo-ink);
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
 .bo-form-section h2 {
@@ -1244,7 +1386,8 @@ button {
   }
 
   .bo-drawer__actions,
-  .bo-form-actions {
+  .bo-form-actions,
+  .bo-auth-actions {
     grid-template-columns: 1fr;
     display: grid;
     gap: 12px;
