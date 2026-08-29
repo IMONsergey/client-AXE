@@ -50,12 +50,12 @@
           <form class="bo-auth-form bo-auth-pane is-active" data-auth-pane="login" data-next-view="requests" novalidate autocomplete="off">
             <label class="bo-field">
               <span>E-mail</span>
-              <input id="login-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="login-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
+              <input id="login-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="login-email-error" data-error-required="Введите e-mail" data-error-email="Введите корректный e-mail">
               <span class="bo-field__error" id="login-email-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
               <span>Пароль</span>
-              <input id="login-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="login-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
+              <input id="login-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="login-password-error" data-error-required="Введите пароль" data-error-minlength="Минимум 6 символов">
               <span class="bo-field__error" id="login-password-error" aria-live="polite" hidden></span>
             </label>
             <button class="bo-link-button" type="button" data-view-target="forgot"><span>Забыли пароль?</span> <span class="bo-inline-link">Восстановить</span></button>
@@ -66,17 +66,17 @@
           <form class="bo-auth-form bo-auth-pane" data-auth-pane="register" data-next-view="confirm" novalidate autocomplete="off" aria-hidden="true" hidden>
             <label class="bo-field">
               <span>E-mail*</span>
-              <input id="register-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="register-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
+              <input id="register-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="register-email-error" data-error-required="Введите e-mail" data-error-email="Введите корректный e-mail">
               <span class="bo-field__error" id="register-email-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
               <span>Пароль*</span>
-              <input id="register-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
+              <input id="register-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-error" data-error-required="Введите пароль" data-error-minlength="Минимум 6 символов">
               <span class="bo-field__error" id="register-password-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
               <span>Подтвердить пароль*</span>
-              <input id="register-password-confirm" name="password_confirm" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-confirm-error" data-match="password" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов." data-error-match="Пароли должны совпадать.">
+              <input id="register-password-confirm" name="password_confirm" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-confirm-error" data-match="password" data-error-required="Введите пароль" data-error-minlength="Минимум 6 символов" data-error-match="Пароли должны совпадать">
               <span class="bo-field__error" id="register-password-confirm-error" aria-live="polite" hidden></span>
             </label>
             <button class="bo-primary" type="submit">Зарегистрироваться</button>
@@ -101,7 +101,7 @@
         <form class="bo-auth-form" data-next-view="reset" novalidate autocomplete="off">
           <label class="bo-field">
             <span>E-mail</span>
-            <input id="forgot-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="forgot-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
+            <input id="forgot-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="forgot-email-error" data-error-required="Введите e-mail" data-error-email="Введите корректный e-mail">
             <span class="bo-field__error" id="forgot-email-error" aria-live="polite" hidden></span>
           </label>
           <div class="bo-auth-actions">
@@ -238,15 +238,15 @@
             <label class="bo-field">
               <span>Дата заявки <b>*</b></span>
               <span class="bo-date-field" data-date-field>
-                <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-date-input data-error-required="Укажите дату в формате дд.мм.гггг." data-error-pattern="Укажите дату в формате дд.мм.гггг."><button class="bo-date-toggle" type="button" data-date-toggle aria-label="Открыть календарь"><img src="assets/icon-calendar.svg" alt=""></button></span>
+                <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-date-input data-error-required="Укажите дату в формате дд.мм.гггг" data-error-pattern="Укажите дату в формате дд.мм.гггг"><button class="bo-date-toggle" type="button" data-date-toggle aria-label="Открыть календарь"><img src="assets/icon-calendar.svg" alt=""></button></span>
                 <span class="bo-date-picker" data-date-picker hidden></span>
               </span>
               <span class="bo-field__error" id="request-date-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
               <span>Тип заявки <b>*</b></span>
-              <select id="request-type" name="type" required aria-describedby="request-type-error" data-error-required="Выберите тип заявки.">
-                <option value="" disabled selected>Выберите тип заявки.</option>
+              <select id="request-type" name="type" required aria-describedby="request-type-error" data-error-required="Выберите тип заявки">
+                <option value="" disabled selected>Выберите тип заявки</option>
                 <option value="Покупка">Покупка</option>
                 <option value="Продажа">Продажа</option>
               </select>
@@ -254,13 +254,13 @@
             </label>
             <label class="bo-field">
               <span>Участник (Биржа-участник) <b>*</b></span>
-              <input id="request-participant" name="participant" type="text" placeholder="Название биржи-участника" autocomplete="off" required maxlength="80" aria-describedby="request-participant-error" data-error-required="Укажите биржу-участника.">
+              <input id="request-participant" name="participant" type="text" placeholder="Название биржи-участника" autocomplete="off" required maxlength="80" aria-describedby="request-participant-error" data-error-required="Укажите биржу-участника">
               <span class="bo-field__error" id="request-participant-error" aria-live="polite" hidden></span>
             </label>
             <label class="bo-field">
               <span>Статус заявки <b>*</b></span>
-              <select id="request-status" name="status" required aria-describedby="request-status-error" data-error-required="Выберите статус заявки.">
-                <option value="" disabled selected>Выберите статус заявки.</option>
+              <select id="request-status" name="status" required aria-describedby="request-status-error" data-error-required="Выберите статус заявки">
+                <option value="" disabled selected>Выберите статус заявки</option>
                 <option value="Активна">Активна</option>
                 <option value="Исполнена">Исполнена</option>
                 <option value="Отменена">Отменена</option>
@@ -274,7 +274,7 @@
           <h2>Спецификация товара и объемы</h2>
           <label class="bo-field">
             <span>Товар <b>*</b></span>
-            <textarea id="request-product" name="product" placeholder="Описание товара в произвольном формате" required maxlength="260" aria-describedby="request-product-error" data-error-required="Опишите товар."></textarea>
+            <textarea id="request-product" name="product" placeholder="Описание товара в произвольном формате" required maxlength="260" aria-describedby="request-product-error" data-error-required="Опишите товар"></textarea>
             <span class="bo-field__error" id="request-product-error" aria-live="polite" hidden></span>
           </label>
           <div class="bo-form-grid">
@@ -313,7 +313,7 @@
             <img src="assets/icon-close.svg" alt="">
           </button>
         </div>
-        <p>Заявка добавлена в список и доступна в текущей демо-сессии.</p>
+        <p>Заявка добавлена в список и доступна в текущей демо-сессии</p>
         <button class="bo-primary" type="button" data-close-success>Закрыть</button>
       </div>
     </div>
