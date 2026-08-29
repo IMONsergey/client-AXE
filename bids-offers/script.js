@@ -510,14 +510,14 @@ function renderRequests() {
   }
   requestsBody.innerHTML = filtered.map((request, index) => `
     <tr data-request-id="${escapeHtml(request.id)}" tabindex="0" style="--row-index: ${index}" aria-label="${escapeHtml(request.type)} ${escapeHtml(request.product)}">
-      <td>${escapeHtml(request.date)}</td>
-      <td><strong class="bo-type ${typeClasses[request.type]}">${escapeHtml(request.type)}</strong></td>
-      <td>${escapeHtml(request.participant)}</td>
-      <td>${escapeHtml(request.product)}</td>
-      <td>${volumeMarkup(request)}</td>
-      <td><span class="bo-cell-clamp bo-cell-clamp--price">${escapeHtml(request.price)}</span></td>
-      <td>${escapeHtml(request.delivery)}</td>
-      <td><span class="bo-status ${statusClasses[request.status]}">${escapeHtml(request.status)}</span></td>
+      <td data-label="ДАТА ЗАЯВКИ">${escapeHtml(request.date)}</td>
+      <td data-label="ТИП"><strong class="bo-type ${typeClasses[request.type]}">${escapeHtml(request.type)}</strong></td>
+      <td data-label="УЧАСТНИК">${escapeHtml(request.participant)}</td>
+      <td data-label="ТОВАР">${escapeHtml(request.product)}</td>
+      <td data-label="ОБЪЁМ">${volumeMarkup(request)}</td>
+      <td data-label="ЦЕНА И УСЛОВИЯ"><span class="bo-cell-clamp bo-cell-clamp--price">${escapeHtml(request.price)}</span></td>
+      <td data-label="УСЛОВИЯ ПОСТАВКИ">${escapeHtml(request.delivery)}</td>
+      <td data-label="СТАТУС"><span class="bo-status ${statusClasses[request.status]}">${escapeHtml(request.status)}</span></td>
     </tr>
   `).join("");
   syncControlState();
