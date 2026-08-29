@@ -11,12 +11,15 @@ const requestForm = document.querySelector("[data-request-form]");
 const drawer = document.querySelector(".bo-drawer");
 const drawerBackdrop = document.querySelector(".bo-drawer-backdrop");
 const drawerClosers = document.querySelectorAll("[data-close-drawer]");
+const successModal = document.querySelector("[data-success-modal]");
+const successClosers = document.querySelectorAll("[data-close-success]");
 const sortButtons = document.querySelectorAll("[data-sort-key]");
 const columnFilterButtons = document.querySelectorAll("[data-column-filter]");
 const columnFilterValueButtons = document.querySelectorAll("[data-column-filter-value]");
 const columnMenus = document.querySelectorAll("[data-column-menu]");
 const typographWordPattern = /(^|[\s([{"'«„])((?:а|в|и|к|о|с|у|во|да|до|за|из|ли|на|не|но|об|от|по|со|то|же|бы|без|для|или|как|над|под|при|про))\s+([^\s])/giu;
 const typographSkipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
+const successCloseDelay = 280;
 
 const statusClasses = {
   "Активна": "bo-status--active",
@@ -39,6 +42,8 @@ let sortState = {
   key: null,
   direction: "asc",
 };
+
+let lastSubmittedRequestId = null;
 
 let requests = [
   {
@@ -354,6 +359,31 @@ function closeDrawer(animate = true) {
   }
 }
 
+function openSuccessModal(requestId) {
+  lastSubmittedRequestId = requestId;
+  successModal.hidden = false;
+  successModal.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(() => {
+    app.classList.add("is-success-open");
+    successModal.querySelector("[data-close-success]").focus({ preventScroll: true });
+  });
+}
+
+function closeSuccessModal() {
+  if (successModal.hidden) {
+    return;
+  }
+  app.classList.remove("is-success-open");
+  successModal.setAttribute("aria-hidden", "true");
+  window.setTimeout(() => {
+    successModal.hidden = true;
+    setView("requests");
+    if (lastSubmittedRequestId) {
+      window.setTimeout(() => openDrawer(lastSubmittedRequestId), 120);
+    }
+  }, successCloseDelay);
+}
+
 function requestFromForm(form) {
   const values = new FormData(form);
   const id = `request-${Date.now()}`;
@@ -402,11 +432,17 @@ function setFieldError(field, message) {
   }
   if (error) {
     error.textContent = message;
-    error.hidden = !message;
+    error.hidden = false;
   }
   if (field.closest(".bo-auth-pane.is-active")) {
     requestAnimationFrame(updateAuthStageHeight);
   }
+}
+
+function prepareValidationSlots() {
+  document.querySelectorAll(".bo-field__error").forEach((error) => {
+    error.hidden = false;
+  });
 }
 
 function validateField(field) {
@@ -441,16 +477,46 @@ function clearFormErrors(form) {
 function closeColumnMenus() {
   columnMenus.forEach((menu) => {
     menu.hidden = true;
+    menu.style.removeProperty("--menu-top");
+    menu.style.removeProperty("--menu-left");
   });
   columnFilterButtons.forEach((button) => {
     button.classList.remove("is-active");
   });
 }
 
-function toggleColumnMenu(key) {
+function positionColumnMenu(menu, button) {
+  const rect = button.getBoundingClientRect();
+  const menuWidth = Math.max(menu.offsetWidth, 138);
+  const viewportGap = 12;
+  const left = Math.min(
+    Math.max(viewportGap, rect.left + 8),
+    window.innerWidth - menuWidth - viewportGap,
+  );
+  menu.style.setProperty("--menu-left", `${left}px`);
+  menu.style.setProperty("--menu-top", `${rect.bottom + 6}px`);
+}
+
+function repositionOpenColumnMenu() {
+  const openMenu = [...columnMenus].find((menu) => !menu.hidden);
+  if (!openMenu) {
+    return;
+  }
+  const button = document.querySelector(`[data-column-filter="${openMenu.dataset.columnMenu}"]`);
+  if (button) {
+    positionColumnMenu(openMenu, button);
+  }
+}
+
+function toggleColumnMenu(button) {
+  const key = button.dataset.columnFilter;
   columnMenus.forEach((menu) => {
     const isCurrent = menu.dataset.columnMenu === key;
-    menu.hidden = isCurrent ? !menu.hidden : true;
+    const shouldOpen = isCurrent ? menu.hidden : false;
+    menu.hidden = !shouldOpen;
+    if (shouldOpen) {
+      positionColumnMenu(menu, button);
+    }
   });
   columnFilterButtons.forEach((button) => {
     const menu = document.querySelector(`[data-column-menu="${button.dataset.columnFilter}"]`);
@@ -493,8 +559,7 @@ forms.forEach((form) => {
       form.reset();
       clearFormErrors(form);
       renderRequests();
-      setView("requests");
-      window.setTimeout(() => openDrawer(request.id), 120);
+      openSuccessModal(request.id);
       return;
     }
     setView(form.dataset.nextView);
@@ -541,7 +606,7 @@ sortButtons.forEach((button) => {
 columnFilterButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     event.stopPropagation();
-    toggleColumnMenu(button.dataset.columnFilter);
+    toggleColumnMenu(button);
   });
 });
 
@@ -579,15 +644,23 @@ drawerClosers.forEach((button) => {
   button.addEventListener("click", () => closeDrawer());
 });
 
+successClosers.forEach((button) => {
+  button.addEventListener("click", closeSuccessModal);
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
+    closeSuccessModal();
     closeDrawer();
     closeColumnMenus();
   }
 });
 
 renderRequests();
+prepareValidationSlots();
 setAuthMode("login");
 applyTypography(app);
 app.classList.add("is-view-ready");
 window.addEventListener("resize", updateAuthStageHeight);
+window.addEventListener("resize", repositionOpenColumnMenu);
+window.addEventListener("scroll", repositionOpenColumnMenu, true);
