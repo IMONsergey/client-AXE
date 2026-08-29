@@ -123,7 +123,7 @@
       <div class="bo-page-title">
         <div>
           <h1 id="requests-title">Bids &amp; Offers</h1>
-          <p>Тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест тест...</p>
+          <p>Сервис Bids &amp; Offers помогает участникам ассоциации размещать заявки на покупку и продажу биржевых товаров, находить встречные предложения и быстро переходить к деталям сделки.</p>
         </div>
         <button class="bo-add-button" type="button" data-view-target="form">
           <span>+</span>
@@ -168,14 +168,14 @@
           <table class="bo-table" id="requests-table">
             <thead>
               <tr>
-                <th>ДАТА ЗАЯВКИ</th>
-                <th>ТИП</th>
+                <th data-sort-state="none"><button class="bo-th-control" type="button" data-sort-key="date"><span>ДАТА ЗАЯВКИ</span><i class="bo-sort-icon" aria-hidden="true"></i></button></th>
+                <th class="bo-th-filter"><button class="bo-th-control" type="button" data-column-filter="type"><span>ТИП</span><i class="bo-filter-icon" aria-hidden="true"></i></button><div class="bo-column-menu" data-column-menu="type" hidden><button type="button" data-column-filter-value="">Все</button><button type="button" data-column-filter-value="Продажа">Продажа</button><button type="button" data-column-filter-value="Покупка">Покупка</button></div></th>
                 <th>УЧАСТНИК</th>
                 <th>ТОВАР</th>
-                <th>ОБЪЁМ</th>
-                <th>ЦЕНА И УСЛОВИЯ</th>
+                <th data-sort-state="none"><button class="bo-th-control" type="button" data-sort-key="volume"><span>ОБЪЁМ</span><i class="bo-sort-icon" aria-hidden="true"></i></button></th>
+                <th data-sort-state="none"><button class="bo-th-control" type="button" data-sort-key="price"><span>ЦЕНА И УСЛОВИЯ</span><i class="bo-sort-icon" aria-hidden="true"></i></button></th>
                 <th>УСЛОВИЯ ПОСТАВКИ</th>
-                <th>СТАТУС</th>
+                <th class="bo-th-filter"><button class="bo-th-control" type="button" data-column-filter="status"><span>СТАТУС</span><i class="bo-filter-icon" aria-hidden="true"></i></button><div class="bo-column-menu" data-column-menu="status" hidden><button type="button" data-column-filter-value="">Все</button><button type="button" data-column-filter-value="Активна">Активна</button><button type="button" data-column-filter-value="Исполнена">Исполнена</button><button type="button" data-column-filter-value="Отменена">Отменена</button></div></th>
               </tr>
             </thead>
             <tbody data-requests-body></tbody>
