@@ -7,6 +7,10 @@ const requestForm = document.querySelector("[data-request-form]");
 const drawer = document.querySelector(".bo-drawer");
 const drawerBackdrop = document.querySelector(".bo-drawer-backdrop");
 const drawerClosers = document.querySelectorAll("[data-close-drawer]");
+const sortButtons = document.querySelectorAll("[data-sort-key]");
+const columnFilterButtons = document.querySelectorAll("[data-column-filter]");
+const columnFilterValueButtons = document.querySelectorAll("[data-column-filter-value]");
+const columnMenus = document.querySelectorAll("[data-column-menu]");
 
 const statusClasses = {
   "Активна": "bo-status--active",
@@ -17,6 +21,17 @@ const statusClasses = {
 const typeClasses = {
   "Продажа": "bo-type--sell",
   "Покупка": "bo-type--buy",
+};
+
+const defaultSortDirections = {
+  date: "desc",
+  volume: "desc",
+  price: "desc",
+};
+
+let sortState = {
+  key: null,
+  direction: "asc",
 };
 
 let requests = [
@@ -109,6 +124,54 @@ function volumeMarkup(request) {
   return `${escapeHtml(request.volume)} <small>(${escapeHtml(request.volumeNote)})</small>`;
 }
 
+function parseDate(value) {
+  const match = String(value || "").match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!match) {
+    return 0;
+  }
+  const [, day, month, year] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day)).getTime();
+}
+
+function parseNumber(value) {
+  const match = String(value || "").replace(",", ".").match(/\d+(\.\d+)?/);
+  return match ? Number(match[0]) : null;
+}
+
+function sortValue(request, key) {
+  if (key === "date") {
+    return parseDate(request.date);
+  }
+  if (key === "volume") {
+    return parseNumber(request.volume);
+  }
+  if (key === "price") {
+    return parseNumber(request.price);
+  }
+  return 0;
+}
+
+function sortRequests(items) {
+  if (!sortState.key) {
+    return items;
+  }
+  return [...items].sort((a, b) => {
+    const aValue = sortValue(a, sortState.key);
+    const bValue = sortValue(b, sortState.key);
+    if (aValue === null && bValue === null) {
+      return 0;
+    }
+    if (aValue === null) {
+      return 1;
+    }
+    if (bValue === null) {
+      return -1;
+    }
+    const diff = aValue - bValue;
+    return sortState.direction === "asc" ? diff : -diff;
+  });
+}
+
 function matchesFilters(request) {
   const values = new FormData(filters);
   const type = values.get("type");
@@ -125,7 +188,7 @@ function matchesFilters(request) {
 }
 
 function renderRequests() {
-  const filtered = requests.filter(matchesFilters);
+  const filtered = sortRequests(requests.filter(matchesFilters));
   requestsBody.innerHTML = filtered.map((request, index) => `
     <tr data-request-id="${escapeHtml(request.id)}" tabindex="0" style="--row-index: ${index}" aria-label="${escapeHtml(request.type)} ${escapeHtml(request.product)}">
       <td>${escapeHtml(request.date)}</td>
@@ -138,6 +201,7 @@ function renderRequests() {
       <td><span class="bo-status ${statusClasses[request.status]}">${escapeHtml(request.status)}</span></td>
     </tr>
   `).join("");
+  syncControlState();
 }
 
 function getRequestById(id) {
@@ -228,6 +292,41 @@ function requestFromForm(form) {
   };
 }
 
+function closeColumnMenus() {
+  columnMenus.forEach((menu) => {
+    menu.hidden = true;
+  });
+  columnFilterButtons.forEach((button) => {
+    button.classList.remove("is-active");
+  });
+}
+
+function toggleColumnMenu(key) {
+  columnMenus.forEach((menu) => {
+    const isCurrent = menu.dataset.columnMenu === key;
+    menu.hidden = isCurrent ? !menu.hidden : true;
+  });
+  columnFilterButtons.forEach((button) => {
+    const menu = document.querySelector(`[data-column-menu="${button.dataset.columnFilter}"]`);
+    button.classList.toggle("is-active", menu && !menu.hidden);
+  });
+}
+
+function syncControlState() {
+  sortButtons.forEach((button) => {
+    const th = button.closest("th");
+    const active = sortState.key === button.dataset.sortKey;
+    button.classList.toggle("is-active", active);
+    th.dataset.sortState = active ? sortState.direction : "none";
+  });
+
+  columnFilterValueButtons.forEach((button) => {
+    const menu = button.closest("[data-column-menu]");
+    const value = filters.elements[menu.dataset.columnMenu].value;
+    button.classList.toggle("is-active", button.dataset.columnFilterValue === value);
+  });
+}
+
 viewButtons.forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.viewTarget));
 });
@@ -254,6 +353,40 @@ forms.forEach((form) => {
 filters.addEventListener("input", renderRequests);
 filters.addEventListener("change", renderRequests);
 
+sortButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const key = button.dataset.sortKey;
+    if (sortState.key === key) {
+      sortState.direction = sortState.direction === "asc" ? "desc" : "asc";
+    } else {
+      sortState = {
+        key,
+        direction: defaultSortDirections[key],
+      };
+    }
+    renderRequests();
+  });
+});
+
+columnFilterButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleColumnMenu(button.dataset.columnFilter);
+  });
+});
+
+columnFilterValueButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const menu = button.closest("[data-column-menu]");
+    filters.elements[menu.dataset.columnMenu].value = button.dataset.columnFilterValue;
+    closeColumnMenus();
+    renderRequests();
+  });
+});
+
+document.addEventListener("click", closeColumnMenus);
+
 requestsBody.addEventListener("click", (event) => {
   const row = event.target.closest("[data-request-id]");
   if (row) {
@@ -279,6 +412,7 @@ drawerClosers.forEach((button) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeDrawer();
+    closeColumnMenus();
   }
 });
 

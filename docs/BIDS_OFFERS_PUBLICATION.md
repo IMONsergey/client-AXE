@@ -35,3 +35,7 @@ Visual constraints for this standalone page:
 - the request details drawer is viewport-fixed and must cover the full browser height;
 - the back icon in `На главную` points left;
 - the authenticated header actions stay in one row on desktop and supported narrow widths.
+- the auth and workspace states share the same page gradient;
+- the requests workspace uses a fluid flex layout instead of a fixed narrow frame;
+- `ТИП` and `СТАТУС` table headers expose column filters;
+- `ДАТА ЗАЯВКИ`, `ОБЪЁМ`, and `ЦЕНА И УСЛОВИЯ` table headers expose sorting.
