@@ -11,6 +11,8 @@ const sortButtons = document.querySelectorAll("[data-sort-key]");
 const columnFilterButtons = document.querySelectorAll("[data-column-filter]");
 const columnFilterValueButtons = document.querySelectorAll("[data-column-filter-value]");
 const columnMenus = document.querySelectorAll("[data-column-menu]");
+const typographWordPattern = /(^|[\s([{"'«„])((?:а|в|и|к|о|с|у|во|да|до|за|из|ли|на|не|но|об|от|по|со|то|же|бы|без|для|или|как|над|под|при|про))\s+([^\s])/giu;
+const typographSkipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
 
 const statusClasses = {
   "Активна": "bo-status--active",
@@ -88,7 +90,10 @@ function setView(view) {
   closeDrawer(false);
   app.dataset.view = view;
   app.classList.remove("is-view-ready");
-  requestAnimationFrame(() => app.classList.add("is-view-ready"));
+  requestAnimationFrame(() => {
+    applyTypography(app);
+    app.classList.add("is-view-ready");
+  });
   document.querySelectorAll(".bo-tab").forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
   });
@@ -107,6 +112,29 @@ function escapeHtml(value) {
     "\"": "&quot;",
     "'": "&#039;",
   })[char]);
+}
+
+function typographText(value) {
+  return String(value || "").replace(typographWordPattern, "$1$2\u00a0$3");
+}
+
+function applyTypography(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || typographSkipTags.has(parent.tagName) || !/[а-яё]/i.test(node.nodeValue)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  const nodes = [];
+  while (walker.nextNode()) {
+    nodes.push(walker.currentNode);
+  }
+  nodes.forEach((node) => {
+    node.nodeValue = typographText(node.nodeValue);
+  });
 }
 
 function splitDetail(value) {
@@ -242,6 +270,7 @@ function fillDrawer(request) {
   if (request.logo) {
     logo.src = request.logo;
   }
+  applyTypography(drawer);
 }
 
 function openDrawer(id) {
@@ -292,6 +321,70 @@ function requestFromForm(form) {
   };
 }
 
+function getFieldErrorMessage(field) {
+  const value = String(field.value || "").trim();
+  if (field.required && !value) {
+    return field.dataset.errorRequired || "Заполните обязательное поле.";
+  }
+  if (field.type === "email" && value && field.validity.typeMismatch) {
+    return field.dataset.errorEmail || "Введите корректный e-mail.";
+  }
+  if (field.minLength > 0 && value && value.length < field.minLength) {
+    return field.dataset.errorMinlength || "Минимум 6 символов.";
+  }
+  if (field.pattern && value && !new RegExp(`^(?:${field.pattern})$`).test(value)) {
+    return field.dataset.errorPattern || "Заполните обязательное поле.";
+  }
+  if (field.dataset.match) {
+    const matchedField = field.form.elements[field.dataset.match];
+    if (matchedField && value && value !== matchedField.value) {
+      return field.dataset.errorMatch || "Пароли должны совпадать.";
+    }
+  }
+  return "";
+}
+
+function setFieldError(field, message) {
+  const container = field.closest(".bo-field");
+  const error = container ? container.querySelector(".bo-field__error") : null;
+  field.setAttribute("aria-invalid", message ? "true" : "false");
+  if (container) {
+    container.classList.toggle("is-invalid", Boolean(message));
+  }
+  if (error) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+}
+
+function validateField(field) {
+  const message = getFieldErrorMessage(field);
+  setFieldError(field, message);
+  return !message;
+}
+
+function validateForm(form) {
+  const fields = [...form.querySelectorAll("input, select, textarea")];
+  let firstInvalid = null;
+  fields.forEach((field) => {
+    if (!validateField(field) && !firstInvalid) {
+      firstInvalid = field;
+    }
+  });
+  if (firstInvalid) {
+    firstInvalid.focus({ preventScroll: true });
+    firstInvalid.scrollIntoView({ block: "center", behavior: "smooth" });
+    return false;
+  }
+  return true;
+}
+
+function clearFormErrors(form) {
+  form.querySelectorAll("input, select, textarea").forEach((field) => {
+    setFieldError(field, "");
+  });
+}
+
 function closeColumnMenus() {
   columnMenus.forEach((menu) => {
     menu.hidden = true;
@@ -334,13 +427,14 @@ viewButtons.forEach((button) => {
 forms.forEach((form) => {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!form.reportValidity()) {
+    if (!validateForm(form)) {
       return;
     }
     if (form === requestForm) {
       const request = requestFromForm(form);
       requests = [request, ...requests];
       form.reset();
+      clearFormErrors(form);
       renderRequests();
       setView("requests");
       window.setTimeout(() => openDrawer(request.id), 120);
@@ -348,6 +442,25 @@ forms.forEach((form) => {
     }
     setView(form.dataset.nextView);
   });
+
+  form.addEventListener("input", (event) => {
+    if (!event.target.matches("input, select, textarea")) {
+      return;
+    }
+    validateField(event.target);
+    if (event.target.name === "password") {
+      const confirm = form.elements.password_confirm;
+      if (confirm && confirm.value) {
+        validateField(confirm);
+      }
+    }
+  });
+
+  form.addEventListener("blur", (event) => {
+    if (event.target.matches("input, select, textarea")) {
+      validateField(event.target);
+    }
+  }, true);
 });
 
 filters.addEventListener("input", renderRequests);
@@ -417,4 +530,5 @@ document.addEventListener("keydown", (event) => {
 });
 
 renderRequests();
+applyTypography(app);
 app.classList.add("is-view-ready");
