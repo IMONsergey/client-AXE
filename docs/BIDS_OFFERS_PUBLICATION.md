@@ -47,5 +47,6 @@ Visual constraints for this standalone page:
 - the authenticated header actions stay in one row on desktop and supported narrow widths.
 - the auth and workspace states share the same page gradient;
 - the requests workspace uses a fluid flex layout instead of a fixed narrow frame;
+- below desktop width, request rows become readable cards instead of a horizontally clipped table;
 - `ТИП` and `СТАТУС` table headers expose column filters;
 - `ДАТА ЗАЯВКИ`, `ОБЪЁМ`, and `ЦЕНА И УСЛОВИЯ` table headers expose sorting.
