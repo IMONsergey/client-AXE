@@ -1,0 +1,7 @@
+{
+  "name": "client-axe",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server.mjs"
+  }
+}
