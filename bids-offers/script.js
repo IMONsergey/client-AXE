@@ -25,7 +25,9 @@ const columnMenus = document.querySelectorAll("[data-column-menu]");
 const typographWordPattern = /(^|[\s([{"'«„])((?:а|в|и|к|о|с|у|во|да|до|за|из|ли|на|не|но|об|от|по|со|то|же|бы|без|для|или|как|над|под|при|про))\s+([^\s])/giu;
 const typographSkipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
 const authSwitchDelay = 140;
+const viewSwitchDelay = 150;
 const successCloseDelay = 280;
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 const statusClasses = {
   "Активна": "bo-status--active",
@@ -50,6 +52,7 @@ let sortState = {
 };
 
 let authSwitchTimer = null;
+let viewSwitchTimer = null;
 let lastSubmittedRequestId = null;
 let lastRegisterEmail = "test@test.ru";
 let lastForgotEmail = "test@test.ru";
@@ -192,8 +195,7 @@ let requests = [
   },
 ];
 
-function setView(view) {
-  closeDrawer(false);
+function normalizeViewTarget(view) {
   let authMode = null;
   if (view === "register") {
     authMode = "register";
@@ -201,17 +203,65 @@ function setView(view) {
   } else if (view === "login") {
     authMode = "login";
   }
+  return { view, authMode };
+}
+
+function completeViewSwitch(view, authMode, after) {
   app.dataset.view = view;
+  app.classList.remove("is-view-leaving");
   app.classList.remove("is-view-ready");
+  if (authMode) {
+    setAuthMode(authMode);
+  }
   requestAnimationFrame(() => {
     applyTypography(app);
     updateAuthStageHeight();
     app.classList.add("is-view-ready");
+    if (typeof after === "function") {
+      after();
+    }
   });
-  if (authMode) {
-    setAuthMode(authMode);
-  }
   window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function setView(nextView, options = {}) {
+  const settings = typeof options === "boolean" ? { immediate: options } : options;
+  const { view, authMode } = normalizeViewTarget(nextView);
+  const sameView = app.dataset.view === view;
+  window.clearTimeout(viewSwitchTimer);
+  closeDrawer(false);
+  closeColumnMenus();
+  closeDatePicker();
+
+  if (sameView) {
+    app.classList.remove("is-view-leaving");
+    if (authMode) {
+      setAuthMode(authMode);
+    }
+    requestAnimationFrame(() => {
+      applyTypography(app);
+      updateAuthStageHeight();
+      app.classList.add("is-view-ready");
+      if (typeof settings.after === "function") {
+        settings.after();
+      }
+    });
+    return;
+  }
+
+  const immediate = Boolean(settings.immediate) || reducedMotionQuery.matches;
+  app.classList.remove("is-view-ready");
+
+  if (immediate) {
+    completeViewSwitch(view, authMode, settings.after);
+    return;
+  }
+
+  app.classList.add("is-view-leaving");
+  viewSwitchTimer = window.setTimeout(() => {
+    viewSwitchTimer = null;
+    completeViewSwitch(view, authMode, settings.after);
+  }, viewSwitchDelay);
 }
 
 function normalize(value) {
@@ -551,10 +601,13 @@ function closeSuccessModal() {
   successModal.setAttribute("aria-hidden", "true");
   window.setTimeout(() => {
     successModal.hidden = true;
-    setView("requests");
-    if (lastSubmittedRequestId) {
-      window.setTimeout(() => openDrawer(lastSubmittedRequestId), 120);
-    }
+    setView("requests", {
+      after: () => {
+        if (lastSubmittedRequestId) {
+          window.setTimeout(() => openDrawer(lastSubmittedRequestId), 120);
+        }
+      },
+    });
   }, successCloseDelay);
 }
 
