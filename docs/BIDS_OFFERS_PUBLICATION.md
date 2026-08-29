@@ -17,6 +17,7 @@ Implemented screens:
 Implemented behavior:
 
 - login, registration, confirmation, password reset, list, drawer, and form views are routed client-side;
+- page-to-page transitions use a short exit and soft enter animation so navigation between demo views stays visually continuous;
 - email confirmation and password reset confirmation use the email entered by the user in the current demo flow;
 - table rows are rendered from a request dataset and all rows open the details drawer;
 - the table includes an empty state when selected filters return no requests;
