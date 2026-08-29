@@ -63,7 +63,7 @@ let requests = [
     product: "Пшеница 3 класса, урожай 2026",
     volume: "5000 т",
     volumeNote: "мин. партия 500 т",
-    price: "320 USD/т, предоплата 30%",
+    price: "320 USD/т, предоплата 30%, базис цены фиксируется после подтверждения доступного объема, качества партии, графика отгрузки и финального согласования платежного календаря между участниками сделки",
     delivery: "FOB, порт Новороссийск",
     status: "Активна",
     flag: "assets/russia-flag.png",
@@ -186,7 +186,7 @@ let requests = [
     participant: "NCDEX (Индия)",
     product: "Соевые бобы",
     volume: "от 2000 т",
-    price: "Цена и график оплаты согласуются после подтверждения объема и порта назначения.",
+    price: "Цена и график оплаты согласуются после подтверждения объема и порта назначения, проверки доступного периода поставки, валюты расчетов, условий резервирования партии и согласования документов",
     delivery: "Любой способ, порт назначения - по согласованию",
     status: "Отменена",
   },
@@ -336,14 +336,6 @@ function setAuthMode(mode, immediate = false) {
   }, authSwitchDelay);
 }
 
-function splitDetail(value) {
-  const parts = String(value || "").split(/,\s(.+)/);
-  if (parts.length < 3) {
-    return escapeHtml(value);
-  }
-  return `${escapeHtml(parts[0])}, <small>${escapeHtml(parts[1])}</small>`;
-}
-
 function volumeMarkup(request) {
   if (!request.volumeNote) {
     return escapeHtml(request.volume);
@@ -443,6 +435,7 @@ function renderRequests() {
           <div class="bo-empty-state">
             <strong>По выбранным фильтрам заявок нет</strong>
             <span>Измените параметры поиска или выберите другой статус</span>
+            <button class="bo-secondary" type="button" data-reset-filters>Сбросить фильтры</button>
           </div>
         </td>
       </tr>
@@ -458,7 +451,7 @@ function renderRequests() {
       <td>${escapeHtml(request.participant)}</td>
       <td>${escapeHtml(request.product)}</td>
       <td>${volumeMarkup(request)}</td>
-      <td>${splitDetail(request.price)}</td>
+      <td><span class="bo-cell-clamp bo-cell-clamp--price">${escapeHtml(request.price)}</span></td>
       <td>${escapeHtml(request.delivery)}</td>
       <td><span class="bo-status ${statusClasses[request.status]}">${escapeHtml(request.status)}</span></td>
     </tr>
@@ -770,6 +763,12 @@ function syncTopFilters() {
   });
 }
 
+function resetFilters() {
+  filters.reset();
+  closeColumnMenus();
+  renderRequests();
+}
+
 function syncControlState() {
   sortButtons.forEach((button) => {
     const th = button.closest("th");
@@ -906,6 +905,11 @@ document.addEventListener("click", (event) => {
 });
 
 requestsBody.addEventListener("click", (event) => {
+  const resetButton = event.target.closest("[data-reset-filters]");
+  if (resetButton) {
+    resetFilters();
+    return;
+  }
   const row = event.target.closest("[data-request-id]");
   if (row) {
     openDrawer(row.dataset.requestId);
