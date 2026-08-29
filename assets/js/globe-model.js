@@ -1,14 +1,14 @@
 export const GLOBE_VIEW = Object.freeze({
   phi: 75 * Math.PI / 180,
-  theta: 47 * Math.PI / 180
+  theta: 25 * Math.PI / 180
 });
 
 export const GLOBE_STYLE = Object.freeze({
-  radiusRatio: 0.44,
-  sphere: ['rgba(4, 87, 97, 0.94)', 'rgba(3, 68, 78, 0.97)', 'rgba(2, 47, 57, 0.995)'],
+  radiusRatio: 0.455,
+  sphere: ['rgba(7, 94, 111, 0.94)', 'rgba(6, 82, 97, 0.97)', 'rgba(3, 48, 61, 0.995)'],
   dot: [42, 225, 241],
-  outline: 'rgba(42, 225, 241, 0.055)',
-  glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.018)', 'rgba(0, 193, 207, 0.075)', 'rgba(0, 193, 207, 0)']
+  outline: 'rgba(42, 225, 241, 0.07)',
+  glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.02)', 'rgba(0, 193, 207, 0.085)', 'rgba(0, 193, 207, 0)']
 });
 
 const DEG = Math.PI / 180;
@@ -61,10 +61,10 @@ export function projectPoint(point, phi, theta) {
 
 export function pointAppearance(z, size) {
   const edge = clamp((z - 0.01) / 0.23, 0, 1);
-  const baseDot = Math.max(1.12, size / 490);
+  const baseDot = Math.max(0.92, size / 650);
 
   return {
-    alpha: (0.52 + 0.44 * z) * (0.62 + 0.38 * edge),
-    radius: baseDot * (0.92 + 0.48 * z)
+    alpha: (0.62 + 0.42 * z) * (0.68 + 0.32 * edge),
+    radius: baseDot * (0.94 + 0.42 * z)
   };
 }

@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js';
+} from './globe-model.js?v=2026-08-29-4';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');

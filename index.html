@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/home-redesign.css?v=2026-08-29-2">
+  <link rel="stylesheet" href="assets/css/home-redesign.css?v=2026-08-29-4">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -54,7 +54,7 @@
       <section class="hero section" id="top" aria-labelledby="hero-title">
         <div class="container hero__inner">
           <div class="hero__content">
-            <h1 class="title-xl" id="hero-title">Международная ассоциация товарных <br>и фьючерсных бирж</h1>
+            <h1 class="title-xl" id="hero-title">Международная ассоциация товарных <br><span class="title-xl__nowrap">и фьючерсных бирж</span></h1>
             <p class="hero__lead">Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.</p>
             <a class="button hero__button" href="#about">
               <span>Подробнее об Ассоциации</span>
@@ -75,7 +75,10 @@
         <div class="container">
           <article class="trade-card">
             <div class="trade-card__content">
-              <h2 class="title-md" id="trade-title">Bids &amp; Offers</h2>
+              <div class="trade-card__head">
+                <h2 class="title-md" id="trade-title">Bids &amp; Offers</h2>
+                <svg class="trade-card__mark" aria-hidden="true"><use href="#icon-arrow"/></svg>
+              </div>
               <ul class="trade-card__list">
                 <li>Подать/просмотреть заявки на межбиржевые сделки</li>
                 <li>Подача и просмотр заявок доступны только авторизованным представителям бирж-членов Ассоциации</li>
@@ -87,7 +90,11 @@
               </a>
             </div>
             <div class="trade-card__media">
-              <img src="assets/images/figma-v4/trade-requests-earth.png" alt="">
+              <img src="assets/images/figma-bids/bids-13.jpeg" alt="">
+              <span class="trade-card__asset trade-card__asset--wheat"><img src="assets/images/figma-bids/bids-10.png" alt=""></span>
+              <span class="trade-card__asset trade-card__asset--metal"><img src="assets/images/figma-bids/bids-12.png" alt=""></span>
+              <span class="trade-card__asset trade-card__asset--fuel"><img src="assets/images/figma-bids/bids-04.png" alt=""></span>
+              <span class="trade-card__asset trade-card__asset--leaf"><img src="assets/images/figma-bids/bids-03.png" alt=""></span>
             </div>
           </article>
         </div>
@@ -96,27 +103,31 @@
       <section class="association section content-lower" id="about" aria-labelledby="about-title">
         <div class="container">
           <div class="metric-mosaic" aria-label="ЦИФРЫ">
-            <div class="metric-tile metric-tile--image metric-tile--grain-a"></div>
-            <div class="metric-tile metric-tile--image metric-tile--grain-b"></div>
-            <div class="metric-tile metric-tile--number metric-tile--blue"><strong>8</strong><span>бирж</span></div>
-            <div class="metric-tile metric-tile--image metric-tile--grain-c"></div>
-            <div class="metric-tile metric-tile--image metric-tile--grain-d"></div>
-            <div class="metric-tile metric-tile--number metric-tile--red"><strong>100+</strong><b>млрд $</b><span>оборот торгов <br>на товарных рынках</span></div>
-            <div class="metric-tile metric-tile--image metric-tile--grain-e"></div>
-            <div class="metric-tile metric-tile--image metric-tile--grain-f"></div>
-            <a class="metric-tile metric-tile--link" href="#tasks"><span>Цели <br>и задачи</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
-            <div class="metric-tile metric-tile--number metric-tile--teal"><strong>7</strong><span>стран-участниц</span></div>
-          </div>
-
-          <div class="association__body">
-            <div class="association__copy">
-              <h2 class="title-lg" id="about-title">Об ассоциации</h2>
-              <p>Международная ассоциация товарных и фьючерсных бирж создана для укрепления взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС. Это новая наднациональная площадка для выстраивания экономических мостов, которые соединят товарные потоки и рынки в интересах этих государств.</p>
+            <div class="metric-mosaic__top">
+              <div class="metric-tile metric-tile--image metric-tile--grain-a"></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-b"></div>
+              <div class="metric-tile metric-tile--number metric-tile--blue"><strong>8</strong><span>бирж</span></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-c"></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-d"></div>
+              <div class="metric-tile metric-tile--number metric-tile--red"><strong>100+</strong><b>млрд $</b><span>оборот торгов <br>на товарных рынках</span></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-e"></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-f"></div>
+              <a class="metric-tile metric-tile--link metric-tile--goals" href="#tasks"><span>Цели <br>и задачи</span><img src="assets/images/figma/about-icon-directions.png" alt=""><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+              <div class="metric-tile metric-tile--number metric-tile--teal"><strong>7</strong><span>стран-участниц</span></div>
+              <div class="metric-tile metric-tile--image metric-tile--grain-g metric-tile--mobile-oil"></div>
             </div>
-            <div class="association-links" aria-label="Разделы об ассоциации">
-              <a href="#directions"><span>направления <br>деятельности</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
-              <a href="#timeline"><span>этапы <br>развития</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
-              <a href="#members"><span>участники <br>ассоциации</span><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+            <div class="metric-mosaic__bottom">
+              <div class="metric-tile metric-tile--about association__copy">
+                <h2 class="title-lg" id="about-title">Об ассоциации</h2>
+                <p>Международная ассоциация товарных и фьючерсных бирж создана для укрепления взаимодействия участников товарных и товарно-деривативных рынков ЕАЭС+, БРИКС+ и ШОС. Это новая наднациональная площадка для выстраивания экономических мостов, которые соединят товарные потоки и рынки в интересах этих государств.</p>
+              </div>
+              <div class="metric-mosaic__side">
+                <div class="metric-tile metric-tile--image metric-tile--grain-g"></div>
+                <a class="metric-tile metric-tile--link metric-tile--pale metric-tile--mobile-goals" href="#tasks"><span>Цели <br>и задачи</span><img src="assets/images/figma/about-icon-directions.png" alt=""><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+                <a class="metric-tile metric-tile--link metric-tile--pale" href="#directions"><span>направления <br>деятельности</span><img src="assets/images/figma/about-icon-directions.png" alt=""><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+                <a class="metric-tile metric-tile--link metric-tile--pale" href="#timeline"><span>этапы <br>развития</span><img src="assets/images/figma/about-icon-timeline.png" alt=""><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+                <a class="metric-tile metric-tile--link metric-tile--pale" href="#members"><span>участники <br>ассоциации</span><img src="assets/images/figma/about-icon-members.png" alt=""><svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+              </div>
             </div>
           </div>
         </div>
@@ -319,7 +330,7 @@
 
   <script src="assets/js/typograph.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
-  <script type="module" src="assets/js/globe.js"></script>
-  <script src="assets/js/home-redesign.js?v=2026-08-29-2"></script>
+  <script type="module" src="assets/js/globe.js?v=2026-08-29-4"></script>
+  <script src="assets/js/home-redesign.js?v=2026-08-29-4"></script>
 </body>
 </html>

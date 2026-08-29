@@ -12,6 +12,7 @@
   --paper-2: #edf4f6;
   --line: rgba(255, 255, 255, 0.14);
   --line-dark: rgba(8, 42, 56, 0.13);
+  --mosaic-line: rgba(63, 219, 230, 0.28);
   --container: 1280px;
   --pad: clamp(20px, 5vw, 80px);
 }
@@ -179,6 +180,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .button {
+  display: inline-flex;
   justify-content: center;
   gap: 12px;
   min-height: 48px;
@@ -217,8 +219,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .menu-toggle { display: none; }
 
 .hero {
-  min-height: 820px;
-  padding: 108px 0 92px;
+  min-height: 806px;
+  padding: 74px 0 70px;
 }
 
 .hero__inner {
@@ -231,7 +233,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero__content {
   flex: 0 1 650px;
   min-width: 0;
-  padding-top: 28px;
+  min-height: 610px;
+  padding-top: 0;
 }
 
 .title-xl,
@@ -251,8 +254,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .title-xl {
-  max-width: 700px;
-  font-size: clamp(56px, 5vw, 82px);
+  max-width: 760px;
+  font-size: clamp(54px, 4.45vw, 64px);
+}
+
+.title-xl__nowrap {
+  white-space: nowrap;
 }
 
 .title-lg {
@@ -265,14 +272,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .hero__lead {
   max-width: 648px;
-  margin: 58px 0 0;
+  margin: 56px 0 0;
   color: var(--muted);
   font-size: 20px;
   line-height: 1.45;
   font-weight: 600;
 }
 
-.hero__button { margin-top: 86px; }
+.hero__button { margin-top: 78px; }
 
 .hero__visual {
   flex: 1 1 560px;
@@ -287,6 +294,46 @@ button, a { -webkit-tap-highlight-color: transparent; }
   aspect-ratio: 1;
 }
 
+.hero__globe-shell::before {
+  content: "";
+  position: absolute;
+  inset: 2.6%;
+  z-index: 2;
+  pointer-events: none;
+  background: url("../images/figma/continents-asia.png") center / contain no-repeat;
+  opacity: 0.86;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 24px rgba(22, 199, 211, 0.18));
+}
+
+@media (min-width: 1181px) {
+  .hero__inner {
+    position: relative;
+    display: block;
+    min-height: 676px;
+  }
+
+  .hero__content {
+    width: 760px;
+    max-width: 760px;
+  }
+
+  .hero__visual {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 650px;
+    height: 650px;
+    min-width: 0;
+  }
+
+  .hero__globe-shell {
+    width: 610px;
+    height: 610px;
+    margin-left: auto;
+  }
+}
+
 .hero__globe-canvas,
 .hero__globe-canvas canvas,
 .hero__orbit {
@@ -296,11 +343,17 @@ button, a { -webkit-tap-highlight-color: transparent; }
   height: 100%;
 }
 
+.hero__globe-canvas {
+  z-index: 1;
+  opacity: 0.5;
+}
+
 .hero__globe-canvas canvas {
   cursor: grab;
 }
 
 .hero__orbit {
+  z-index: 3;
   fill: none;
   overflow: visible;
   pointer-events: none;
@@ -312,33 +365,53 @@ button, a { -webkit-tap-highlight-color: transparent; }
   vector-effect: non-scaling-stroke;
 }
 
-.trade-promo { padding: 72px 0 48px; }
+.trade-promo { padding: 0 0 48px; }
 
 .trade-card {
   display: flex;
-  min-height: 450px;
+  min-height: 386px;
   overflow: hidden;
-  background: rgba(4, 50, 66, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(90deg, rgba(4, 44, 58, 0.97) 0%, rgba(4, 47, 61, 0.93) 42%, rgba(4, 47, 61, 0.22) 64%, rgba(4, 47, 61, 0) 100%),
+    rgba(4, 50, 66, 0.92);
+  border: 1px solid rgba(47, 224, 253, 0.24);
 }
 
 .trade-card__content {
-  flex: 0 0 43%;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 46%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: clamp(36px, 4vw, 58px);
+  padding: 54px 56px 44px;
+}
+
+.trade-card__head {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.trade-card__mark {
+  display: none;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  color: var(--teal-bright);
 }
 
 .trade-card__list {
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  margin: 54px 0 52px;
+  gap: 18px;
+  margin: 36px 0 42px;
   padding: 0;
   list-style: none;
   color: var(--muted);
-  font-size: 17px;
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -355,32 +428,72 @@ button, a { -webkit-tap-highlight-color: transparent; }
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--teal-bright);
+  border: 2px solid var(--teal-bright);
+  background: transparent;
 }
 
 .trade-card__media {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
+  margin-left: -160px;
 }
 
 .trade-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
-.association { padding: 48px 0 60px; }
+.trade-card__asset {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: rgba(8, 42, 56, 0.72);
+}
+
+.trade-card__asset img {
+  width: 31px;
+  height: 31px;
+  object-fit: contain;
+}
+
+.trade-card__asset--wheat { left: 18%; top: 18%; }
+.trade-card__asset--metal { left: 46%; top: 31%; }
+.trade-card__asset--fuel { right: 12%; top: 43%; }
+.trade-card__asset--leaf { left: 61%; bottom: 30%; }
+
+.association { padding: 0 0 72px; }
 
 .metric-mosaic {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-left: 1px solid var(--mosaic-line);
+  border-top: 1px solid var(--mosaic-line);
+}
+
+.metric-mosaic__top,
+.metric-mosaic__bottom,
+.metric-mosaic__side {
+  display: flex;
   flex-wrap: wrap;
   align-items: stretch;
+  width: 100%;
 }
 
 .metric-tile {
   flex: 0 0 20%;
-  min-height: 188px;
+  min-height: 216px;
   overflow: hidden;
+  border-right: 1px solid var(--mosaic-line);
+  border-bottom: 1px solid var(--mosaic-line);
 }
 
 .metric-tile--image {
@@ -389,12 +502,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
   filter: saturate(0.92);
 }
 
-.metric-tile--grain-a { background-image: url("../images/direction-clean-1.jpg"); }
-.metric-tile--grain-b { background-image: url("../images/direction-clean-2.jpg"); }
-.metric-tile--grain-c { background-image: url("../images/direction-clean-3.jpg"); }
-.metric-tile--grain-d { background-image: url("../images/figma/direction-featured-background.webp"); }
-.metric-tile--grain-e { background-image: url("../images/direction-pricing.png"); }
-.metric-tile--grain-f { background-image: url("../images/direction-platform.png"); }
+.metric-tile--grain-a { background-image: url("../images/figma-mosaic/mosaic-07.png"); }
+.metric-tile--grain-b { background-image: url("../images/figma-mosaic/mosaic-01.png"); }
+.metric-tile--grain-c { background-image: url("../images/figma-mosaic/mosaic-10.png"); }
+.metric-tile--grain-d { background-image: url("../images/figma-mosaic/mosaic-02.png"); }
+.metric-tile--grain-e { background-image: url("../images/figma-mosaic/mosaic-03.png"); }
+.metric-tile--grain-f { background-image: url("../images/figma-mosaic/mosaic-06.png"); }
+.metric-tile--grain-g { background-image: url("../images/figma-mosaic/mosaic-08.png"); }
+.metric-tile--mobile-oil,
+.metric-tile--mobile-goals { display: none; }
 
 .metric-tile--number,
 .metric-tile--link {
@@ -427,10 +543,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .metric-tile--red { background: var(--red); }
-.metric-tile--blue { background: var(--blue); }
+.metric-tile--blue { background: #4f9bd4; }
 .metric-tile--teal { background: var(--teal); }
 
 .metric-tile--link {
+  position: relative;
   gap: 28px;
   background: #067889;
   color: #fff;
@@ -440,10 +557,52 @@ button, a { -webkit-tap-highlight-color: transparent; }
   text-transform: uppercase;
 }
 
+.metric-tile--link > img {
+  width: 36px;
+  height: 36px;
+  margin-top: auto;
+  object-fit: contain;
+}
+
 .metric-tile--link .icon-arrow {
-  align-self: flex-end;
-  width: 22px;
-  height: 22px;
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.metric-tile--pale {
+  background: #067889;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.metric-tile--pale > img {
+  filter: none;
+  opacity: 0.76;
+}
+
+.metric-tile--about {
+  flex: 0 0 60%;
+  min-height: 432px;
+  color: #fff;
+  background: rgba(237, 244, 246, 0.1);
+}
+
+.metric-mosaic__bottom {
+  flex-wrap: nowrap;
+}
+
+.metric-mosaic__side {
+  flex: 0 0 40%;
+}
+
+.metric-mosaic__side .metric-tile {
+  flex-basis: 50%;
+  min-height: 216px;
 }
 
 .association__body {
@@ -454,15 +613,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .association__copy {
-  flex: 1 1 52%;
-  padding: clamp(42px, 4.6vw, 70px);
+  flex: 0 0 60%;
+  padding: 60px 52px;
 }
 
 .association__copy p {
   max-width: 640px;
-  margin: 50px 0 0;
+  margin: 54px 0 0;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.62;
 }
 
@@ -1331,6 +1490,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .metric-tile { flex-basis: 25%; }
+  .metric-mosaic__bottom { flex-direction: column; }
+  .metric-tile--about,
+  .metric-mosaic__side {
+    flex-basis: auto;
+    width: 100%;
+  }
   .association-links a { flex-basis: 33.333%; }
   .task-card { flex-basis: 50%; }
   .direction-card { flex-basis: 50%; }
@@ -1340,7 +1505,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 760px) {
-  :root { --pad: 32px; }
+  :root { --pad: 24px; }
 
   body {
     background: #082638;
@@ -1385,7 +1550,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .hero {
     min-height: auto;
-    padding: 68px 0 56px;
+    padding: 38px 0 36px;
   }
 
   .hero__inner {
@@ -1394,11 +1559,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .hero__content {
     flex-basis: auto;
+    min-height: auto;
     padding-top: 0;
   }
 
   .title-xl {
-    font-size: clamp(48px, 13.4vw, 76px);
+    width: calc(100vw - var(--pad));
+    max-width: none;
+    font-size: 44px;
+    line-height: 1.03;
   }
 
   .title-lg {
@@ -1406,18 +1575,25 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .title-md {
-    font-size: clamp(40px, 11vw, 58px);
+    font-size: clamp(38px, 10.4vw, 54px);
+  }
+
+  .trade-card .title-md {
+    font-size: 38px;
+    white-space: nowrap;
+    word-spacing: -0.16em;
   }
 
   .hero__lead {
-    margin-top: 34px;
-    font-size: 17px;
+    margin-top: 38px;
+    font-size: 14px;
     line-height: 1.45;
   }
 
   .hero__button {
     width: 100%;
-    margin-top: 42px;
+    min-height: 56px;
+    margin-top: 39px;
   }
 
   .hero__visual {
@@ -1425,21 +1601,32 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .trade-promo {
-    padding: 26px 0 34px;
+    padding: 84px 0 34px;
   }
 
   .trade-card {
     min-height: 0;
+    background: rgba(4, 50, 66, 0.92);
   }
 
   .trade-card__content {
-    padding: 30px;
+    min-height: 476px;
+    padding: 30px 28px 26px;
+  }
+
+  .trade-card__head {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .trade-card__mark {
+    display: block;
   }
 
   .trade-card__list {
-    gap: 18px;
-    margin: 32px 0;
-    font-size: 14px;
+    gap: 16px;
+    margin: 28px 0 auto;
+    font-size: 12px;
   }
 
   .button--light {
@@ -1447,7 +1634,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .trade-card__media {
-    height: 344px;
+    height: 238px;
+    margin-left: 0;
+  }
+
+  .trade-card__asset {
+    width: 36px;
+    height: 36px;
+  }
+
+  .trade-card__asset img {
+    width: 21px;
+    height: 21px;
   }
 
   .association {
@@ -1456,7 +1654,40 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .metric-tile {
     flex-basis: 50%;
-    min-height: 144px;
+    min-height: 150px;
+  }
+
+  .metric-mosaic__top .metric-tile,
+  .metric-mosaic__side .metric-tile {
+    flex-basis: 50%;
+  }
+
+  .metric-tile--mobile-oil,
+  .metric-tile--mobile-goals {
+    display: flex;
+  }
+
+  .metric-tile--goals {
+    display: none;
+  }
+
+  .metric-mosaic__side > .metric-tile--grain-g {
+    display: none;
+  }
+
+  .metric-tile--grain-a { order: 1; }
+  .metric-tile--grain-b { order: 2; }
+  .metric-tile--blue { order: 3; }
+  .metric-tile--grain-c { order: 4; }
+  .metric-tile--grain-e { order: 5; }
+  .metric-tile--grain-f { order: 6; }
+  .metric-tile--grain-d { order: 7; }
+  .metric-tile--red { order: 8; }
+  .metric-tile--teal { order: 9; }
+  .metric-tile--mobile-oil { order: 10; }
+
+  .metric-tile--about {
+    min-height: 0;
   }
 
   .metric-tile--number,
@@ -1521,25 +1752,46 @@ button, a { -webkit-tap-highlight-color: transparent; }
     padding: 48px 0;
   }
 
+  .task-board,
+  .direction-list,
+  .member-list,
+  .document-list,
+  .news-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .task-board::-webkit-scrollbar,
+  .direction-list::-webkit-scrollbar,
+  .member-list::-webkit-scrollbar,
+  .document-list::-webkit-scrollbar,
+  .news-list::-webkit-scrollbar {
+    display: none;
+  }
+
   .task-card,
   .direction-card,
   .direction-card--featured {
-    flex-basis: 100%;
+    flex: 0 0 238px;
+    scroll-snap-align: start;
   }
 
   .task-card {
-    min-height: 160px;
-    padding: 28px;
+    min-height: 188px;
+    padding: 24px;
   }
 
   .task-card--title {
-    min-height: 130px;
+    min-height: 188px;
   }
 
   .direction-card,
   .direction-card--featured {
-    min-height: 170px;
-    padding: 28px;
+    min-height: 238px;
+    padding: 24px;
   }
 
   .direction-card p {
@@ -1552,6 +1804,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .timeline-card {
     flex-basis: 238px;
+  }
+
+  .member-card,
+  .document-card,
+  .news-card {
+    flex: 0 0 280px;
+    min-width: 0;
+    scroll-snap-align: start;
   }
 
   .countries-map {
@@ -1635,12 +1895,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .person-card div {
-    min-height: 164px;
-    padding: 18px;
+    min-height: 138px;
+    padding: 14px;
   }
 
   .person-card h3 {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .person-card p {
+    font-size: 12px;
+  }
+
+  .person-card span {
+    font-size: 10px;
   }
 
   .member-list,
@@ -1719,7 +1987,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .title-xl {
-    font-size: 46px;
+    font-size: 44px;
+  }
+
+  .title-xl__nowrap {
+    display: block;
+    font-size: 0.82em;
   }
 
   .metric-tile {
@@ -1727,6 +2000,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .person-list {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
