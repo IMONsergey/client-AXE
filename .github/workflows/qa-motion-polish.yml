@@ -1,0 +1,136 @@
+name: QA AXE motion polish
+
+on:
+  push:
+    branches: [feat/figma-concept-1]
+    paths:
+      - .github/workflows/qa-motion-polish.yml
+      - index.html
+      - assets/css/motion-polish.css
+      - assets/css/countries-grid-motion.css
+      - assets/js/smooth-scroll.js
+      - assets/js/globe.js
+      - assets/js/countries-grid-motion.js
+
+permissions:
+  contents: read
+
+jobs:
+  qa-motion-polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Static invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          polish = Path('assets/css/motion-polish.css').read_text(encoding='utf-8')
+          countries = Path('assets/css/countries-grid-motion.css').read_text(encoding='utf-8')
+          smooth = Path('assets/js/smooth-scroll.js').read_text(encoding='utf-8')
+          globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          country_js = Path('assets/js/countries-grid-motion.js').read_text(encoding='utf-8')
+
+          assert 'motion-polish.css' in html
+          assert 'smooth-scroll.js' in html
+          assert html.count('class="orbit__pulse-line ') == 2
+          assert 'backdrop-filter: blur(8px)' in polish
+          assert '\n  filter: blur(' not in polish.lower()
+          assert 'AUTO_SPEED = reducedMotion ? 0 : 0.067' in globe
+
+          # Custom wheel interception is gone: the loaded compatibility module now
+          # only forces native browser scrolling and exposes a disabled debug state.
+          assert "style.scrollBehavior = 'auto'" in smooth
+          assert "addEventListener('wheel'" not in smooth
+          assert 'enabled: false' in smooth and 'native: true' in smooth
+
+          # Countries no longer create the decorative four-sided trace layer.
+          assert "createElement('i')" not in country_js
+          assert "traces: 0" in country_js
+          assert 'content first' in countries.lower()
+          assert 'display: none !important' in countries
+
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/axe-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+
+      - name: Install Chromium
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Runtime and visual QA
+        run: |
+          node <<'EOF'
+          const { chromium } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
+          const white = v => /rgb\(255, 255, 255\)/.test(v);
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_SMOOTH_SCROLL__?.getState().ready === true);
+
+            const scrollState = await page.evaluate(() => ({
+              state: window.__AXE_SMOOTH_SCROLL__.getState(),
+              behavior: getComputedStyle(document.documentElement).scrollBehavior
+            }));
+            if (scrollState.state.enabled || !scrollState.state.native || scrollState.behavior !== 'auto') {
+              throw new Error(`custom smooth scroll still active ${JSON.stringify(scrollState)}`);
+            }
+
+            await page.mouse.wheel(0, 720);
+            await page.waitForTimeout(120);
+            const nativeY = await page.evaluate(() => scrollY);
+            if (nativeY <= 0) throw new Error(`native wheel did not scroll: ${nativeY}`);
+
+            for (const selector of ['.header-request', '.hero__request']) {
+              await page.hover(selector);
+              await page.waitForTimeout(430);
+              const style = await page.$eval(selector, el => {
+                const s = getComputedStyle(el);
+                return { bg: s.backgroundColor, opacity: s.opacity };
+              });
+              if (!white(style.bg) || style.opacity !== '1') throw new Error(`${selector} hover invalid ${JSON.stringify(style)}`);
+            }
+
+            await page.evaluate(() => document.querySelector('.countries__grid').scrollIntoView({ behavior:'auto', block:'center' }));
+            await page.waitForFunction(() => window.__AXE_COUNTRIES_GRID__?.getState().started === true, null, { timeout:5000 });
+            await page.waitForFunction(() => document.querySelector('.country')?.classList.contains('is-visible'), null, { timeout:5000 });
+            const intro = await page.evaluate(() => ({
+              traces: document.querySelectorAll('.country__trace').length,
+              flag: Number(getComputedStyle(document.querySelector('.country img')).opacity),
+              line: Number(getComputedStyle(document.querySelector('.country'), '::before').opacity)
+            }));
+            if (intro.traces !== 0) throw new Error(`legacy trace nodes remain: ${intro.traces}`);
+            if (intro.flag < intro.line) throw new Error(`grid appears before country content ${JSON.stringify(intro)}`);
+
+            await page.waitForTimeout(1600);
+            const finalLine = await page.$eval('.country', el => Number(getComputedStyle(el, '::before').opacity));
+            if (finalLine < .95) throw new Error(`country grid did not resolve: ${finalLine}`);
+            await page.locator('.countries').screenshot({ path:'countries-content-first.png' });
+
+            if (errors.length) throw new Error(errors.join('\n'));
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: motion-polish-visual-qa
+          path: countries-content-first.png
+          if-no-files-found: error
+          retention-days: 1

@@ -1,0 +1,290 @@
+name: QA AXE implementation
+
+on:
+  push:
+    branches:
+      - feat/figma-concept-1
+    paths:
+      - .github/workflows/qa-figma-concept.yml
+      - index.html
+      - assets/css/**
+      - assets/js/**
+      - assets/vendor/**
+      - assets/images/**
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/figma-concept-1
+
+      - name: Validate implementation invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          html = Path('index.html').read_text(encoding='utf-8')
+          styles = Path('assets/css/styles.css').read_text(encoding='utf-8')
+          refinements = Path('assets/css/refinements.css').read_text(encoding='utf-8')
+          enhancements = Path('assets/css/enhancements.css').read_text(encoding='utf-8')
+          motion_css = Path('assets/css/motion.css').read_text(encoding='utf-8')
+          motion_js = Path('assets/js/motion.js').read_text(encoding='utf-8')
+          navigation = Path('assets/js/navigation.js').read_text(encoding='utf-8')
+          globe = Path('assets/js/globe.js').read_text(encoding='utf-8')
+          dots = Path('assets/js/dot-field.js').read_text(encoding='utf-8')
+          typo = Path('assets/js/typograph.js').read_text(encoding='utf-8')
+          combined = '\n'.join((html, styles, refinements, enhancements, motion_css, motion_js, navigation, globe, dots, typo))
+
+          for forbidden in ('www.figma.com/api/mcp/asset', 'fonts.googleapis.com', 'fonts.gstatic.com', 'assets/images/arrow.png'):
+              assert forbidden not in combined, f'forbidden runtime dependency remains: {forbidden}'
+
+          assert '<br' not in html.lower()
+          assert html.count('visual-stage__dot-field') == 1
+          assert html.count('hero__globe-orbits hero__globe-orbits--') == 2
+          assert 'arcs: []' in globe
+          assert 'pointerdown' in globe and 'pointermove' in globe
+          assert 'ResizeObserver' in globe
+          assert 'requestAnimationFrame' in dots and 'ResizeObserver' in dots
+          assert 'prefers-reduced-motion: reduce' in dots
+          assert 'mobileMetricsStyle' not in typo and "createElement('style')" not in typo
+
+          expected_images = (
+              'assets/images/direction-links.png',
+              'assets/images/direction-pricing.png',
+              'assets/images/direction-platform.png',
+          )
+          for image in expected_images:
+              assert f'src="{image}"' in html, f'missing original direction image: {image}'
+              assert Path(image).exists(), f'original direction image file missing: {image}'
+          assert 'direction-patterns.js' not in html
+          assert 'data-pattern=' not in html
+          assert 'direction-card__pattern' not in html
+
+          assert 'position: fixed !important' in enhancements
+          assert '.site-header.is-scrolled' in enhancements
+          assert 'appendChild(header)' not in navigation
+          assert 'site-header-placeholder' not in navigation
+          assert 'backdrop-filter' not in enhancements
+
+          assert 'motion.css' in html and 'motion.js' in html
+          assert 'IntersectionObserver' in motion_js
+          assert 'motion-word__inner' in motion_css
+          assert 'blur(' not in motion_css.lower()
+          assert 'filter:' not in motion_css.lower()
+
+          match = re.search(r'const MAP_SAMPLES\s*=\s*([\d_]+)', globe)
+          assert match and int(match.group(1).replace('_', '')) <= 32767
+
+          assert 'height: calc((100vw - 32px) * 1.08) !important' in refinements
+          assert 'height: 33.333333% !important' in refinements
+          assert '.metric-card--teal {\n    top: 33.333333%;' in refinements
+          assert '.metric-card--blue {\n    top: 66.666666%;' in refinements
+          assert 'aspect-ratio: 2 / 1' in refinements
+          assert '.document-card {\n    grid-column: 1;' in refinements
+
+          refs = re.findall(r'(?:src|href)="(assets/[^"#?]+)"', html)
+          missing = sorted({ref for ref in refs if not (root / ref).exists()})
+          assert not missing, f'missing local files: {missing}'
+          assert html.count('class="country"') == 7
+          assert html.count('class="direction-card"') == 3
+          assert html.count('metric-card metric-card--') == 3
+          assert Path('assets/vendor/cobe.js').exists()
+
+      - name: Start static server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/axe-http.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+
+      - name: Install browsers
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 install --with-deps chromium webkit
+          npm install --no-save --no-package-lock playwright@1.55.0
+
+      - name: Verify runtime and responsive geometry
+        shell: bash
+        run: |
+          node <<'EOF'
+          const { chromium, webkit } = require('playwright');
+          const url = 'http://127.0.0.1:4173/';
+
+          const closeTo = (actual, expected, tolerance, label) => {
+            if (Math.abs(actual - expected) > tolerance) {
+              throw new Error(`${label}: expected ${expected.toFixed(2)}, got ${actual.toFixed(2)}`);
+            }
+          };
+
+          async function verifyMobile(page, engine) {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.evaluate(() => scrollTo(0, 0));
+            await page.waitForTimeout(240);
+
+            const boxes = await page.evaluate(() => {
+              const box = (selector) => {
+                const rect = document.querySelector(selector)?.getBoundingClientRect();
+                return rect && {
+                  left: rect.left,
+                  top: rect.top,
+                  width: rect.width,
+                  height: rect.height,
+                  cx: rect.left + rect.width / 2,
+                  cy: rect.top + rect.height / 2
+                };
+              };
+              return {
+                metrics: box('.metrics'),
+                dark: box('.metric-card--dark'),
+                teal: box('.metric-card--teal'),
+                blue: box('.metric-card--blue'),
+                about: box('.about-grid'),
+                document: box('.document-card'),
+                empty: box('.about-grid__cell:first-child')
+              };
+            });
+
+            for (const [name, value] of Object.entries(boxes)) {
+              if (!value) throw new Error(`${engine}: missing ${name}`);
+            }
+
+            const { metrics, dark, teal, blue, about, document, empty } = boxes;
+            closeTo(metrics.height, metrics.width * 1.08, 3, `${engine}: taller metric grid`);
+            const w = metrics.width / 3;
+            const h = metrics.height / 3;
+            const expected = [
+              ['8', dark, 1/6, 1/6],
+              ['7', teal, 5/6, 1/2],
+              ['~15', blue, 1/2, 5/6]
+            ];
+
+            for (const [label, card, xr, yr] of expected) {
+              closeTo(card.width, w, 2.5, `${engine}: ${label} width`);
+              closeTo(card.height, h, 2.5, `${engine}: ${label} height`);
+              closeTo(card.cx, metrics.left + metrics.width * xr, 2.5, `${engine}: ${label} center-x`);
+              closeTo(card.cy, metrics.top + metrics.height * yr, 2.5, `${engine}: ${label} center-y`);
+            }
+
+            closeTo(about.width, about.height * 2, 2.5, `${engine}: document area ratio`);
+            closeTo(document.left, about.left, 2.5, `${engine}: document must be left`);
+            closeTo(document.width, about.width / 2, 2.5, `${engine}: document width`);
+            closeTo(document.height, about.height, 2.5, `${engine}: document height`);
+            closeTo(empty.left, about.left + about.width / 2, 2.5, `${engine}: empty cell must be right`);
+          }
+
+          async function verifyEngine(browserType, engine) {
+            const browser = await browserType.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForFunction(() => window.__AXE_DOT_FIELD__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_GLOBE__?.getState().ready === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_PRELOADER__?.getState().hidden === true, null, { timeout: 15000 });
+            await page.waitForFunction(() => window.__AXE_MOTION__?.getState().ready === true, null, { timeout: 15000 });
+
+            const staticArt = await page.evaluate(() => [...document.querySelectorAll('.direction-card__visual')].map(img => ({
+              tag: img.tagName,
+              naturalWidth: img.naturalWidth,
+              canvasInside: Boolean(img.closest('.direction-card')?.querySelector('canvas'))
+            })));
+            if (staticArt.length !== 3 || staticArt.some(item => item.tag !== 'IMG' || item.naturalWidth < 100 || item.canvasInside)) {
+              throw new Error(`${engine}: direction artwork is not static ${JSON.stringify(staticArt)}`);
+            }
+
+            const headerAtTop = await page.evaluate(() => {
+              const header = document.querySelector('.site-header');
+              const rect = header.getBoundingClientRect();
+              return {
+                position: getComputedStyle(header).position,
+                top: rect.top,
+                scrolled: header.classList.contains('is-scrolled')
+              };
+            });
+            if (headerAtTop.position !== 'fixed' || Math.abs(headerAtTop.top) > 1 || headerAtTop.scrolled) {
+              throw new Error(`${engine}: header initial state invalid ${JSON.stringify(headerAtTop)}`);
+            }
+
+            await page.evaluate(() => scrollTo(0, 900));
+            await page.waitForTimeout(720);
+            const headerScrolled = await page.evaluate(() => {
+              const header = document.querySelector('.site-header');
+              const rect = header.getBoundingClientRect();
+              return {
+                position: getComputedStyle(header).position,
+                top: rect.top,
+                scrolled: header.classList.contains('is-scrolled'),
+                motion: window.__AXE_MOTION__.getState()
+              };
+            });
+            if (headerScrolled.position !== 'fixed' || Math.abs(headerScrolled.top) > 1 || !headerScrolled.scrolled) {
+              throw new Error(`${engine}: header scrolled state invalid ${JSON.stringify(headerScrolled)}`);
+            }
+            if (headerScrolled.motion.revealTargets < 10 || headerScrolled.motion.wordTargets < 4) {
+              throw new Error(`${engine}: motion pool too small ${JSON.stringify(headerScrolled.motion)}`);
+            }
+
+            const initialFrame = await page.evaluate(() => window.__AXE_DOT_FIELD__.getState().frame);
+            await page.waitForFunction(
+              frame => window.__AXE_DOT_FIELD__?.getState().frame > frame,
+              initialFrame,
+              { timeout: 2200 }
+            );
+
+            const globe = page.locator('#axe-globe');
+            const r = await globe.boundingBox();
+            if (!r) throw new Error(`${engine}: globe missing`);
+            const x = r.x + r.width * .54;
+            const y = r.y + r.height * .52;
+            await page.mouse.move(x, y);
+            await page.mouse.down();
+            await page.mouse.move(x + 48, y + 18, { steps: 5 });
+            await page.mouse.up();
+
+            await verifyMobile(page, engine);
+            if (errors.length) throw new Error(`${engine}: ${errors.join('\n')}`);
+            await browser.close();
+          }
+
+          (async () => {
+            await verifyEngine(chromium, 'Chromium');
+            await verifyEngine(webkit, 'WebKit');
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Capture responsive Chromium renders
+        shell: bash
+        run: |
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,1000" --full-page http://127.0.0.1:4173/ preview-1440.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1024,900" --full-page http://127.0.0.1:4173/ preview-1024.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="768,900" --full-page http://127.0.0.1:4173/ preview-768.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page http://127.0.0.1:4173/ preview-390.png
+          test -s preview-1440.png
+          test -s preview-1024.png
+          test -s preview-768.png
+          test -s preview-390.png
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa
+          path: |
+            preview-1440.png
+            preview-1024.png
+            preview-768.png
+            preview-390.png
+          if-no-files-found: error
+          retention-days: 1
