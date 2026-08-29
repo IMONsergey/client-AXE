@@ -37,65 +37,52 @@
     </header>
 
     <section class="bo-view bo-auth-view" data-view-panel="login" aria-labelledby="login-title">
-      <div class="bo-auth-card">
+      <div class="bo-auth-card" data-auth-card data-auth-mode="login">
         <div class="bo-auth-card__head">
           <h1 id="login-title">Bids &amp; Offers</h1>
           <div class="bo-tabs">
-            <button class="bo-tab is-active" type="button" data-view-target="login">Вход</button>
-            <button class="bo-tab" type="button" data-view-target="register">Регистрация</button>
+            <button class="bo-tab is-active" type="button" data-auth-target="login">Вход</button>
+            <button class="bo-tab" type="button" data-auth-target="register">Регистрация</button>
           </div>
         </div>
-        <form class="bo-auth-form" data-next-view="requests" novalidate autocomplete="off">
-          <label class="bo-field">
-            <span>E-mail</span>
-            <input id="login-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="login-email-hint login-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
-            <span class="bo-field__hint" id="login-email-hint">Введите e-mail, указанный при регистрации.</span>
-            <span class="bo-field__error" id="login-email-error" aria-live="polite" hidden></span>
-          </label>
-          <label class="bo-field">
-            <span>Пароль</span>
-            <input id="login-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="login-password-hint login-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
-            <span class="bo-field__hint" id="login-password-hint">Пароль должен содержать не менее 6 символов.</span>
-            <span class="bo-field__error" id="login-password-error" aria-live="polite" hidden></span>
-          </label>
-          <button class="bo-link-button" type="button" data-view-target="forgot">Забыли пароль? Восстановить</button>
-          <button class="bo-primary" type="submit">Войти</button>
-          <button class="bo-link-button bo-auth-switch" type="button" data-view-target="register">Нет аккаунта? Зарегистрироваться</button>
-        </form>
-      </div>
-    </section>
 
-    <section class="bo-view bo-auth-view" data-view-panel="register" aria-labelledby="register-title">
-      <div class="bo-auth-card bo-auth-card--register">
-        <div class="bo-auth-card__head">
-          <h1 id="register-title">Bids &amp; Offers</h1>
-          <div class="bo-tabs">
-            <button class="bo-tab" type="button" data-view-target="login">Вход</button>
-            <button class="bo-tab is-active" type="button" data-view-target="register">Регистрация</button>
-          </div>
+        <div class="bo-auth-stage" data-auth-stage>
+          <form class="bo-auth-form bo-auth-pane is-active" data-auth-pane="login" data-next-view="requests" novalidate autocomplete="off">
+            <label class="bo-field">
+              <span>E-mail</span>
+              <input id="login-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="login-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
+              <span class="bo-field__error" id="login-email-error" aria-live="polite" hidden></span>
+            </label>
+            <label class="bo-field">
+              <span>Пароль</span>
+              <input id="login-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="login-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
+              <span class="bo-field__error" id="login-password-error" aria-live="polite" hidden></span>
+            </label>
+            <button class="bo-link-button" type="button" data-view-target="forgot"><span>Забыли пароль?</span> <span class="bo-inline-link">Восстановить</span></button>
+            <button class="bo-primary" type="submit">Войти</button>
+            <button class="bo-link-button bo-auth-switch" type="button" data-auth-target="register"><span>Нет аккаунта?</span> <span class="bo-inline-link">Зарегистрироваться</span></button>
+          </form>
+
+          <form class="bo-auth-form bo-auth-pane" data-auth-pane="register" data-next-view="confirm" novalidate autocomplete="off" aria-hidden="true">
+            <label class="bo-field">
+              <span>E-mail*</span>
+              <input id="register-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="register-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
+              <span class="bo-field__error" id="register-email-error" aria-live="polite" hidden></span>
+            </label>
+            <label class="bo-field">
+              <span>Пароль*</span>
+              <input id="register-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
+              <span class="bo-field__error" id="register-password-error" aria-live="polite" hidden></span>
+            </label>
+            <label class="bo-field">
+              <span>Подтвердить пароль*</span>
+              <input id="register-password-confirm" name="password_confirm" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-confirm-error" data-match="password" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов." data-error-match="Пароли должны совпадать.">
+              <span class="bo-field__error" id="register-password-confirm-error" aria-live="polite" hidden></span>
+            </label>
+            <button class="bo-primary" type="submit">Зарегистрироваться</button>
+            <button class="bo-link-button bo-auth-switch" type="button" data-auth-target="login"><span>Уже зарегистрированы?</span> <span class="bo-inline-link">Войти</span></button>
+          </form>
         </div>
-        <form class="bo-auth-form" data-next-view="confirm" novalidate autocomplete="off">
-          <label class="bo-field">
-            <span>E-mail*</span>
-            <input id="register-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="register-email-hint register-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
-            <span class="bo-field__hint" id="register-email-hint">Введите e-mail.</span>
-            <span class="bo-field__error" id="register-email-error" aria-live="polite" hidden></span>
-          </label>
-          <label class="bo-field">
-            <span>Пароль*</span>
-            <input id="register-password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-hint register-password-error" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов.">
-            <span class="bo-field__hint" id="register-password-hint">Пароль должен содержать не менее 6 символов.</span>
-            <span class="bo-field__error" id="register-password-error" aria-live="polite" hidden></span>
-          </label>
-          <label class="bo-field">
-            <span>Подтвердить пароль*</span>
-            <input id="register-password-confirm" name="password_confirm" type="password" placeholder="Введите пароль" autocomplete="off" required minlength="6" aria-describedby="register-password-confirm-hint register-password-confirm-error" data-match="password" data-error-required="Введите пароль." data-error-minlength="Минимум 6 символов." data-error-match="Пароли должны совпадать.">
-            <span class="bo-field__hint" id="register-password-confirm-hint">Повторите пароль, чтобы исключить ошибку.</span>
-            <span class="bo-field__error" id="register-password-confirm-error" aria-live="polite" hidden></span>
-          </label>
-          <button class="bo-primary" type="submit">Зарегистрироваться</button>
-          <button class="bo-link-button bo-auth-switch" type="button" data-view-target="login">Уже зарегистрированы? Войти</button>
-        </form>
       </div>
     </section>
 
@@ -114,8 +101,7 @@
         <form class="bo-auth-form" data-next-view="reset" novalidate autocomplete="off">
           <label class="bo-field">
             <span>E-mail</span>
-            <input id="forgot-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="forgot-email-hint forgot-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
-            <span class="bo-field__hint" id="forgot-email-hint">Введите e-mail, указанный при регистрации.</span>
+            <input id="forgot-email" name="email" type="email" placeholder="Введите e-mail" autocomplete="off" required aria-describedby="forgot-email-error" data-error-required="Введите e-mail." data-error-email="Введите корректный e-mail.">
             <span class="bo-field__error" id="forgot-email-error" aria-live="polite" hidden></span>
           </label>
           <button class="bo-primary" type="submit">Подтвердить</button>
