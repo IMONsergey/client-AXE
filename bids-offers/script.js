@@ -441,8 +441,8 @@ function renderRequests() {
       <tr class="bo-empty-row">
         <td colspan="8">
           <div class="bo-empty-state">
-            <strong>По выбранным фильтрам заявок нет.</strong>
-            <span>Измените параметры поиска или выберите другой статус.</span>
+            <strong>По выбранным фильтрам заявок нет</strong>
+            <span>Измените параметры поиска или выберите другой статус</span>
           </div>
         </td>
       </tr>
@@ -584,24 +584,24 @@ function requestFromForm(form) {
 function getFieldErrorMessage(field) {
   const value = String(field.value || "").trim();
   if (field.required && !value) {
-    return field.dataset.errorRequired || "Заполните обязательное поле.";
+    return field.dataset.errorRequired || "Заполните обязательное поле";
   }
   if (field.type === "email" && value && field.validity.typeMismatch) {
-    return field.dataset.errorEmail || "Введите корректный e-mail.";
+    return field.dataset.errorEmail || "Введите корректный e-mail";
   }
   if (field.minLength > 0 && value && value.length < field.minLength) {
-    return field.dataset.errorMinlength || "Минимум 6 символов.";
+    return field.dataset.errorMinlength || "Минимум 6 символов";
   }
   if (field.pattern && value && !new RegExp(`^(?:${field.pattern})$`).test(value)) {
-    return field.dataset.errorPattern || "Заполните обязательное поле.";
+    return field.dataset.errorPattern || "Заполните обязательное поле";
   }
   if (field.dataset.dateInput !== undefined && value && !isValidDateString(value)) {
-    return field.dataset.errorPattern || "Укажите дату в формате дд.мм.гггг.";
+    return field.dataset.errorPattern || "Укажите дату в формате дд.мм.гггг";
   }
   if (field.dataset.match) {
     const matchedField = field.form.elements[field.dataset.match];
     if (matchedField && value && value !== matchedField.value) {
-      return field.dataset.errorMatch || "Пароли должны совпадать.";
+      return field.dataset.errorMatch || "Пароли должны совпадать";
     }
   }
   return "";
