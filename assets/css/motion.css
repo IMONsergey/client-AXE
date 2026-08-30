@@ -102,14 +102,10 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* Metric cells fade exactly in place so the rigid matrix never wobbles. */
-.motion-ready .metric-card.motion-reveal,
-.motion-ready .metric-card.motion-reveal.is-visible {
+/* The mosaic fades as one unit so its shared one-pixel seams never separate. */
+.motion-ready .association-mosaic.motion-reveal,
+.motion-ready .association-mosaic.motion-reveal.is-visible {
   transform: none;
-}
-
-.motion-ready .direction-card.motion-reveal {
-  transform: translate3d(0, 16px, 0);
 }
 
 /* Countries use a structural line-draw instead of moving the whole cells. Moving
@@ -225,7 +221,7 @@
 
 /* Four-column tablet grid: rows after the first reuse the previous row's bottom
    edge as their top edge; cells 1 and 5 receive the outer left rule. */
-@media (max-width: 900px) {
+@media (max-width: 1050px) {
   .country:nth-child(n + 5) {
     --country-top-size: 0%;
   }
@@ -247,21 +243,20 @@
   }
 }
 
-/* Original direction-card images remain fully static. */
-
 /* Micro-interactions: short distance, slow finish. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
-.about__link .icon-arrow,
-.document-card__arrow {
+.association-mosaic__nav-arrow {
   transition: transform 340ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
-.hero__request:hover .icon-arrow,
-.about__link:hover .icon-arrow,
-.document-card:hover .document-card__arrow {
+.hero__request:hover .icon-arrow {
   transform: translate3d(3px, 0, 0);
+}
+
+.association-mosaic__nav-card:hover .association-mosaic__nav-arrow {
+  transform: translate3d(0, 3px, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {

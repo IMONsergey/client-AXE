@@ -68,26 +68,14 @@
       /* Compact stagger values keep text reading as one sentence rather than a
          sequence of individual effects. */
       splitWords(document.querySelector('.hero__title'), 32, 90);
-      splitWords(document.querySelector('.about__copy h2'), 38, 0);
+      splitWords(document.querySelector('.association-mosaic__about h2'), 38, 0);
       splitWords(document.querySelector('.countries h2'), 36, 0);
-      document.querySelectorAll('.direction-card h3').forEach((element) => splitWords(element, 30, 0));
     }
 
     registerReveal(document.querySelector('.hero__copy'), { delay: 150 });
     registerReveal(document.querySelector('.hero__visual'), { delay: 90, scale: true });
 
-    document.querySelectorAll('.metric-card').forEach((element, index) => {
-      registerReveal(element, { delay: index * 58, scale: true });
-    });
-
-    registerReveal(document.querySelector('.about__copy p'), { delay: 80 });
-    registerReveal(document.querySelector('.about__link'), { delay: 145, short: true });
-    registerReveal(document.querySelector('.about-grid'), { delay: 55, scale: true });
-
-    /* Direction-card images intentionally receive no motion class. */
-    document.querySelectorAll('.direction-card').forEach((element, index) => {
-      registerReveal(element, { delay: index * 64 });
-    });
+    registerReveal(document.querySelector('.association-mosaic'), { delay: 55, scale: true });
 
     document.querySelectorAll('.country').forEach((element, index) => {
       registerReveal(element, { delay: Math.min(index * 38, 228), short: true });

@@ -1,6 +1,6 @@
 const stage = document.querySelector('.visual-stage');
 const canvas = stage?.querySelector('.visual-stage__dot-field');
-const contentLower = stage?.querySelector('.content-lower');
+const associationMosaic = stage?.querySelector('.association-mosaic');
 
 if (stage && canvas) {
   const context = canvas.getContext('2d', { alpha: true, desynchronized: true });
@@ -76,10 +76,10 @@ if (stage && canvas) {
     }
 
     function getMiddleOffset() {
-      if (!contentLower) return Math.min(890, height * 0.42);
+      if (!associationMosaic) return Math.min(890, height * 0.42);
       const stageRect = stage.getBoundingClientRect();
-      const lowerRect = contentLower.getBoundingClientRect();
-      return clamp(lowerRect.top - stageRect.top - 160, 720, Math.max(720, height - 900));
+      const mosaicRect = associationMosaic.getBoundingClientRect();
+      return clamp(mosaicRect.top - stageRect.top - 160, 720, Math.max(720, height - 900));
     }
 
     function buildDots() {

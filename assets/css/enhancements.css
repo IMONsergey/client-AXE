@@ -290,19 +290,6 @@ html.menu-open {
   .site-nav a { min-height: 58px; padding-block: 13px; }
 }
 
-/* Restore the exact static direction artwork from the first localized Figma version. */
-.direction-card__visual {
-  display: block;
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  background: none !important;
-  opacity: 1;
-  mix-blend-mode: normal;
-}
-
-.direction-card__pattern { display: none !important; }
-
 @media (prefers-reduced-motion: reduce) {
   .preloader,
   .site-header,

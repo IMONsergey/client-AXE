@@ -54,7 +54,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
   margin-inline: auto;
 }
 
-.site-shell { overflow: hidden; }
+.site-shell {
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(241, 244, 246, 0) 81.96%, #f1f4f6 91.48%),
+    radial-gradient(67.36% 48.22% at 83.89% 68.67%, rgba(0, 132, 193, 0.5) 0%, rgba(0, 132, 193, 0) 100%),
+    linear-gradient(180deg, #122438 13.53%, #008290 71.98%, #c9e4ff 100%);
+  background-repeat: no-repeat;
+  background-size: 100% calc(100% + 900px);
+}
 
 .visual-stage {
   position: relative;
@@ -62,26 +70,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
   overflow: hidden;
   padding-bottom: 72px;
   color: #fff;
-  background:
-    radial-gradient(ellipse 54% 31% at 83% 31%, rgba(0, 127, 173, 0.16) 0%, rgba(0, 127, 173, 0) 74%),
-    linear-gradient(180deg, #091827 0%, #07313e 28%, #006b78 54%, #0095a4 73%, #80bdd5 91%, #dce9ef 100%);
-}
-
-.visual-stage::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 560px;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(242, 245, 247, 0) 0%, rgba(242, 245, 247, 0.24) 35%, var(--country-bg) 100%);
+  background: transparent;
 }
 
 .site-header,
 .hero,
-.content-lower {
+.bids-promo,
+.association-mosaic {
   position: relative;
   z-index: 2;
 }
@@ -144,15 +139,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .site-nav a,
 .header-request,
 .hero__request,
-.about__link,
-.document-card {
+.association-mosaic__nav-card {
   transition: opacity 160ms ease, background-color 160ms ease, color 160ms ease;
 }
 
 .site-nav a:hover,
 .header-request:hover,
-.hero__request:hover,
-.about__link:hover { opacity: 0.8; }
+.hero__request:hover { opacity: 0.8; }
 
 .header-request {
   display: inline-flex;
@@ -242,17 +235,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
   height: 21px;
 }
 
-.metric-card strong,
-.about__copy h2,
-.direction-card h3,
-.direction-card__index,
+.association-mosaic__metric strong,
+.association-mosaic__metric b,
+.association-mosaic__about h2,
+.association-mosaic__nav-title,
 .countries h2 {
   font-family: var(--font-display);
   letter-spacing: 0;
-}
-
-.about__link {
-  font-family: var(--font-action);
 }
 
 .hero__visual {
@@ -489,239 +478,181 @@ button, a { -webkit-tap-highlight-color: transparent; }
   to { transform: rotate(0.7deg) scale(1.006); }
 }
 
-.content-lower {
+.association-mosaic {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1.06fr)) repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "wheat fertilizer exchanges metals sugar"
+    "turnover pistachios timber goals countries"
+    "about about about oil directions"
+    "about about about stages members";
+  aspect-ratio: 5 / 3.28;
   margin-top: 96px;
-}
-
-.metrics {
   border-top: 1px solid var(--grid-line);
   border-left: 1px solid var(--grid-line);
 }
 
-.metric-row {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0;
-}
-
-.metric-cell {
-  display: block;
+.association-mosaic__photo,
+.association-mosaic__metric,
+.association-mosaic__about,
+.association-mosaic__nav-card {
   min-width: 0;
-  min-height: clamp(156px, 13.6vw, 196px);
+  min-height: 0;
   border-right: 1px solid var(--grid-line);
   border-bottom: 1px solid var(--grid-line);
 }
 
-.metric-card {
+.association-mosaic__photo {
+  overflow: hidden;
+}
+
+.association-mosaic__photo img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.association-mosaic__photo--wheat { grid-area: wheat; }
+.association-mosaic__photo--fertilizer { grid-area: fertilizer; }
+.association-mosaic__photo--metals { grid-area: metals; }
+.association-mosaic__photo--sugar { grid-area: sugar; }
+.association-mosaic__photo--pistachios { grid-area: pistachios; }
+.association-mosaic__photo--timber { grid-area: timber; }
+.association-mosaic__photo--oil { grid-area: oil; }
+
+.association-mosaic__metric {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 27px;
-  padding: 20px 16px;
+  padding: 18px;
   color: #fff;
   text-align: center;
 }
 
-.metric-card--dark { background: #091019; }
-.metric-card--teal { background: #0799a7; }
-.metric-card--blue { background: #548bad; }
-
-.metric-card strong {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  font-size: clamp(64px, 5.8vw, 83px);
-  line-height: 0.78;
-  letter-spacing: -0.055em;
+.association-mosaic__metric strong,
+.association-mosaic__metric b {
+  display: block;
+  margin: 0;
   font-weight: 400;
+  text-transform: uppercase;
 }
 
-.metric-label {
+.association-mosaic__metric strong {
+  font-size: clamp(70px, 6vw, 96px);
+  line-height: 0.88;
+}
+
+.association-mosaic__metric span {
   display: block;
-  font-size: 16px;
+  margin-top: 20px;
+  font-size: clamp(14px, 1.15vw, 17px);
   line-height: 1.35;
   font-weight: 500;
-  text-wrap: balance;
 }
 
-.metric-card--blue { gap: 22px; }
-.metric-card--blue .metric-label { max-width: 126px; line-height: 1.18; }
-.metric-card__tilde { margin-right: 2px; font-size: 0.58em; letter-spacing: -0.03em; }
-
-.about {
-  display: grid;
-  grid-template-columns: minmax(0, 1.13fr) minmax(500px, 0.87fr);
-  gap: clamp(60px, 6.5vw, 98px);
-  align-items: stretch;
-  margin-top: 64px;
+.association-mosaic__metric--exchanges {
+  grid-area: exchanges;
+  background: #4387c4;
 }
 
-.about__copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-top: 46px;
-  min-width: 0;
+.association-mosaic__metric--turnover {
+  grid-area: turnover;
+  background: #be405e;
 }
 
-.about__copy h2 {
+.association-mosaic__metric--turnover strong {
+  font-size: clamp(62px, 5.25vw, 84px);
+}
+
+.association-mosaic__metric--turnover b {
+  margin-top: 4px;
+  font-size: clamp(27px, 2.45vw, 38px);
+  line-height: 1;
+}
+
+.association-mosaic__metric--turnover span {
+  margin-top: 16px;
+}
+
+.association-mosaic__metric--countries {
+  grid-area: countries;
+  background: #0095a4;
+}
+
+.association-mosaic__about {
+  grid-area: about;
+  padding: clamp(44px, 4vw, 62px) clamp(46px, 4.2vw, 68px);
+}
+
+.association-mosaic__about h2 {
   margin: 0;
-  font-size: clamp(46px, 4.2vw, 60px);
-  line-height: 1.033;
-  letter-spacing: -0.012em;
+  font-size: clamp(48px, 4.3vw, 66px);
+  line-height: 1;
   font-weight: 400;
-  text-wrap: balance;
+  text-transform: uppercase;
 }
 
-.about__copy p {
-  width: min(100%, 680px);
-  margin: 58px 0 0;
-  font-size: 20px;
-  line-height: 30px;
+.association-mosaic__about p {
+  width: min(100%, 650px);
+  margin: clamp(42px, 3.9vw, 58px) 0 0;
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.52;
   text-wrap: pretty;
-  hyphens: manual;
 }
 
-.about__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 30px;
-  color: var(--cyan-soft);
-  font-size: 20px;
-  line-height: 30px;
-  white-space: nowrap;
+.association-mosaic__nav {
+  display: contents;
 }
 
-.about__link .icon-arrow {
-  width: 17px;
-  height: 17px;
-}
-
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(190px, 1fr));
-  min-height: 420px;
-  border-top: 1px solid var(--grid-line);
-  border-left: 1px solid var(--grid-line);
-}
-
-.about-grid__cell,
-.document-card {
-  min-width: 0;
-  border-right: 1px solid var(--grid-line);
-  border-bottom: 1px solid var(--grid-line);
-}
-
-.document-card {
+.association-mosaic__nav-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 0;
-  padding: 28px 18px 17px;
-  background: #fff;
-  color: #0e151d;
-  text-align: center;
+  justify-content: space-between;
+  padding: clamp(24px, 2.45vw, 37px) clamp(22px, 2.25vw, 34px);
+  color: #fff;
 }
 
-.document-card:hover { background: #f7fafb; opacity: 1; }
-.document-card__icon { width: 29px; height: 38px; object-fit: contain; }
-.document-card__title {
-  max-width: 155px;
-  margin-top: 20px;
-  font-size: 16px;
-  line-height: 19px;
-  font-weight: 500;
-  text-wrap: balance;
+.association-mosaic__nav-card:hover {
+  background: rgba(47, 224, 253, 0.07);
 }
 
-.document-card__footer {
+.association-mosaic__nav-card:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -3px;
+}
+
+.association-mosaic__nav-card--goals { grid-area: goals; }
+.association-mosaic__nav-card--directions { grid-area: directions; }
+.association-mosaic__nav-card--stages { grid-area: stages; }
+.association-mosaic__nav-card--members { grid-area: members; }
+
+.association-mosaic__nav-title {
+  font-size: clamp(24px, 2.05vw, 31px);
+  line-height: 1.08;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.association-mosaic__nav-footer {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  margin-top: auto;
-  color: #79848c;
+  gap: 16px;
 }
 
-.document-card__meta {
-  font-size: 10px;
-  line-height: 14px;
-  letter-spacing: 0.055em;
-  text-align: left;
-  white-space: nowrap;
+.association-mosaic__nav-icon {
+  width: clamp(36px, 3.4vw, 52px);
+  height: clamp(36px, 3.4vw, 52px);
+  object-fit: contain;
 }
 
-.document-card__arrow {
-  width: 13px;
-  height: 13px;
-}
-
-.directions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 64px;
-}
-
-.direction-card {
-  min-width: 0;
-  overflow: hidden;
-  border-radius: 7px 7px 0 0;
-  background: var(--paper);
-  color: var(--ink);
-}
-
-.direction-card__body {
-  display: flex;
-  min-height: 368px;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 48px clamp(32px, 3.2vw, 50px) 42px;
-  background: var(--paper);
-}
-
-.direction-card__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 44px;
-}
-
-.direction-card h3 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 18px;
-  line-height: 29px;
-  letter-spacing: -0.01em;
-  font-weight: 500;
-  text-wrap: balance;
-}
-
-.direction-card p {
-  width: min(100%, 330px);
-  margin: 0;
-  font-size: clamp(24px, 1.85vw, 28px);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  font-weight: 500;
-  text-wrap: pretty;
-  hyphens: manual;
-}
-
-.direction-card__index {
-  color: #168ca0;
-  font-size: 11px;
-  line-height: 29px;
-  font-weight: 500;
-}
-
-.direction-card__visual {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
+.association-mosaic__nav-arrow {
+  width: clamp(32px, 3vw, 44px);
+  height: clamp(32px, 3vw, 44px);
+  object-fit: contain;
 }
 
 .countries {
@@ -796,9 +727,61 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .hero__copy { margin-top: 28px; }
   .hero__globe-shell { width: min(100%, 540px); }
 
-  .about {
-    grid-template-columns: minmax(0, 1fr) minmax(460px, 0.9fr);
-    gap: 48px;
+}
+
+@media (min-width: 1051px) and (max-width: 1180px) {
+  .association-mosaic__about {
+    padding: 24px 28px;
+  }
+
+  .association-mosaic__about h2 {
+    font-size: 44px;
+  }
+
+  .association-mosaic__about p {
+    margin-top: 24px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .association-mosaic__metric strong {
+    font-size: 68px;
+  }
+
+  .association-mosaic__metric span {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .association-mosaic__metric--turnover strong {
+    font-size: 58px;
+  }
+
+  .association-mosaic__metric--turnover b {
+    font-size: 26px;
+  }
+
+  .association-mosaic__metric--turnover span {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  .association-mosaic__nav-card {
+    padding: 18px;
+  }
+
+  .association-mosaic__nav-title {
+    font-size: 22px;
+  }
+
+  .association-mosaic__nav-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .association-mosaic__nav-arrow {
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -898,40 +881,49 @@ button, a { -webkit-tap-highlight-color: transparent; }
     object-position: center;
   }
 
-  .content-lower { margin-top: 96px; }
-
-  .about {
-    grid-template-columns: 1fr;
-    gap: 58px;
-  }
-
-  .about__copy { padding-top: 0; }
-  .about__copy p { width: min(100%, 760px); }
-  .about-grid { width: min(100%, 720px); margin-left: auto; }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1050px) {
   :root { --layout-pad: 24px; }
 
   .visual-stage { padding-bottom: 56px; }
 
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .association-mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    grid-template-areas:
+      "wheat fertilizer"
+      "exchanges metals"
+      "pistachios timber"
+      "sugar turnover"
+      "countries oil"
+      "about about"
+      "navigation navigation";
+    aspect-ratio: auto;
+    margin-top: 80px;
   }
 
-  .metric-row { display: contents; }
-  .metric-cell:not(.metric-card) { display: none; }
-  .metric-card { min-height: 178px; border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line); }
-
-  .directions { grid-template-columns: 1fr; }
-  .direction-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(220px, 0.75fr);
-    border-radius: 7px;
+  .association-mosaic__photo,
+  .association-mosaic__metric {
+    aspect-ratio: 768 / 633;
   }
-  .direction-card__body { min-height: 300px; }
-  .direction-card__visual { height: 100%; min-height: 300px; }
+
+  .association-mosaic__about {
+    min-height: calc(100vw - (var(--layout-pad) * 2));
+    padding: clamp(38px, 8vw, 58px) clamp(26px, 7vw, 46px);
+  }
+
+  .association-mosaic__nav {
+    grid-area: navigation;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .association-mosaic__nav-card {
+    min-height: clamp(144px, 37vw, 190px);
+    padding: clamp(28px, 7vw, 44px) clamp(26px, 7vw, 44px);
+  }
 
   .countries__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
@@ -975,35 +967,63 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .bids-promo { margin-top: 72px; }
 
-  .content-lower { margin-top: 72px; }
+  .association-mosaic { margin-top: 72px; }
 
-  .metrics { grid-template-columns: 1fr; }
-  .metric-card { min-height: 156px; }
-  .metric-card strong { font-size: 68px; }
-  .metric-card--blue .metric-label { max-width: 180px; }
-
-  .about { margin-top: 58px; }
-  .about__copy h2 { font-size: 42px; line-height: 46px; }
-  .about__copy p { margin-top: 42px; font-size: 18px; line-height: 27px; }
-  .about__link { margin-top: 26px; font-size: 18px; line-height: 27px; }
-
-  .about-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, 160px);
-    min-height: 0;
+  .association-mosaic__metric {
+    padding: 10px;
   }
-  .document-card { grid-column: 2; grid-row: 3; padding: 20px 14px 13px; }
-  .document-card__icon { width: 24px; height: 32px; }
-  .document-card__title { max-width: 130px; margin-top: 13px; font-size: 14px; line-height: 17px; }
-  .document-card__meta { font-size: 8.5px; }
-  .document-card__arrow { width: 11px; height: 11px; }
 
-  .directions { gap: 12px; margin-top: 52px; }
-  .direction-card { display: block; }
-  .direction-card__body { min-height: 340px; padding: 40px 30px 32px; }
-  .direction-card__copy { gap: 38px; }
-  .direction-card p { width: min(100%, 340px); font-size: 24px; line-height: 1.2; }
-  .direction-card__visual { height: 150px; min-height: 0; }
+  .association-mosaic__metric strong {
+    font-size: clamp(48px, 15vw, 62px);
+  }
+
+  .association-mosaic__metric span {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .association-mosaic__metric--turnover strong {
+    font-size: clamp(45px, 13.5vw, 56px);
+  }
+
+  .association-mosaic__metric--turnover b {
+    margin-top: 2px;
+    font-size: clamp(20px, 6.1vw, 25px);
+  }
+
+  .association-mosaic__metric--turnover span {
+    margin-top: 7px;
+    font-size: clamp(9px, 2.8vw, 11px);
+    line-height: 1.25;
+  }
+
+  .association-mosaic__about {
+    padding: 34px 24px;
+  }
+
+  .association-mosaic__about h2 {
+    font-size: clamp(31px, 9vw, 38px);
+  }
+
+  .association-mosaic__about p {
+    margin-top: 26px;
+    font-size: clamp(14px, 4vw, 17px);
+    line-height: 1.52;
+  }
+
+  .association-mosaic__nav-title {
+    font-size: clamp(27px, 8vw, 34px);
+  }
+
+  .association-mosaic__nav-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .association-mosaic__nav-arrow {
+    width: 36px;
+    height: 36px;
+  }
 
   .countries__inner { padding: 48px 0 76px; }
   .countries__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 34px; }

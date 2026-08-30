@@ -108,62 +108,6 @@
   50% { opacity: .92; stroke-width: 2.15; }
 }
 
-/* Direction cards assemble in two planes: editorial body first, artwork second.
-   No blur and no scale-pop. */
-.motion-ready .direction-card.motion-reveal,
-.motion-ready .direction-card.motion-reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-
-.motion-ready .direction-card .direction-card__body {
-  clip-path: inset(0 0 100% 0);
-  opacity: 0;
-  transform: translate3d(0, 10px, 0);
-  transition:
-    clip-path 1180ms var(--motion-ease-soft),
-    opacity 760ms var(--motion-ease),
-    transform 1380ms var(--motion-ease-soft);
-  transition-delay: var(--motion-delay, 0ms);
-  will-change: clip-path, opacity, transform;
-}
-
-.motion-ready .direction-card .direction-card__visual {
-  clip-path: inset(100% 0 0 0);
-  opacity: 0;
-  transform: translate3d(0, 8px, 0) scale(1.008);
-  transform-origin: 50% 100%;
-  transition:
-    clip-path 1280ms var(--motion-ease-soft),
-    opacity 860ms var(--motion-ease),
-    transform 1480ms var(--motion-ease-soft);
-  transition-delay: calc(var(--motion-delay, 0ms) + 190ms);
-  will-change: clip-path, opacity, transform;
-}
-
-.motion-ready .direction-card .direction-card__index {
-  opacity: 0;
-  transform: translate3d(-8px, 0, 0);
-  transition:
-    opacity 700ms var(--motion-ease),
-    transform 980ms var(--motion-ease-soft);
-  transition-delay: calc(var(--motion-delay, 0ms) + 430ms);
-}
-
-.motion-ready .direction-card.is-visible .direction-card__body,
-.motion-ready .direction-card.is-visible .direction-card__visual {
-  clip-path: inset(0 0 0 0);
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
-  will-change: auto;
-}
-
-.motion-ready .direction-card.is-visible .direction-card__index {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
 /* Small header backdrop blur is the only deliberate blur exception. */
 .site-header {
   -webkit-backdrop-filter: blur(0px);
@@ -191,32 +135,20 @@
 /* Micro interactions finish more slowly. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
-.about__link .icon-arrow,
-.document-card__arrow {
+.association-mosaic__nav-arrow {
   transition: transform 460ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
-.hero__request:hover .icon-arrow,
-.about__link:hover .icon-arrow,
-.document-card:hover .document-card__arrow {
+.hero__request:hover .icon-arrow {
   transform: translate3d(2px, 0, 0);
+}
+
+.association-mosaic__nav-card:hover .association-mosaic__nav-arrow {
+  transform: translate3d(0, 2px, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .orbit__pulse-line { animation: none !important; opacity: .45; }
 
-  .motion-ready .direction-card .direction-card__body,
-  .motion-ready .direction-card .direction-card__visual,
-  .motion-ready .direction-card .direction-card__index {
-    clip-path: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
 }
-
-/* Grid-only concept: reuse the brand colors already established in the map variants. */
-.metric-card--dark { background: #3b7fc1; }
-.metric-card--teal { background: #b6435c; }
-.metric-card--blue { background: #008998; }
