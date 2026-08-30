@@ -4,7 +4,7 @@
 
 ## Scope
 
-Проверены текущий hero, промоблок `Bids & Offers`, мозаика «Об ассоциации», блоки «Наша цель», «Наши задачи», «Направления деятельности», «Этапы развития» и «Страны—участники» в ветке `gh-pages`.
+Проверены текущий hero, промоблок `Bids & Offers`, мозаика «Об ассоциации», блоки «Наша цель», «Наши задачи», «Направления деятельности», «Этапы развития», «Страны—участники» и «Ключевые события» в ветке `gh-pages`.
 
 Референс:
 
@@ -13,6 +13,8 @@
 - `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_zqqeNl/Снимок экрана — 2026-08-30 в 14.06.52.png`
 - `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_nMsD91/Снимок экрана — 2026-08-30 в 16.57.26.png`
 - `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_Dn25qR/Снимок экрана — 2026-08-30 в 16.57.41.png`
+- `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_reH8YT/Снимок экрана — 2026-08-30 в 17.01.06.png`
+- `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_Nogtv3/Снимок экрана — 2026-08-30 в 17.02.09.png`
 
 Исходные ассеты:
 
@@ -24,6 +26,8 @@
 - `/Users/erdc/Downloads/Map assett.png`
 - `/Users/erdc/Downloads/Untitled (12)/` — семь флагов
 - `/Users/erdc/Downloads/Untitled (13)/` — восемь логотипов бирж
+- `/Users/erdc/Downloads/Фото собятия.png`
+- `/Users/erdc/Downloads/Стрелка внутр собцтия.svg`
 
 Итоговые кадры:
 
@@ -43,6 +47,9 @@
 - `output/playwright/current-home-countries-map-desktop.png`
 - `output/playwright/current-home-countries-map-desktop-hover.png`
 - `output/playwright/current-home-countries-map-mobile.png`
+- `output/playwright/current-home-events-desktop.png`
+- `output/playwright/current-home-events-mobile.png`
+- `output/playwright/current-home-events-320.png`
 
 ## Checks
 
@@ -83,6 +90,10 @@
 - На `320px` mobile-сетка перестраивается в две колонки, ни одна подпись не переполняется; общий горизонтальный overflow отсутствует.
 - Проверены границы `900/901px`, размеры карты на `732px`, сохранность геометрии таймлайна и отсутствие ошибок или предупреждений в консоли.
 - Все 16 пользовательских изображений и `countries-map.js` отвечают локально со статусом `200`.
+- Desktop-блок «Ключевые события» имеет высоту `896px` при ширине `1552px`; карточка сохраняет исходную пропорцию `2:1`, текст и внутренняя стрелка расположены поверх фотографии.
+- На `684px` фотография начинается на `302px`, а дата, заголовок и описание идут ниже отдельным потоком; нижний разделитель расположен на `1101px`, как в референсе.
+- На границе `780/781px` секция без переполнения переключается между mobile и desktop-композициями. На `320px` заголовки переносятся без наложений, весь утверждённый текст остаётся видимым.
+- Кнопки слайдера подключены к общему контроллеру, единственный текущий слайд остаётся активным после переключения; консоль не содержит ошибок или предупреждений.
 
 ## Result
 
