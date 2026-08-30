@@ -174,6 +174,53 @@
       </section>
     </section>
 
+    <section class="tasks" id="tasks" aria-labelledby="tasks-title">
+      <div class="tasks__grid layout-container">
+        <header class="tasks__header">
+          <h2 id="tasks-title">Наши<br class="tasks__title-break"> задачи</h2>
+          <div class="tasks__controls" aria-label="Управление слайдером">
+            <button class="tasks__control tasks__control--previous" type="button" aria-label="Предыдущая задача">
+              <img class="tasks__control-icon tasks__control-icon--static" src="assets/images/tasks/arrow-left.svg" alt="" width="36" height="36">
+              <img class="tasks__control-icon tasks__control-icon--active" src="assets/images/tasks/arrow-left-active.svg" alt="" width="36" height="36">
+            </button>
+            <button class="tasks__control tasks__control--next" type="button" aria-label="Следующая задача">
+              <img class="tasks__control-icon tasks__control-icon--static" src="assets/images/tasks/arrow-right.svg" alt="" width="36" height="36">
+              <img class="tasks__control-icon tasks__control-icon--active" src="assets/images/tasks/arrow-right-active.svg" alt="" width="36" height="36">
+            </button>
+          </div>
+        </header>
+
+        <article class="tasks__card is-active" data-task-slide>
+          <span class="tasks__number">01</span>
+          <p>Развивать межбиржевое взаимодействие и прямые торговые связей</p>
+        </article>
+        <article class="tasks__card" data-task-slide>
+          <span class="tasks__number">02</span>
+          <p>Внедрять принципы недискриминационной торговли, развивать организованные товарные рынки на основе лучших практик</p>
+        </article>
+        <article class="tasks__card" data-task-slide>
+          <span class="tasks__number">03</span>
+          <p>Содействовать гармонизации регламентов, стандартов и правил допуска к торгам</p>
+        </article>
+        <article class="tasks__card" data-task-slide>
+          <span class="tasks__number">04</span>
+          <p>Содействовать формированию репрезентативных международных товарных индикаторов и бенчмарков на ключевые товарные группы</p>
+        </article>
+        <article class="tasks__card" data-task-slide>
+          <span class="tasks__number">05</span>
+          <p>Создать единое коммуникационное пространство для практического взаимодействия профессиональных участников</p>
+        </article>
+        <article class="tasks__card" data-task-slide>
+          <span class="tasks__number">06</span>
+          <p>Защищать общие интересы участников и представлять их на международном уровне</p>
+        </article>
+
+        <div class="tasks__logo" aria-hidden="true">
+          <img src="assets/images/tasks/logo.svg" alt="" width="249" height="30">
+        </div>
+      </div>
+    </section>
+
     <section class="countries" id="members" aria-labelledby="countries-title">
       <div class="countries__inner layout-container">
         <h2 class="typo" id="countries-title">Страны—участники</h2>
@@ -194,6 +241,7 @@
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/smooth-scroll.js"></script>
+  <script src="assets/js/tasks-slider.js"></script>
   <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>

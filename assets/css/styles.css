@@ -698,6 +698,118 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: none;
 }
 
+.tasks {
+  color: var(--ink);
+  background: var(--country-bg);
+  padding: 80px 0 107px;
+}
+
+.tasks__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 244px);
+  border-top: 1px solid rgba(0, 111, 129, 0.24);
+  border-left: 1px solid rgba(0, 111, 129, 0.24);
+}
+
+.tasks__header,
+.tasks__card,
+.tasks__logo {
+  min-width: 0;
+  border-right: 1px solid rgba(0, 111, 129, 0.24);
+  border-bottom: 1px solid rgba(0, 111, 129, 0.24);
+}
+
+.tasks__header {
+  padding: 40px 36px;
+}
+
+.tasks__header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 80px;
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.tasks__controls {
+  display: none;
+}
+
+.tasks__control {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tasks__control-icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tasks__control-icon--active {
+  display: none;
+}
+
+.tasks__control:hover .tasks__control-icon--static,
+.tasks__control:focus-visible .tasks__control-icon--static {
+  display: none;
+}
+
+.tasks__control:hover .tasks__control-icon--active,
+.tasks__control:focus-visible .tasks__control-icon--active {
+  display: block;
+}
+
+.tasks__control:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.tasks__card {
+  padding: 32px 36px;
+}
+
+.tasks__number {
+  display: block;
+  color: var(--teal);
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.tasks__card p {
+  max-width: 310px;
+  margin: 22px 0 0;
+  color: #000;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.tasks__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url("../images/tasks/logo-background.png") center / cover no-repeat;
+}
+
+.tasks__logo img {
+  width: min(68%, 249px);
+  height: auto;
+}
+
 .countries {
   position: relative;
   z-index: 3;
@@ -1011,6 +1123,66 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 }
 
+@media (max-width: 780px) {
+  .tasks {
+    padding: 64px 0 78px;
+  }
+
+  .tasks__grid {
+    display: block;
+    width: calc(100% - 56px);
+    border-top: 1px solid rgba(0, 111, 129, 0.24);
+    border-left: 1px solid rgba(0, 111, 129, 0.24);
+    touch-action: pan-y;
+  }
+
+  .tasks__header {
+    min-height: 252px;
+    padding: 25px 52px 40px;
+  }
+
+  .tasks__header h2 {
+    font-size: clamp(54px, 10.6vw, 74px);
+    line-height: 1;
+  }
+
+  .tasks__title-break {
+    display: none;
+  }
+
+  .tasks__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 42px;
+  }
+
+  .tasks__card {
+    display: none;
+    min-height: 285px;
+    padding: 48px 52px;
+  }
+
+  .tasks__card.is-active {
+    display: block;
+  }
+
+  .tasks__number {
+    font-size: 48px;
+  }
+
+  .tasks__card p {
+    max-width: 560px;
+    margin-top: 30px;
+    font-size: clamp(20px, 4vw, 28px);
+    line-height: 1.34;
+  }
+
+  .tasks__logo {
+    display: none;
+  }
+}
+
 @media (max-width: 680px) {
   :root { --layout-pad: 16px; }
 
@@ -1138,6 +1310,40 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .country { min-height: 170px; gap: 18px; }
   .country img { width: 68px; height: 68px; }
   .country span { font-size: 11px; letter-spacing: 0.18em; }
+}
+
+@media (max-width: 480px) {
+  .tasks {
+    padding-top: 48px;
+  }
+
+  .tasks__header {
+    min-height: 218px;
+    padding: 28px 28px 32px;
+  }
+
+  .tasks__grid {
+    width: calc(100% - 32px);
+  }
+
+  .tasks__controls {
+    margin-top: 24px;
+  }
+
+  .tasks__control {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+
+  .tasks__card {
+    min-height: 252px;
+    padding: 36px 28px;
+  }
+
+  .tasks__number {
+    font-size: 40px;
+  }
 }
 
 @media (max-width: 420px) {
