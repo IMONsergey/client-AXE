@@ -372,6 +372,38 @@
           </div>
         </div>
       </section>
+
+      <section class="events" id="events" aria-labelledby="events-title">
+        <div class="events__inner">
+          <header class="events__header">
+            <h2 id="events-title">Ключевые события</h2>
+            <div class="events__controls" data-slider-controls>
+              <button class="events__control events__control--previous" type="button" aria-label="Предыдущее событие" data-slider-previous>
+                <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+              </button>
+              <button class="events__control events__control--next" type="button" aria-label="Следующее событие" data-slider-next>
+                <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="events__slider" data-responsive-slider data-slider-breakpoint="9999">
+            <article class="events__slide is-active" data-slider-slide>
+              <div class="events__media">
+                <img src="assets/images/events/key-event.png" alt="" width="1922" height="963" loading="lazy">
+              </div>
+              <div class="events__content">
+                <time datetime="2026-04-03">03.04.2026</time>
+                <h3>Заголовок ключевого события</h3>
+                <p>Краткое описание ключевого события. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis,</p>
+                <span class="events__open" aria-hidden="true">
+                  <img src="assets/images/events/event-link-arrow.svg" alt="" width="53" height="53">
+                </span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
