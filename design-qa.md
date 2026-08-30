@@ -1,35 +1,38 @@
 # Homepage Design QA
 
-Дата: 2026-08-29
+Дата: 2026-08-30
 
 ## Scope
 
-Проверена версия главной страницы `Текущая главная`, опубликованная из ветки `gh-pages`.
+Проверены текущий hero и новый промоблок `Bids & Offers`, расположенный сразу после него в ветке `gh-pages`.
 
-Основные референсы:
+Референс:
 
-- `/Users/erdc/Downloads/Ассоциации товарных бирж стран БРИКС (3)/desctop.png`
-- `/Users/erdc/Downloads/Ассоциации товарных бирж стран БРИКС (3)/mob.png`
+- `/var/folders/jh/rw4gjc1n0qxcfyrgk32nd5kh0000gn/T/TemporaryItems/NSIRD_screencaptureui_aNVGuS/Снимок экрана — 2026-08-30 в 13.10.34.png`
 
-Рабочие скриншоты проверки:
+Исходные ассеты:
 
-- `/Users/erdc/Documents/ChatGPT/ACE/output/design-compare/impl-desktop-full-final-3.png`
-- `/Users/erdc/Documents/ChatGPT/ACE/output/design-compare/impl-mobile-full-final-4.png`
-- `/Users/erdc/Documents/ChatGPT/ACE/output/design-compare/impl-tablet-full-final.png`
-- `/Users/erdc/Documents/ChatGPT/ACE/output/design-compare/impl-desktop-top-final-2.png`
-- `/Users/erdc/Documents/ChatGPT/ACE/output/design-compare/impl-mobile-top-final-5.png`
+- `/Users/erdc/Downloads/Untitled (8)/Фон для секции Bids & Offers.png`
+- `/Users/erdc/Downloads/Untitled (8)/Элемент над фото.png`
+- `/Users/erdc/Downloads/Untitled (8)/Фото для секции Bids & Offers.png`
+
+Итоговые кадры:
+
+- `output/playwright/current-home-hero-desktop.png`
+- `output/playwright/current-home-bids-promo-desktop.png`
+- `output/playwright/current-home-bids-promo-mobile.png`
 
 ## Checks
 
-- Desktop header remains in one row.
-- Hero desktop and mobile were checked against same-width crops.
-- Mobile hero heading uses four-line composition matching the reference rhythm.
-- `Bids & Offers` uses exported Figma image assets and readable overlay icons.
-- Association mosaic uses real exported commodity assets.
-- Mobile card groups are horizontal flex rails instead of broken vertical stacks.
-- Page was checked at `390x1090`, `768x1024`, and `1440x1000`.
-- Automated browser check passed: no hidden images, no page-level horizontal overflow, no console errors.
+- Hero-кнопка отделена от дескриптора интервалом `56px` на desktop и `42px` на mobile.
+- Desktop-секция сохраняет исходную пропорцию `1922:918`, радиус `6px` и обводку `rgba(47, 224, 253, 0.24)`.
+- На desktop фотография раскрывается маской слева направо; на tablet/mobile — сверху вниз.
+- Прозрачный сетевой ассет расположен поверх фотографии и не подменён CSS-графикой.
+- При ширине до `1050px` порядок элементов становится вертикальным: текст, кнопка, фотография.
+- Проверены ширины `1440`, `1051`, `1050`, `768` и `390px`.
+- Нет горизонтального переполнения, обрезанных элементов, ошибок или предупреждений в консоли.
+- Все видимые строки блока дословно совпадают с реестром разрешённого текста.
 
 ## Result
 
-Passed for publication. Remaining differences are non-blocking visual tolerances caused by browser-rendered typography and live canvas/rendered asset behavior versus the static mockup.
+final result: passed
