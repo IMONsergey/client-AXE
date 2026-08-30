@@ -175,48 +175,89 @@
     </section>
 
     <section class="tasks" id="tasks" aria-labelledby="tasks-title">
-      <div class="tasks__grid layout-container">
+      <div class="tasks__grid layout-container" data-responsive-slider data-slider-breakpoint="780">
         <header class="tasks__header">
           <h2 id="tasks-title">Наши<br class="tasks__title-break"> задачи</h2>
           <div class="tasks__controls" aria-label="Управление слайдером">
-            <button class="tasks__control tasks__control--previous" type="button" aria-label="Предыдущая задача">
-              <img class="tasks__control-icon tasks__control-icon--static" src="assets/images/tasks/arrow-left.svg" alt="" width="36" height="36">
-              <img class="tasks__control-icon tasks__control-icon--active" src="assets/images/tasks/arrow-left-active.svg" alt="" width="36" height="36">
+            <button class="slider-control" type="button" aria-label="Предыдущая задача" data-slider-previous>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-left.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-left-active.svg" alt="" width="36" height="36">
             </button>
-            <button class="tasks__control tasks__control--next" type="button" aria-label="Следующая задача">
-              <img class="tasks__control-icon tasks__control-icon--static" src="assets/images/tasks/arrow-right.svg" alt="" width="36" height="36">
-              <img class="tasks__control-icon tasks__control-icon--active" src="assets/images/tasks/arrow-right-active.svg" alt="" width="36" height="36">
+            <button class="slider-control" type="button" aria-label="Следующая задача" data-slider-next>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-right.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-right-active.svg" alt="" width="36" height="36">
             </button>
           </div>
         </header>
 
-        <article class="tasks__card is-active" data-task-slide>
+        <article class="tasks__card is-active" data-slider-slide>
           <span class="tasks__number">01</span>
           <p>Развивать межбиржевое взаимодействие и прямые торговые связей</p>
         </article>
-        <article class="tasks__card" data-task-slide>
+        <article class="tasks__card" data-slider-slide>
           <span class="tasks__number">02</span>
           <p>Внедрять принципы недискриминационной торговли, развивать организованные товарные рынки на основе лучших практик</p>
         </article>
-        <article class="tasks__card" data-task-slide>
+        <article class="tasks__card" data-slider-slide>
           <span class="tasks__number">03</span>
           <p>Содействовать гармонизации регламентов, стандартов и правил допуска к торгам</p>
         </article>
-        <article class="tasks__card" data-task-slide>
+        <article class="tasks__card" data-slider-slide>
           <span class="tasks__number">04</span>
           <p>Содействовать формированию репрезентативных международных товарных индикаторов и бенчмарков на ключевые товарные группы</p>
         </article>
-        <article class="tasks__card" data-task-slide>
+        <article class="tasks__card" data-slider-slide>
           <span class="tasks__number">05</span>
           <p>Создать единое коммуникационное пространство для практического взаимодействия профессиональных участников</p>
         </article>
-        <article class="tasks__card" data-task-slide>
+        <article class="tasks__card" data-slider-slide>
           <span class="tasks__number">06</span>
           <p>Защищать общие интересы участников и представлять их на международном уровне</p>
         </article>
 
         <div class="tasks__logo" aria-hidden="true">
           <img src="assets/images/tasks/logo.svg" alt="" width="249" height="30">
+        </div>
+      </div>
+    </section>
+
+    <section class="directions" id="directions" aria-labelledby="directions-title">
+      <div class="directions__inner layout-container">
+        <header class="directions__header">
+          <h2 id="directions-title">Направления деятельности</h2>
+          <div class="directions__controls" aria-label="Управление слайдером">
+            <button class="slider-control" type="button" aria-label="Предыдущее направление" data-slider-previous>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-left.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-left-active.svg" alt="" width="36" height="36">
+            </button>
+            <button class="slider-control" type="button" aria-label="Следующее направление" data-slider-next>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-right.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-right-active.svg" alt="" width="36" height="36">
+            </button>
+          </div>
+        </header>
+
+        <div class="directions__grid" data-responsive-slider data-slider-breakpoint="780">
+          <article class="directions__card directions__card--featured is-active" data-slider-slide>
+            <h3>Межбиржевое сотрудничество с зарубежными партнерами, включая развитие трансграничной биржевой торговли</h3>
+            <span class="directions__number">01</span>
+          </article>
+          <article class="directions__card" data-slider-slide>
+            <h3>Формирование совместных продуктов и услуг</h3>
+            <span class="directions__number">02</span>
+          </article>
+          <article class="directions__card" data-slider-slide>
+            <h3>Гармонизация регулирования и устранение барьеров</h3>
+            <span class="directions__number">03</span>
+          </article>
+          <article class="directions__card" data-slider-slide>
+            <h3>Создание базы для формирования ценовых показателей</h3>
+            <span class="directions__number">04</span>
+          </article>
+          <article class="directions__card" data-slider-slide>
+            <h3>Защита интересов участников и экспертная деятельность</h3>
+            <span class="directions__number">05</span>
+          </article>
         </div>
       </div>
     </section>
@@ -241,7 +282,7 @@
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/smooth-scroll.js"></script>
-  <script src="assets/js/tasks-slider.js"></script>
+  <script src="assets/js/responsive-slider.js"></script>
   <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>
