@@ -178,7 +178,7 @@
       <div class="tasks__grid layout-container" data-responsive-slider data-slider-breakpoint="780">
         <header class="tasks__header">
           <h2 id="tasks-title">Наши<br class="tasks__title-break"> задачи</h2>
-          <div class="tasks__controls" aria-label="Управление слайдером">
+          <div class="tasks__controls" aria-label="Управление слайдером" data-slider-controls>
             <button class="slider-control" type="button" aria-label="Предыдущая задача" data-slider-previous>
               <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-left.svg" alt="" width="36" height="36">
               <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-left-active.svg" alt="" width="36" height="36">
@@ -225,7 +225,7 @@
       <div class="directions__inner layout-container">
         <header class="directions__header">
           <h2 id="directions-title">Направления деятельности</h2>
-          <div class="directions__controls" aria-label="Управление слайдером">
+          <div class="directions__controls" aria-label="Управление слайдером" data-slider-controls>
             <button class="slider-control" type="button" aria-label="Предыдущее направление" data-slider-previous>
               <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-left.svg" alt="" width="36" height="36">
               <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-left-active.svg" alt="" width="36" height="36">
@@ -262,20 +262,65 @@
       </div>
     </section>
 
-    <section class="countries" id="members" aria-labelledby="countries-title">
-      <div class="countries__inner layout-container">
-        <h2 class="typo" id="countries-title">Страны—участники</h2>
-        <div class="countries__grid">
-          <div class="country"><img src="assets/images/flags/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
-          <div class="country"><img src="assets/images/flags/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
-          <div class="country"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
-          <div class="country"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
-          <div class="country"><img src="assets/images/flags/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
-          <div class="country"><img src="assets/images/flags/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
-          <div class="country"><img src="assets/images/flags/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
+    <div class="lower-stage">
+      <section class="timeline" id="timeline" aria-labelledby="timeline-title">
+        <header class="timeline__header layout-container">
+          <h2 id="timeline-title">Этапы развития</h2>
+          <div class="timeline__controls" aria-label="Управление слайдером" data-slider-controls>
+            <button class="slider-control" type="button" aria-label="Предыдущий этап" data-slider-previous>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-left.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-left-active.svg" alt="" width="36" height="36">
+            </button>
+            <button class="slider-control" type="button" aria-label="Следующий этап" data-slider-next>
+              <img class="slider-control__icon slider-control__icon--static" src="assets/images/ui/slider-arrow-right.svg" alt="" width="36" height="36">
+              <img class="slider-control__icon slider-control__icon--active" src="assets/images/ui/slider-arrow-right-active.svg" alt="" width="36" height="36">
+            </button>
+          </div>
+        </header>
+
+        <div class="timeline__track" data-responsive-slider data-slider-mode="track">
+          <article class="timeline__card is-active" data-slider-slide>
+            <header><strong>2025</strong><span>Май</span></header>
+            <p>Петербургская Биржа выступила с инициативой создания Международной ассоциации товарных и фьючерсных бирж</p>
+          </article>
+          <article class="timeline__card" data-slider-slide>
+            <header><strong>2025</strong><span>Июнь</span></header>
+            <p>Декларации о создании Ассоциации подписана на ПМЭФ-2025 в Санкт-Петербурге, намерение присоединиться к Ассоциации выразили 7 стран (Россия, Индия, Иран, Китай, Беларусь, Узбекистан, Казахстан)</p>
+          </article>
+          <article class="timeline__card" data-slider-slide>
+            <header><strong>2026</strong><span>Январь</span></header>
+            <p>Учреждение Ассоциации</p>
+          </article>
+          <article class="timeline__card" data-slider-slide>
+            <header><strong>2026</strong><span>Февраль</span></header>
+            <p>Ассоциация официально зарегистрирована</p>
+          </article>
+          <article class="timeline__card" data-slider-slide>
+            <header><strong>2026</strong><span>Март</span></header>
+            <p>Состоялась регистрация Ассоциации, прошло первое заседание. Египетская товарная биржа принята в Ассоциацию</p>
+          </article>
+          <article class="timeline__card" data-slider-slide>
+            <header><strong>2026</strong><span>Июль</span></header>
+            <p>Началась разработка стратегии. В ассоциацию принята Иранская энергетическая биржа (IEE). Общее число участников - 8 бирж из 7 стран. Заинтересованность в участии в Ассоциации выразили товарные биржи Турции, Зимбабве, Танзании.</p>
+          </article>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section class="countries" id="members" aria-labelledby="countries-title">
+        <div class="countries__inner layout-container">
+          <h2 class="typo" id="countries-title">Страны—участники</h2>
+          <div class="countries__grid">
+            <div class="country"><img src="assets/images/flags/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
+            <div class="country"><img src="assets/images/flags/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
+            <div class="country"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
+            <div class="country"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
+            <div class="country"><img src="assets/images/flags/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
+            <div class="country"><img src="assets/images/flags/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
+            <div class="country"><img src="assets/images/flags/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="assets/js/typograph.js"></script>

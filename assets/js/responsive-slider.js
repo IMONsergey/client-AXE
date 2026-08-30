@@ -1,11 +1,13 @@
 (() => {
   document.querySelectorAll('[data-responsive-slider]').forEach((root) => {
     const slides = [...root.querySelectorAll('[data-slider-slide]')];
-    const controls = root.previousElementSibling?.querySelector('.directions__controls') ?? root.querySelector('.tasks__controls');
+    const controls = root.previousElementSibling?.querySelector('[data-slider-controls]') ?? root.querySelector('[data-slider-controls]');
     const previous = controls?.querySelector('[data-slider-previous]');
     const next = controls?.querySelector('[data-slider-next]');
     const breakpoint = Number(root.dataset.sliderBreakpoint) || 780;
     const mobile = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const trackMode = root.dataset.sliderMode === 'track';
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let activeIndex = 0;
     let touchStartX = null;
 
@@ -13,9 +15,17 @@
       slides.forEach((slide, index) => {
         const isActive = index === activeIndex;
         slide.classList.toggle('is-active', isActive);
-        slide.hidden = mobile.matches && !isActive;
-        slide.setAttribute('aria-hidden', mobile.matches && !isActive ? 'true' : 'false');
+        slide.hidden = !trackMode && mobile.matches && !isActive;
+        slide.setAttribute('aria-hidden', !trackMode && mobile.matches && !isActive ? 'true' : 'false');
       });
+
+      if (trackMode) {
+        const firstOffset = slides[0]?.offsetLeft ?? 0;
+        root.scrollTo({
+          left: (slides[activeIndex]?.offsetLeft ?? firstOffset) - firstOffset,
+          behavior: reducedMotion.matches ? 'auto' : 'smooth'
+        });
+      }
     }
 
     function move(step) {
