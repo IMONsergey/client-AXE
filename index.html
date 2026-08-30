@@ -306,17 +306,69 @@
         </div>
       </section>
 
-      <section class="countries" id="members" aria-labelledby="countries-title">
-        <div class="countries__inner layout-container">
-          <h2 class="typo" id="countries-title">Страны—участники</h2>
-          <div class="countries__grid">
-            <div class="country"><img src="assets/images/flags/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
-            <div class="country"><img src="assets/images/flags/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
-            <div class="country"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
-            <div class="country"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
-            <div class="country"><img src="assets/images/flags/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
-            <div class="country"><img src="assets/images/flags/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
-            <div class="country"><img src="assets/images/flags/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
+      <section class="countries-map" id="members" aria-labelledby="countries-title" data-countries-map>
+        <h2 class="countries-map__title typo" id="countries-title">Страны—участники</h2>
+
+        <div class="countries-map__desktop" data-map-scene>
+          <img class="countries-map__map countries-map__map--desktop" src="assets/images/countries/map.png" alt="" width="2382" height="1722" loading="lazy">
+          <svg class="countries-map__connections" aria-hidden="true" data-map-connections></svg>
+
+          <div class="countries-map__logos" aria-hidden="true">
+            <img class="countries-map__logo countries-map__logo--spimex" src="assets/images/countries/logos/spimex.png" alt="" width="267" height="75" data-map-logo="russia">
+            <img class="countries-map__logo countries-map__logo--butb" src="assets/images/countries/logos/butb.png" alt="" width="222" height="111" data-map-logo="belarus">
+            <img class="countries-map__logo countries-map__logo--ets" src="assets/images/countries/logos/ets.png" alt="" width="180" height="105" data-map-logo="kazakhstan">
+            <img class="countries-map__logo countries-map__logo--uzex" src="assets/images/countries/logos/uzex.png" alt="" width="270" height="102" data-map-logo="uzbekistan">
+            <img class="countries-map__logo countries-map__logo--emx" src="assets/images/countries/logos/emx.png" alt="" width="273" height="120" data-map-logo="egypt">
+            <img class="countries-map__logo countries-map__logo--ime" src="assets/images/countries/logos/ime.png" alt="" width="234" height="81" data-map-logo="iran">
+            <img class="countries-map__logo countries-map__logo--irenex" src="assets/images/countries/logos/irenex.png" alt="" width="225" height="113" data-map-logo="iran">
+            <img class="countries-map__logo countries-map__logo--asia" src="assets/images/countries/logos/asia-europe-exchange.png" alt="" width="327" height="87" data-map-logo="china">
+          </div>
+
+          <div class="countries-map__cards">
+            <button class="countries-map__country-card" type="button" data-map-country="russia">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-russia.png" alt="" width="140" height="92"><strong>Россия</strong></span>
+              <span class="countries-map__country-copy">АО «Санкт-Петербургская Международная Товарно-сырьевая Биржа» (Петербургская Биржа)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="belarus">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-belarus.png" alt="" width="140" height="92"><strong>Беларусь</strong></span>
+              <span class="countries-map__country-copy">Белорусская универсальная товарная биржа (БУТБ)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="kazakhstan">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="140" height="92"><strong>Казахстан</strong></span>
+              <span class="countries-map__country-copy">АО «Товарная биржа „Евразийская торговая система“ (ЕТС)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="uzbekistan">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="140" height="92"><strong>Узбекистан</strong></span>
+              <span class="countries-map__country-copy">Узбекская республиканская товарно-сырьевая биржа (UzEx)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="egypt">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-egypt.png" alt="" width="140" height="92"><strong>Египет</strong></span>
+              <span class="countries-map__country-copy">Egyptian Mercantile Exchange (EMX)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="iran">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-iran.png" alt="" width="140" height="92"><strong>Иран</strong></span>
+              <span class="countries-map__country-copy">Иранская товарная биржа (Iran Mercantile Exchange, IME)</span>
+              <span class="countries-map__country-copy">Иранская энергетическая биржа (Iran Energy Exchange, IRENEX)</span>
+            </button>
+            <button class="countries-map__country-card" type="button" data-map-country="china">
+              <span class="countries-map__country-heading"><img src="assets/images/flags/flag-china.png" alt="" width="140" height="92"><strong>Китай</strong></span>
+              <span class="countries-map__country-copy">Синьцзянский Азиатско-Европейский международный центр торговли материалами</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="countries-map__mobile">
+          <div class="countries-map__mobile-map">
+            <img class="countries-map__map countries-map__map--mobile" src="assets/images/countries/map.png" alt="" width="2382" height="1722" loading="lazy">
+          </div>
+          <div class="countries-map__mobile-flags">
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-russia.png" alt="" width="140" height="92"><span>Россия</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-belarus.png" alt="" width="140" height="92"><span>Беларусь</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="140" height="92"><span>Казахстан</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="140" height="92"><span>Узбекистан</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-egypt.png" alt="" width="140" height="92"><span>Египет</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-iran.png" alt="" width="140" height="92"><span>Иран</span></div>
+            <div class="countries-map__mobile-country"><img src="assets/images/flags/flag-china.png" alt="" width="140" height="92"><span>Китай</span></div>
           </div>
         </div>
       </section>
@@ -328,6 +380,7 @@
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/smooth-scroll.js"></script>
   <script src="assets/js/responsive-slider.js"></script>
+  <script src="assets/js/countries-map.js"></script>
   <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>

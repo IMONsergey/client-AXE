@@ -6,16 +6,6 @@
   let ready = false;
   let visibleCount = 0;
 
-  /* Load the dedicated countries-grid motion layer before scroll observers start. */
-  if (!document.querySelector('link[data-axe-countries-motion]')) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'assets/css/countries-grid-motion.css';
-    link.dataset.axeCountriesMotion = 'true';
-    document.head.appendChild(link);
-  }
-  import('./countries-grid-motion.js').catch((error) => console.error(error));
-
   function splitWords(element, step = 32, base = 0) {
     if (!element || element.dataset.motionSplit === 'true') return;
 
@@ -69,7 +59,7 @@
          sequence of individual effects. */
       splitWords(document.querySelector('.hero__title'), 32, 90);
       splitWords(document.querySelector('.association-mosaic__about h2'), 38, 0);
-      splitWords(document.querySelector('.countries h2'), 36, 0);
+      splitWords(document.querySelector('.countries-map__title'), 36, 0);
     }
 
     registerReveal(document.querySelector('.hero__copy'), { delay: 150 });
@@ -79,9 +69,6 @@
     registerReveal(document.querySelector('.goal-statement__label'), { delay: 25, short: true });
     registerReveal(document.querySelector('.goal-statement__title'), { delay: 80 });
 
-    document.querySelectorAll('.country').forEach((element, index) => {
-      registerReveal(element, { delay: Math.min(index * 38, 228), short: true });
-    });
   }
 
   function waitForSiteReady(callback) {

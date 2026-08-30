@@ -108,141 +108,6 @@
   transform: none;
 }
 
-/* Countries use a structural line-draw instead of moving the whole cells. Moving
-   a bordered cell separated the horizontal and vertical rules during reveal,
-   which is why the old grid looked open. Geometry now stays fixed at all times. */
-.countries__grid {
-  border: 0;
-}
-
-.country {
-  --country-top-size: 100%;
-  position: relative;
-  isolation: isolate;
-  border: 0;
-}
-
-/* Top, right and bottom sides. Shared vertical seams are drawn only once by the
-   right edge of the preceding cell, so the finished grid stays exactly 1px. */
-.country::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--country-line), var(--country-line)),
-    linear-gradient(var(--country-line), var(--country-line)),
-    linear-gradient(var(--country-line), var(--country-line));
-  background-repeat: no-repeat;
-  background-position: left top, right top, right bottom;
-  background-size:
-    var(--country-top-size) 1px,
-    1px 100%,
-    100% 1px;
-}
-
-/* Left side exists only on the first cell of each responsive row. */
-.country::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  display: none;
-  width: 1px;
-  pointer-events: none;
-  background: var(--country-line);
-  transform: scaleY(1);
-  transform-origin: top center;
-}
-
-.country:first-child::after {
-  display: block;
-}
-
-.country > img,
-.country > span {
-  position: relative;
-  z-index: 1;
-}
-
-/* Once motion is active, the cell itself never translates. Only its frame is
-   progressively painted, followed by a very small content lift. */
-.motion-ready .country.motion-reveal,
-.motion-ready .country.motion-reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-
-.motion-ready .country::before {
-  background-size:
-    0 1px,
-    1px 0,
-    0 1px;
-  transition: background-size 920ms var(--motion-ease-soft);
-  transition-delay: var(--motion-delay, 0ms);
-}
-
-.motion-ready .country::after {
-  transform: scaleY(0);
-  transition: transform 920ms var(--motion-ease-soft);
-  transition-delay: var(--motion-delay, 0ms);
-}
-
-.motion-ready .country.is-visible::before {
-  background-size:
-    var(--country-top-size) 1px,
-    1px 100%,
-    100% 1px;
-}
-
-.motion-ready .country.is-visible::after {
-  transform: scaleY(1);
-}
-
-.motion-ready .country > img,
-.motion-ready .country > span {
-  opacity: 0;
-  transform: translate3d(0, 6px, 0);
-  transition:
-    opacity 620ms var(--motion-ease),
-    transform 820ms var(--motion-ease-soft);
-  transition-delay: calc(var(--motion-delay, 0ms) + 150ms);
-}
-
-.motion-ready .country.is-visible > img,
-.motion-ready .country.is-visible > span {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-/* Four-column tablet grid: rows after the first reuse the previous row's bottom
-   edge as their top edge; cells 1 and 5 receive the outer left rule. */
-@media (max-width: 1050px) {
-  .country:nth-child(n + 5) {
-    --country-top-size: 0%;
-  }
-
-  .country:nth-child(4n + 1)::after {
-    display: block;
-  }
-}
-
-/* Two-column mobile grid: same principle, with an outer left edge on every odd
-   cell and no duplicated horizontal seams below the first row. */
-@media (max-width: 680px) {
-  .country:nth-child(n + 3) {
-    --country-top-size: 0%;
-  }
-
-  .country:nth-child(2n + 1)::after {
-    display: block;
-  }
-}
-
 /* Micro-interactions: short distance, slow finish. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
@@ -265,20 +130,9 @@
   .motion-ready .site-header .brand,
   .motion-ready .site-header .site-nav a,
   .motion-ready .site-header .header-request,
-  .motion-ready .site-header .menu-toggle,
-  .motion-ready .country::before,
-  .motion-ready .country::after,
-  .motion-ready .country > img,
-  .motion-ready .country > span {
+  .motion-ready .site-header .menu-toggle {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
-  }
-
-  .motion-ready .country::before {
-    background-size:
-      var(--country-top-size) 1px,
-      1px 100%,
-      100% 1px !important;
   }
 }
