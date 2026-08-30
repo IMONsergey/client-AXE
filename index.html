@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>Международная ассоциация товарных и фьючерсных бирж</title>
+  <link rel="icon" href="assets/images/brand/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="assets/css/refinements.css">
@@ -15,7 +16,7 @@
 <body>
   <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
     <div class="preloader__mark" aria-hidden="true">
-      <img src="assets/images/logo-ace.svg" alt="">
+      <img src="assets/images/brand/logo-ace.svg" alt="">
     </div>
     <span class="preloader__percent">0%</span>
     <span class="preloader__track" aria-hidden="true"><span class="preloader__bar"></span></span>
@@ -35,19 +36,18 @@
         <div class="site-header__inner layout-container">
           <a class="brand" href="#" aria-label="Международная ассоциация товарных и фьючерсных бирж">
             <span class="brand__art" aria-hidden="true">
-              <img class="brand__ace" src="assets/images/logo-ace.svg" alt="">
-              <img class="brand__caption" src="assets/images/logo-caption.svg" alt="">
+              <img class="brand__ace" src="assets/images/brand/logo-ace.svg" alt="">
+              <img class="brand__caption" src="assets/images/brand/logo-caption.svg" alt="">
             </span>
           </a>
 
           <nav class="site-nav" id="site-navigation" aria-label="Навигация">
-            <a class="typo" href="#about">Об ассоциации</a>
-            <a class="typo" href="#media">Медиа</a>
-            <a class="typo" href="#management">Органы управления</a>
-            <a class="typo" href="#members">Члены ассоциации</a>
+            <a class="typo" href="#about">Об Ассоциации</a>
+            <a class="typo" href="#events">Ключевые события</a>
+            <a class="typo" href="#governance">Органы управления</a>
+            <a class="typo" href="#members">Члены Ассоциации</a>
             <a class="typo" href="#documents">Документы</a>
             <a class="typo" href="#news">Новости</a>
-            <a class="typo" href="#join">Вступление</a>
             <a class="typo" href="#contacts">Контакты</a>
           </nav>
 
@@ -55,8 +55,8 @@
             <span class="menu-toggle__lines" aria-hidden="true"></span>
           </button>
 
-          <a class="header-request" href="#trade-requests">
-            <span>Trade Requests</span>
+          <a class="header-request" href="bids-offers/">
+            <span>Bids &amp; Offers</span>
             <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
           </a>
         </div>
@@ -67,9 +67,9 @@
           <h1 class="hero__title typo" id="hero-title">Международная ассоциация товарных и фьючерсных бирж</h1>
 
           <div class="hero__copy">
-            <p class="hero__text typo">Формируем единую цифровую инфраструктуру для межбиржевого сотрудничества, взаимного доступа к торгам и справедливого ценообразования между странами ЕАЭС+, БРИКС+ и ШОС.</p>
-            <a class="hero__request" id="trade-requests" href="#">
-              <span class="typo">Войти в Trade Requests</span>
+            <p class="hero__text typo">Трансграничная торговля в интересах наших участников. Товары. Мосты. Индикаторы.</p>
+            <a class="hero__request" href="#about">
+              <span class="typo">Подробнее об Ассоциации</span>
               <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
             </a>
           </div>
@@ -153,7 +153,7 @@
             <div class="about-grid__cell" aria-hidden="true"></div>
             <div class="about-grid__cell" aria-hidden="true"></div>
             <a class="document-card" href="#">
-              <img class="document-card__icon" src="assets/images/document-icon.svg" alt="" width="29" height="38">
+              <img class="document-card__icon" src="assets/images/ui/document-icon.svg" alt="" width="29" height="38">
               <span class="document-card__title typo">Декларация о создании ассоциации</span>
               <span class="document-card__footer">
                 <span class="document-card__meta typo">ДОКУМЕНТ | PDF</span>
@@ -172,7 +172,7 @@
               </div>
               <span class="direction-card__index">01</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-links.png" alt="" width="417" height="150">
+            <img class="direction-card__visual" src="assets/images/directions/direction-links.png" alt="" width="417" height="150">
           </article>
 
           <article class="direction-card">
@@ -183,7 +183,7 @@
               </div>
               <span class="direction-card__index">02</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-pricing.png" alt="" width="417" height="150">
+            <img class="direction-card__visual" src="assets/images/directions/direction-pricing.png" alt="" width="417" height="150">
           </article>
 
           <article class="direction-card">
@@ -194,7 +194,7 @@
               </div>
               <span class="direction-card__index">03</span>
             </div>
-            <img class="direction-card__visual" src="assets/images/direction-platform.png" alt="" width="417" height="150">
+            <img class="direction-card__visual" src="assets/images/directions/direction-platform.png" alt="" width="417" height="150">
           </article>
         </section>
       </div>
@@ -204,13 +204,13 @@
       <div class="countries__inner layout-container">
         <h2 class="typo" id="countries-title">Страны—участники</h2>
         <div class="countries__grid">
-          <div class="country"><img src="assets/images/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
-          <div class="country"><img src="assets/images/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
-          <div class="country"><img src="assets/images/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
-          <div class="country"><img src="assets/images/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
-          <div class="country"><img src="assets/images/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
-          <div class="country"><img src="assets/images/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
-          <div class="country"><img src="assets/images/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
+          <div class="country"><img src="assets/images/flags/flag-russia.png" alt="" width="80" height="80"><span class="typo">Россия</span></div>
+          <div class="country"><img src="assets/images/flags/flag-belarus.png" alt="" width="80" height="80"><span class="typo">Беларусь</span></div>
+          <div class="country"><img src="assets/images/flags/flag-kazakhstan.png" alt="" width="80" height="80"><span class="typo">Казахстан</span></div>
+          <div class="country"><img src="assets/images/flags/flag-uzbekistan.png" alt="" width="80" height="80"><span class="typo">Узбекистан</span></div>
+          <div class="country"><img src="assets/images/flags/flag-china.png" alt="" width="80" height="80"><span class="typo">Китай</span></div>
+          <div class="country"><img src="assets/images/flags/flag-iran.png" alt="" width="80" height="80"><span class="typo">Иран</span></div>
+          <div class="country"><img src="assets/images/flags/flag-egypt.png" alt="" width="80" height="80"><span class="typo">Египет</span></div>
         </div>
       </div>
     </section>

@@ -15,6 +15,7 @@
     open = Boolean(nextOpen && mobileQuery.matches);
     toggle.classList.toggle('is-open', open);
     nav.classList.toggle('is-open', open);
+    header.classList.toggle('is-menu-open', open);
     document.documentElement.classList.toggle('menu-open', open);
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');

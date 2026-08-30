@@ -46,7 +46,7 @@
     transform 1460ms var(--motion-ease-soft);
 }
 
-/* Trade Requests buttons never dim. Hover inverts the surface cleanly. */
+/* Primary action buttons never dim. Hover inverts the surface cleanly. */
 .header-request,
 .hero__request {
   opacity: 1 !important;
@@ -181,6 +181,11 @@
   background-color: rgba(7, 22, 34, 0.84);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+}
+
+.site-header.is-menu-open {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* Micro interactions finish more slowly. */

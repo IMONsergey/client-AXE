@@ -5,17 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>Bids & Offers</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;700&family=Oswald:wght@500&display=swap" rel="stylesheet">
-  <link rel="icon" href="assets/logo-ace.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/fonts.css">
+  <link rel="icon" href="assets/images/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="bo-app" data-view="login">
     <header class="bo-header">
       <a class="bo-brand" href="../" aria-label="На главную">
-        <img class="bo-brand__full" src="assets/logo-bids-offers.svg" alt="">
+        <img class="bo-brand__full" src="assets/images/logo-bids-offers.svg" alt="">
       </a>
 
       <div class="bo-header__actions">
@@ -25,11 +23,11 @@
           <span class="bo-language__muted">EN</span>
         </div>
         <button class="bo-outline bo-auth-only" type="button" data-view-target="login">
-          <img src="assets/icon-back.svg" alt="">
+          <img src="assets/images/icon-back.svg" alt="">
           <span>На главную</span>
         </button>
         <button class="bo-outline bo-session-only" type="button" data-view-target="login">
-          <img src="assets/icon-back.svg" alt="">
+          <img src="assets/images/icon-back.svg" alt="">
           <span>На главную</span>
         </button>
         <button class="bo-small-primary bo-session-only" type="button" data-view-target="login">Выйти</button>
@@ -199,7 +197,7 @@
             <label class="bo-field">
               <span>Дата заявки <b>*</b></span>
               <span class="bo-date-field" data-date-field>
-                <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-date-input data-error-required="Укажите дату в формате дд.мм.гггг" data-error-pattern="Укажите дату в формате дд.мм.гггг"><button class="bo-date-toggle" type="button" data-date-toggle aria-label="Открыть календарь"><img src="assets/icon-calendar.svg" alt=""></button></span>
+                <span class="bo-input-shell"><input id="request-date" name="date" type="text" placeholder="дд.мм.гггг" inputmode="numeric" autocomplete="off" required pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="request-date-error" data-date-input data-error-required="Укажите дату в формате дд.мм.гггг" data-error-pattern="Укажите дату в формате дд.мм.гггг"><button class="bo-date-toggle" type="button" data-date-toggle aria-label="Открыть календарь"><img src="assets/images/icon-calendar.svg" alt=""></button></span>
                 <span class="bo-date-picker" data-date-picker hidden></span>
               </span>
               <span class="bo-field__error" id="request-date-error" aria-live="polite" hidden></span>
@@ -271,7 +269,7 @@
         <div class="bo-success-card__head">
           <h2 id="success-title">Заявка сохранена</h2>
           <button class="bo-icon-button bo-success-card__close" type="button" data-close-success aria-label="Закрыть">
-            <img src="assets/icon-close.svg" alt="">
+            <img src="assets/images/icon-close.svg" alt="">
           </button>
         </div>
         <p>Заявка добавлена в список и доступна в текущей демо-сессии</p>
@@ -284,7 +282,7 @@
     <div class="bo-drawer__head">
       <p><span>Заявка от:</span> <b data-drawer-date></b></p>
       <button class="bo-icon-button" type="button" data-close-drawer aria-label="Закрыть">
-        <img src="assets/icon-close.svg" alt="">
+        <img src="assets/images/icon-close.svg" alt="">
       </button>
     </div>
     <h2 id="drawer-title" data-drawer-product></h2>
@@ -295,9 +293,9 @@
     <div class="bo-drawer__participant">
       <div>
         <span>Участник</span>
-        <p><img data-drawer-flag src="assets/russia-flag.png" alt=""><b data-drawer-participant></b></p>
+        <p><img data-drawer-flag src="assets/images/russia-flag.png" alt=""><b data-drawer-participant></b></p>
       </div>
-      <img class="bo-drawer__exchange" data-drawer-logo src="assets/spimex-logo.png" alt="">
+      <img class="bo-drawer__exchange" data-drawer-logo src="assets/images/spimex-logo.png" alt="">
     </div>
     <dl class="bo-drawer__details">
       <div>
