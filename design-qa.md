@@ -4,7 +4,7 @@
 
 ## Scope
 
-Проверены текущий hero и новый промоблок `Bids & Offers`, расположенный сразу после него в ветке `gh-pages`.
+Проверены текущий hero, промоблок `Bids & Offers` и мозаика «Об ассоциации» в ветке `gh-pages`.
 
 Референс:
 
@@ -15,12 +15,16 @@
 - `/Users/erdc/Downloads/Untitled (8)/Фон для секции Bids & Offers.png`
 - `/Users/erdc/Downloads/Untitled (8)/Элемент над фото.png`
 - `/Users/erdc/Downloads/Untitled (8)/Фото для секции Bids & Offers.png`
+- `/Users/erdc/Downloads/Untitled (9)/1.png` — `/Users/erdc/Downloads/Untitled (9)/7.png`
+- `/Users/erdc/Downloads/Untitled (11).zip`
 
 Итоговые кадры:
 
 - `output/playwright/current-home-hero-desktop.png`
 - `output/playwright/current-home-bids-promo-desktop.png`
 - `output/playwright/current-home-bids-promo-mobile.png`
+- `output/playwright/current-home-association-desktop.png`
+- `output/playwright/current-home-association-mobile.png`
 
 ## Checks
 
@@ -32,6 +36,13 @@
 - Проверены ширины `1440`, `1051`, `1050`, `768` и `390px`.
 - Нет горизонтального переполнения, обрезанных элементов, ошибок или предупреждений в консоли.
 - Все видимые строки блока дословно совпадают с реестром разрешённого текста.
+- Desktop-мозаика собрана как единая сетка `5 × 4` в порядке, заданном референсом.
+- До `1050px` мозаика перестраивается в `2 × 5`, после нее следуют полноширинный текст и четыре навигационные плитки.
+- Проверены граничные ширины `1050`, `1051` и `1181px`: нет переполнения ячеек или скачка содержимого за границы.
+- На `390` и `320px` текстовый блок и навигационные плитки увеличивают высоту по содержимому и не обрезают текст.
+- Фон мозаики прозрачен; утвержденный общий градиент продолжается ниже без локальной подложки.
+- Семь фотографий загружены в размере `768 × 633`; пять SVG взяты из пользовательского архива.
+- Старые CSS-правила и ассеты замененных секций удалены.
 
 ## Result
 
