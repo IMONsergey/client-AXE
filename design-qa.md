@@ -4,7 +4,7 @@
 
 ## Scope
 
-Проверены текущий hero, промоблок `Bids & Offers` и мозаика «Об ассоциации» в ветке `gh-pages`.
+Проверены текущий hero, промоблок `Bids & Offers`, мозаика «Об ассоциации» и блок «Наша цель» в ветке `gh-pages`.
 
 Референс:
 
@@ -25,6 +25,8 @@
 - `output/playwright/current-home-bids-promo-mobile.png`
 - `output/playwright/current-home-association-desktop.png`
 - `output/playwright/current-home-association-mobile.png`
+- `output/playwright/current-home-goal-desktop.png`
+- `output/playwright/current-home-goal-mobile.png`
 
 ## Checks
 
@@ -43,6 +45,9 @@
 - Фон мозаики прозрачен; утвержденный общий градиент продолжается ниже без локальной подложки.
 - Семь фотографий загружены в размере `768 × 633`; пять SVG взяты из пользовательского архива.
 - Старые CSS-правила и ассеты замененных секций удалены.
+- Блок «Наша цель» сохраняет композицию `1 + 3` колонки на desktop и вертикальную композицию на mobile.
+- Desktop-высота блока — `680px`, mobile-высота — `450px`; утвержденные переносы текста сохранены в обоих режимах.
+- Верхний градиент заканчивается вместе с блоком «Наша цель»; следующий раздел имеет фон `#F1F4F6`.
 
 ## Result
 
