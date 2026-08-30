@@ -76,6 +76,8 @@
     registerReveal(document.querySelector('.hero__visual'), { delay: 90, scale: true });
 
     registerReveal(document.querySelector('.association-mosaic'), { delay: 55, scale: true });
+    registerReveal(document.querySelector('.goal-statement__label'), { delay: 25, short: true });
+    registerReveal(document.querySelector('.goal-statement__title'), { delay: 80 });
 
     document.querySelectorAll('.country').forEach((element, index) => {
       registerReveal(element, { delay: Math.min(index * 38, 228), short: true });

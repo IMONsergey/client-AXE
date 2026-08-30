@@ -8,7 +8,7 @@
   --cyan-soft: #bdf8ff;
   --grid-line: rgba(47, 224, 253, 0.23);
   --paper: #f8f8f8;
-  --country-bg: #f2f5f7;
+  --country-bg: #f1f4f6;
   --country-line: #cfe1e6;
   --font-body: "Inter", Arial, sans-serif;
   --font-display: "Oswald", "Arial Narrow", sans-serif;
@@ -56,27 +56,28 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .site-shell {
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(241, 244, 246, 0) 81.96%, #f1f4f6 91.48%),
-    radial-gradient(67.36% 48.22% at 83.89% 68.67%, rgba(0, 132, 193, 0.5) 0%, rgba(0, 132, 193, 0) 100%),
-    linear-gradient(180deg, #122438 13.53%, #008290 71.98%, #c9e4ff 100%);
-  background-repeat: no-repeat;
-  background-size: 100% calc(100% + 900px);
+  background: #f1f4f6;
 }
 
 .visual-stage {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-bottom: 72px;
+  padding-bottom: 0;
   color: #fff;
-  background: transparent;
+  background:
+    linear-gradient(180deg, rgba(241, 244, 246, 0) 81.96%, #f1f4f6 91.48%),
+    radial-gradient(67.36% 48.22% at 83.89% 68.67%, rgba(0, 132, 193, 0.5) 0%, rgba(0, 132, 193, 0) 100%),
+    linear-gradient(180deg, #122438 13.53%, #008290 71.98%, #c9e4ff 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 109.31%, 100% 125%, 100% 125%;
 }
 
 .site-header,
 .hero,
 .bids-promo,
-.association-mosaic {
+.association-mosaic,
+.goal-statement {
   position: relative;
   z-index: 2;
 }
@@ -655,6 +656,48 @@ button, a { -webkit-tap-highlight-color: transparent; }
   object-fit: contain;
 }
 
+.goal-statement {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 680px;
+  padding-top: 120px;
+  padding-bottom: 110px;
+}
+
+.goal-statement__label {
+  grid-column: 1;
+  align-self: start;
+  margin: 9px 0 0;
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-color: var(--cyan);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+  text-transform: uppercase;
+}
+
+.goal-statement__title {
+  grid-column: 2 / -1;
+  align-self: start;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 54px;
+  line-height: 1.22;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.goal-statement__desktop-break {
+  display: block;
+}
+
+.goal-statement__mobile-copy {
+  display: none;
+}
+
 .countries {
   position: relative;
   z-index: 3;
@@ -783,6 +826,23 @@ button, a { -webkit-tap-highlight-color: transparent; }
     width: 32px;
     height: 32px;
   }
+
+  .goal-statement {
+    min-height: 620px;
+  }
+
+  .goal-statement__label {
+    font-size: 18px;
+  }
+
+  .goal-statement__title {
+    font-size: 48px;
+    line-height: 1.2;
+  }
+
+  .goal-statement__desktop-break {
+    display: none;
+  }
 }
 
 @media (max-width: 1050px) {
@@ -886,7 +946,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 1050px) {
   :root { --layout-pad: 24px; }
 
-  .visual-stage { padding-bottom: 56px; }
+  .visual-stage { padding-bottom: 0; }
 
   .association-mosaic {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -923,6 +983,28 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .association-mosaic__nav-card {
     min-height: clamp(144px, 37vw, 190px);
     padding: clamp(28px, 7vw, 44px) clamp(26px, 7vw, 44px);
+  }
+
+  .goal-statement {
+    display: block;
+    min-height: 600px;
+    padding-top: 72px;
+    padding-bottom: 90px;
+  }
+
+  .goal-statement__label {
+    margin-top: 0;
+  }
+
+  .goal-statement__title {
+    width: min(100%, 850px);
+    margin-top: 36px;
+    font-size: 46px;
+    line-height: 1.17;
+  }
+
+  .goal-statement__desktop-break {
+    display: none;
   }
 
   .countries__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1023,6 +1105,32 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .association-mosaic__nav-arrow {
     width: 36px;
     height: 36px;
+  }
+
+  .goal-statement {
+    min-height: 450px;
+    padding-top: 24px;
+    padding-bottom: 58px;
+  }
+
+  .goal-statement__label {
+    font-size: 17px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+
+  .goal-statement__title {
+    margin-top: 24px;
+    font-size: 29px;
+    line-height: 1.2;
+  }
+
+  .goal-statement__desktop-copy {
+    display: none;
+  }
+
+  .goal-statement__mobile-copy {
+    display: block;
   }
 
   .countries__inner { padding: 48px 0 76px; }
