@@ -52,7 +52,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
     const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
-    const size = Math.min(contentHeight, visualWidth);
+    const size = Math.min(Math.max(contentHeight, 540), visualWidth);
 
     if (size > 0) {
       globeShell.style.width = `${size}px`;

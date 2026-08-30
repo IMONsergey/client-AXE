@@ -44,6 +44,7 @@ textarea {
 
 button {
   cursor: pointer;
+  font-family: "Inter Tight", Inter, Arial, sans-serif;
 }
 
 [hidden] {
@@ -113,6 +114,16 @@ button {
 .bo-tab,
 .bo-link-button {
   border: 0;
+}
+
+.bo-outline,
+.bo-small-primary,
+.bo-primary,
+.bo-secondary,
+.bo-add-button,
+.bo-tab,
+.bo-link-button {
+  font-family: "Inter Tight", Inter, Arial, sans-serif;
 }
 
 .bo-outline,
@@ -567,7 +578,7 @@ button {
   justify-content: center;
   border-radius: 5px;
   padding: 0 23px;
-  font-family: Inter, Arial, sans-serif;
+  font-family: "Inter Tight", Inter, Arial, sans-serif;
   font-size: 19px;
   font-weight: 500;
   text-decoration: none;
@@ -822,6 +833,7 @@ button {
   outline: 0;
   text-align: left;
   font: inherit;
+  font-family: "Inter Tight", Inter, Arial, sans-serif;
   line-height: inherit;
 }
 

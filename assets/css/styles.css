@@ -12,6 +12,7 @@
   --country-line: #cfe1e6;
   --font-body: "Inter", Arial, sans-serif;
   --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-action: "Inter Tight", "Inter", Arial, sans-serif;
   --layout-max: 1480px;
   --layout-pad: 40px;
 }
@@ -135,8 +136,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   margin-left: 10px;
   min-width: 0;
   white-space: nowrap;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 15px;
+  line-height: 22px;
   font-weight: 500;
 }
 
@@ -157,21 +158,22 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  height: 34px;
+  gap: 10px;
+  height: 38px;
   margin-left: auto;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 4px;
   background: var(--teal);
   white-space: nowrap;
-  font-size: 14px;
-  line-height: 20px;
+  font-family: var(--font-action);
+  font-size: 15px;
+  line-height: 22px;
   font-weight: 500;
 }
 
 .header-request .icon-arrow {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .hero {
@@ -204,7 +206,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   flex-direction: column;
   align-items: flex-start;
   width: min(100%, 570px);
-  margin-top: clamp(118px, 10.5vw, 152px);
+  margin-top: clamp(24px, 2vw, 32px);
 }
 
 .hero__text {
@@ -228,7 +230,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   padding: 0 23px;
   border-radius: 4px;
   background: var(--teal);
-  font-family: var(--font-body);
+  font-family: var(--font-action);
   font-size: 19px;
   line-height: 24px;
   font-weight: 500;
@@ -247,6 +249,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .countries h2 {
   font-family: var(--font-display);
   letter-spacing: 0;
+}
+
+.about__link {
+  font-family: var(--font-action);
 }
 
 .hero__visual {
@@ -656,7 +662,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .hero__title { font-size: clamp(46px, 5vw, 56px); }
-  .hero__copy { margin-top: 104px; }
+  .hero__copy { margin-top: 28px; }
   .hero__globe-shell { width: min(100%, 540px); }
 
   .about {
@@ -674,7 +680,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .hero__title { width: min(100%, 720px); }
   .hero__copy {
     width: min(100%, 690px);
-    margin-top: 62px;
+    margin-top: 28px;
   }
 
   .hero__visual {
@@ -734,10 +740,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .brand__art { width: 158px; height: 19px; transform: scale(0.854); transform-origin: left top; overflow: visible; }
 
   .header-request {
-    height: 34px;
+    height: 36px;
     padding: 0 12px;
     gap: 7px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .hero { margin-top: 54px; }
@@ -747,7 +753,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     letter-spacing: 0;
   }
 
-  .hero__copy { margin-top: 42px; }
+  .hero__copy { margin-top: 24px; }
   .hero__text { font-size: 18px; line-height: 27px; }
 
   .hero__request {
@@ -802,7 +808,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 420px) {
   .brand { flex-basis: 148px; width: 148px; }
   .brand__art { transform: scale(0.8); }
-  .header-request { font-size: 12px; padding-inline: 10px; }
+  .header-request { font-size: 13px; padding-inline: 10px; }
   .header-request .icon-arrow { width: 13px; height: 13px; }
   .hero__title { font-size: 38px; }
   .country { padding-inline: 8px; }

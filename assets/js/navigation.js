@@ -5,7 +5,7 @@
 
   if (!toggle || !nav || !header) return;
 
-  const mobileQuery = window.matchMedia('(max-width: 1320px)');
+  const mobileQuery = window.matchMedia('(max-width: 1380px)');
   const links = [...nav.querySelectorAll('a')];
   let open = false;
   let scrolled = false;
