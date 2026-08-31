@@ -669,10 +669,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-size: 20px;
   line-height: 1.4;
   font-weight: 600;
-  text-decoration-line: underline;
-  text-decoration-color: var(--cyan);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
+  text-decoration: none;
   text-transform: uppercase;
 }
 
@@ -686,14 +683,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-weight: 400;
   letter-spacing: 0;
   text-transform: uppercase;
-}
-
-.goal-statement__desktop-break {
-  display: block;
-}
-
-.goal-statement__mobile-copy {
-  display: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .tasks {
@@ -1506,9 +1498,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
     line-height: 1.2;
   }
 
-  .goal-statement__desktop-break {
-    display: none;
-  }
 }
 
 @media (max-width: 1050px) {
@@ -1667,10 +1656,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
     margin-top: 36px;
     font-size: 46px;
     line-height: 1.17;
-  }
-
-  .goal-statement__desktop-break {
-    display: none;
   }
 
 }
@@ -1851,14 +1836,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
     margin-top: 24px;
     font-size: 29px;
     line-height: 1.2;
-  }
-
-  .goal-statement__desktop-copy {
-    display: none;
-  }
-
-  .goal-statement__mobile-copy {
-    display: block;
   }
 
 }
