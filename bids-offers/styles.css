@@ -770,8 +770,8 @@ button {
 }
 
 .bo-table-wrap {
-  overflow-y: visible;
   overflow-x: auto;
+  overflow-y: hidden;
   border-radius: var(--bo-radius);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 137, 152, .45) transparent;
@@ -1564,6 +1564,7 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-table tbody tr {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 14px 18px;
@@ -1759,23 +1760,41 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-table tbody tr {
+    position: relative;
     grid-template-columns: minmax(0, 1fr);
     gap: 13px;
-    padding: 14px;
+    padding: 16px 14px 14px;
   }
 
-  .bo-table td:nth-child(1),
-  .bo-table td:nth-child(2),
-  .bo-table td:nth-child(3),
-  .bo-table td:nth-child(8) {
-    order: initial;
-    justify-self: stretch;
-    text-align: left;
+  .bo-table td:nth-child(1) {
+    order: -6;
+    padding-right: 104px;
+  }
+
+  .bo-table td:nth-child(2) {
+    order: -5;
+  }
+
+  .bo-table td:nth-child(3) {
+    order: -4;
   }
 
   .bo-table td:nth-child(4) {
-    order: -1;
+    order: -3;
     font-size: 17px;
+  }
+
+  .bo-table td:nth-child(8) {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: auto;
+    justify-self: auto;
+    text-align: right;
+  }
+
+  .bo-table td:nth-child(8)::before {
+    display: none;
   }
 
   .bo-language {

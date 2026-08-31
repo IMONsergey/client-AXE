@@ -68,10 +68,10 @@ if (stage && canvas) {
 
     function regionEnvelope(y, offset) {
       const localY = y - offset;
-      if (localY <= 35 || localY >= 1018) return 0;
+      if (localY <= 24 || localY >= 1740) return 0;
 
-      const fadeIn = smoothstep(45, 355, localY);
-      const fadeOut = 1 - smoothstep(650, 1018, localY);
+      const fadeIn = smoothstep(30, 240, localY);
+      const fadeOut = 1 - smoothstep(1260, 1740, localY);
       return fadeIn * fadeOut;
     }
 
@@ -85,8 +85,8 @@ if (stage && canvas) {
     function buildDots() {
       const mobile = width <= 680;
       const tablet = width <= 900;
-      const spacing = mobile ? 52 : tablet ? 48 : 44;
-      const jitter = spacing * 0.11;
+      const spacing = mobile ? 42 : tablet ? 38 : 34;
+      const jitter = spacing * 0.14;
       const columns = Math.ceil(width / spacing) + 2;
       const rows = Math.ceil(height / spacing) + 2;
       const middleOffset = getMiddleOffset();
@@ -104,11 +104,11 @@ if (stage && canvas) {
 
           if (envelope < 0.018) continue;
 
-          const prominent = random() > 0.94;
+          const prominent = random() > 0.92;
           const radius = prominent
             ? 1.65 + random() * 0.85
             : 0.72 + random() * 0.68;
-          const alpha = (0.074 + random() * 0.106 + (prominent ? 0.026 : 0)) * envelope;
+          const alpha = (0.11 + random() * 0.13 + (prominent ? 0.04 : 0)) * envelope;
 
           nextDots.push({
             x,

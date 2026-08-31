@@ -63,7 +63,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .preloader.is-complete { opacity: 0; visibility: hidden; }
 
 .preloader__mark {
-  width: 88px;
+  width: clamp(220px, 18vw, 264px);
   opacity: 0.96;
   transform: translateZ(0);
 }
@@ -76,11 +76,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .preloader__percent {
   position: absolute;
-  bottom: 22px;
+  top: calc(50% + clamp(42px, 4vw, 58px));
   left: 50%;
   width: max-content;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 13px;
+  font-size: clamp(20px, 1.55vw, 24px);
   line-height: 1;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
@@ -271,6 +271,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .site-nav a:hover,
+.site-nav a:focus-visible {
+  color: var(--cyan);
+  opacity: 1;
+}
+
 .header-request:hover,
 .hero__request:hover { opacity: 0.8; }
 
@@ -509,9 +514,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .bids-promo__list li {
-  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 21px;
   margin: 0;
-  padding-left: 39px;
   font-size: clamp(18px, 1.3vw, 25px);
   line-height: 1.34;
   font-weight: 400;
@@ -519,9 +526,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .bids-promo__list li::before {
-  position: absolute;
-  top: 0.42em;
-  left: 0;
+  margin-top: 0.3em;
   width: 18px;
   height: 18px;
   border: 2px solid #2fe0fd;
@@ -567,7 +572,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .hero__globe-shell {
   position: relative;
-  width: min(100%, 640px);
+  width: min(100%, 600px);
   aspect-ratio: 1;
   flex: 0 0 auto;
   overflow: visible;
@@ -793,9 +798,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .goal-statement {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  min-height: 680px;
-  padding-top: 120px;
-  padding-bottom: 110px;
+  min-height: 560px;
+  padding-top: 88px;
+  padding-bottom: 76px;
 }
 
 .goal-statement__label {
@@ -814,9 +819,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   align-self: start;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 54px;
+  font-size: 52px;
   line-height: 1.22;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0;
   text-transform: uppercase;
   hyphens: none;
@@ -827,7 +832,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .tasks {
   color: var(--ink);
   background: var(--country-bg);
-  padding: 80px 0 107px;
+  padding: 64px 0 80px;
 }
 
 .tasks__grid {
@@ -853,7 +858,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .tasks__header h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 80px;
+  font-size: 64px;
   line-height: 0.95;
   font-weight: 400;
   letter-spacing: 0;
@@ -933,7 +938,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .tasks__card {
-  padding: 32px 36px;
+  padding: 28px 36px;
 }
 
 .tasks__number {
@@ -947,10 +952,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .tasks__card p {
   max-width: 310px;
-  margin: 22px 0 0;
+  margin: 16px 0 0;
   color: #000;
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.35;
   font-weight: 500;
 }
 
@@ -971,13 +976,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
   z-index: 1;
   color: var(--ink);
   background: var(--country-bg);
-  padding: 100px 0 129px;
+  padding: 72px 0 92px;
 }
 
 .directions__header h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 80px;
+  font-size: 64px;
   line-height: 1;
   font-weight: 400;
   letter-spacing: 0;
@@ -993,7 +998,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(2, 218px);
   gap: 16px;
-  margin-top: 63px;
+  margin-top: 44px;
 }
 
 .directions__card {
@@ -1058,8 +1063,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .timeline {
-  min-height: 678px;
-  padding-top: 118px;
+  min-height: 600px;
+  padding-top: 82px;
   color: var(--ink);
 }
 
@@ -1073,7 +1078,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .timeline__header h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 80px;
+  font-size: 64px;
   line-height: 1;
   font-weight: 400;
   letter-spacing: 0;
@@ -1091,10 +1096,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: flex;
   width: 100%;
   gap: 16px;
-  margin-top: 58px;
+  margin-top: 42px;
   margin-left: 0;
   padding-inline: var(--timeline-gutter);
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-inline: contain;
   scroll-behavior: smooth;
   scroll-padding-inline: var(--timeline-gutter);
@@ -1542,6 +1548,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   margin-top: 42px;
   padding-inline: var(--leaders-gutter);
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   scroll-padding-inline: var(--leaders-gutter);
@@ -1984,6 +1991,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   gap: 20px;
   margin-top: 52px;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
@@ -2467,7 +2475,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   outline-offset: 4px;
 }
 
-@media (min-width: 1501px) {
+@media (min-width: 1400px) {
   .site-nav {
     position: absolute;
     top: 50%;
@@ -2478,7 +2486,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 }
 
-@media (max-width: 1500px) {
+@media (min-width: 1400px) and (max-width: 1500px) {
+  .site-nav {
+    gap: 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1399px) {
   .site-header__inner { z-index: 2602; }
 
   .brand,
@@ -2635,6 +2650,31 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .member-card {
     padding: 26px 24px 24px;
+  }
+}
+
+@media (min-width: 781px) and (max-width: 1279px) {
+  .tasks__header {
+    padding: 30px 24px;
+  }
+
+  .tasks__header h2 {
+    font-size: 56px;
+  }
+
+  .tasks__card {
+    padding: 24px;
+  }
+
+  .tasks__number {
+    font-size: 28px;
+  }
+
+  .tasks__card p {
+    max-width: none;
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.3;
   }
 }
 
@@ -2810,6 +2850,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     margin-top: 44px;
     padding-inline: var(--members-gutter);
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     scroll-behavior: smooth;
     scroll-padding-inline: var(--members-gutter);
@@ -3295,7 +3336,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .goal-statement {
-    min-height: 620px;
+    min-height: 560px;
   }
 
   .goal-statement__label {
@@ -3327,7 +3368,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .hero__globe-shell {
-    width: min(680px, 82vw);
+    width: min(560px, 72vw);
     height: auto !important;
     aspect-ratio: 1;
   }
@@ -3357,13 +3398,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .bids-promo__list li {
-    padding-left: 30px;
+    grid-template-columns: 14px minmax(0, 1fr);
+    column-gap: 16px;
     font-size: clamp(16px, 2.1vw, 18px);
     line-height: 1.42;
   }
 
   .bids-promo__list li::before {
-    top: 0.46em;
+    margin-top: 0.4em;
     width: 14px;
     height: 14px;
   }
@@ -3448,7 +3490,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .goal-statement {
     display: block;
-    min-height: 600px;
+    min-height: 520px;
     padding-top: 72px;
     padding-bottom: 90px;
   }
@@ -3615,8 +3657,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .site-header.is-scrolled { height: 60px; }
   .site-header__inner { gap: 9px; }
 
-  .preloader__mark { width: 82px; }
-  .preloader__percent { bottom: 17px; font-size: 12px; }
+  .preloader__mark { width: clamp(176px, 50vw, 220px); }
+  .preloader__percent {
+    top: calc(50% + 42px);
+    font-size: 18px;
+  }
 
   .menu-toggle { width: 36px; height: 34px; flex-basis: 36px; }
 

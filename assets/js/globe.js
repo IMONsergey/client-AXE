@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js?v=20260831-3';
+} from './globe-model.js?v=20260831-5';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -54,7 +54,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
     const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
-    const size = Math.min(Math.max(contentHeight, 640), visualWidth);
+    const size = Math.min(Math.max(contentHeight * 0.86, 500), visualWidth, 600);
 
     if (size > 0) {
       globeShell.style.width = `${size}px`;
