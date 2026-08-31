@@ -1,14 +1,14 @@
 export const GLOBE_VIEW = Object.freeze({
-  phi: 75 * Math.PI / 180,
-  theta: 47 * Math.PI / 180
+  phi: 68 * Math.PI / 180,
+  theta: 27 * Math.PI / 180
 });
 
 export const GLOBE_STYLE = Object.freeze({
-  radiusRatio: 0.44,
-  sphere: ['rgba(4, 87, 97, 0.94)', 'rgba(3, 68, 78, 0.97)', 'rgba(2, 47, 57, 0.995)'],
-  dot: [42, 225, 241],
-  outline: 'rgba(42, 225, 241, 0.055)',
-  glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.018)', 'rgba(0, 193, 207, 0.075)', 'rgba(0, 193, 207, 0)']
+  radiusRatio: 0.45,
+  sphere: ['rgba(4, 91, 103, 0.96)', 'rgba(3, 68, 79, 0.98)', 'rgba(2, 41, 52, 0.995)'],
+  dot: [27, 226, 244],
+  outline: 'rgba(42, 225, 241, 0.075)',
+  glow: ['rgba(0, 116, 127, 0)', 'rgba(0, 148, 161, 0.024)', 'rgba(0, 193, 207, 0.09)', 'rgba(0, 193, 207, 0)']
 });
 
 const DEG = Math.PI / 180;
@@ -39,8 +39,19 @@ export function decodeLandPoints(encoded) {
 }
 
 export function prepareLandPoints(encoded) {
-  const points = decodeLandPoints(encoded);
-  return { sourceCount: points.length, points };
+  const decodedPoints = decodeLandPoints(encoded);
+  const points = decodedPoints.filter((point) => (
+    Number.isFinite(point.lat)
+    && Number.isFinite(point.lon)
+    && Math.abs(point.lat) <= Math.PI / 2
+    && Math.abs(point.lon) <= Math.PI
+  ));
+
+  return {
+    sourceCount: decodedPoints.length,
+    invalidCount: decodedPoints.length - points.length,
+    points
+  };
 }
 
 export function projectPoint(point, phi, theta) {
@@ -61,10 +72,10 @@ export function projectPoint(point, phi, theta) {
 
 export function pointAppearance(z, size) {
   const edge = clamp((z - 0.01) / 0.23, 0, 1);
-  const baseDot = Math.max(1.12, size / 490);
+  const baseDot = Math.max(0.82, size / 690);
 
   return {
-    alpha: (0.52 + 0.44 * z) * (0.62 + 0.38 * edge),
-    radius: baseDot * (0.92 + 0.48 * z)
+    alpha: (0.56 + 0.42 * z) * (0.58 + 0.42 * edge),
+    radius: baseDot * (0.9 + 0.42 * z)
   };
 }

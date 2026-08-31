@@ -7,11 +7,11 @@
   <title>Международная ассоциация товарных и фьючерсных бирж</title>
   <link rel="icon" href="assets/images/brand/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-10">
-  <link rel="stylesheet" href="assets/css/refinements.css?v=20260831-1">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-11">
+  <link rel="stylesheet" href="assets/css/refinements.css?v=20260831-2">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/motion.css">
-  <link rel="stylesheet" href="assets/css/motion-polish.css">
+  <link rel="stylesheet" href="assets/css/motion-polish.css?v=20260831-1">
 </head>
 <body>
   <div class="preloader" id="site-preloader" role="progressbar" aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -77,19 +77,10 @@
 
         <div class="hero__visual">
           <div class="hero__globe-shell">
-            <svg class="hero__globe-orbits hero__globe-orbits--back" viewBox="0 0 1000 1000" aria-hidden="true">
-              <path class="orbit__line orbit__line--back" d="M130 789A470 170 -38 0 1 870 211"/>
-              <path class="orbit__pulse-line orbit__pulse-line--back" d="M130 789A470 170 -38 0 1 870 211"/>
-            </svg>
-
             <div class="hero__globe-canvas">
               <canvas id="axe-globe" aria-label="Интерактивный глобус"></canvas>
             </div>
-
-            <svg class="hero__globe-orbits hero__globe-orbits--front" viewBox="0 0 1000 1000" aria-hidden="true">
-              <path class="orbit__line orbit__line--front" d="M870 211A470 170 -38 0 1 130 789"/>
-              <path class="orbit__pulse-line orbit__pulse-line--front" d="M870 211A470 170 -38 0 1 130 789"/>
-            </svg>
+            <img class="hero__globe-orbit" src="assets/images/hero/globe-orbit.svg" alt="" width="754" height="487" aria-hidden="true">
           </div>
         </div>
       </section>
@@ -778,6 +769,6 @@
   <script src="assets/js/contact-form.js?v=20260831-1"></script>
   <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
-  <script type="module" src="assets/js/globe.js"></script>
+  <script type="module" src="assets/js/globe.js?v=20260831-3"></script>
 </body>
 </html>

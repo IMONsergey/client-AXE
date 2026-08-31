@@ -1,4 +1,4 @@
-import LAND_DATA from './globe-land-data.js';
+import LAND_DATA from './globe-land-data.js?v=20260831-3';
 import {
   GLOBE_STYLE,
   GLOBE_VIEW,
@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js';
+} from './globe-model.js?v=20260831-3';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -18,6 +18,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const context = canvas.getContext('2d', { alpha: true });
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const renderQuery = window.matchMedia('(min-width: 901px)');
   const desktopQuery = window.matchMedia('(min-width: 1200px)');
   const landModel = prepareLandPoints(LAND_DATA);
   const landPoints = landModel.points;
@@ -34,13 +35,14 @@ if (canvas && globeShell && heroContent && heroVisual) {
   let resumeAt = performance.now() + 1200;
   let lastFrame = performance.now();
   let readyDispatched = false;
+  let animationFrame = 0;
 
   const DRAG_SENSITIVITY = 0.0030;
   const DRAG_INERTIA_FACTOR = 0.28;
   const ROTATION_SMOOTHING = 0.16;
   const INERTIA = 0.87;
   const AUTO_RESUME_DELAY = 1600;
-  const AUTO_SPEED = reducedMotion ? 0 : 0.067;
+  const AUTO_SPEED = reducedMotion ? 0 : 0.025;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
 
   function syncGlobeToHero() {
@@ -135,7 +137,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
     context.stroke();
   }
 
-  function markReadyAfterPaint() {
+  function markReady() {
     if (readyDispatched) return;
     readyDispatched = true;
     requestAnimationFrame(() => {
@@ -145,15 +147,19 @@ if (canvas && globeShell && heroContent && heroVisual) {
     });
   }
 
-  resizeCanvas();
-
-  const resizeObserver = new ResizeObserver(() => resizeCanvas());
+  const resizeObserver = new ResizeObserver(() => {
+    if (renderQuery.matches) resizeCanvas();
+  });
   resizeObserver.observe(heroContent);
   resizeObserver.observe(heroVisual);
 
   desktopQuery.addEventListener?.('change', resizeCanvas);
-  window.addEventListener('resize', resizeCanvas, { passive: true });
-  document.fonts?.ready?.then(resizeCanvas);
+  window.addEventListener('resize', () => {
+    if (renderQuery.matches) resizeCanvas();
+  }, { passive: true });
+  document.fonts?.ready?.then(() => {
+    if (renderQuery.matches) resizeCanvas();
+  });
 
   canvas.addEventListener('pointerdown', (event) => {
     dragging = true;
@@ -201,6 +207,9 @@ if (canvas && globeShell && heroContent && heroVisual) {
   });
 
   function frame(now) {
+    animationFrame = 0;
+    if (!renderQuery.matches) return;
+
     const dt = Math.min(50, now - lastFrame);
     lastFrame = now;
 
@@ -226,9 +235,25 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     const size = resizeCanvas();
     drawGlobe(size);
-    if (size > 24) markReadyAfterPaint();
-    requestAnimationFrame(frame);
+    if (size > 24) markReady();
+    animationFrame = requestAnimationFrame(frame);
   }
+
+  function syncRendering() {
+    if (!renderQuery.matches) {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+      context?.clearRect(0, 0, canvas.width, canvas.height);
+      markReady();
+      return;
+    }
+
+    resizeCanvas();
+    lastFrame = performance.now();
+    if (!animationFrame) animationFrame = requestAnimationFrame(frame);
+  }
+
+  renderQuery.addEventListener?.('change', syncRendering);
 
   Object.defineProperty(window, '__AXE_GLOBE__', {
     configurable: true,
@@ -239,15 +264,17 @@ if (canvas && globeShell && heroContent && heroVisual) {
           phi,
           theta,
           dragging,
+          enabled: renderQuery.matches,
           size: canvasSize(),
           sourceSamples: landModel.sourceCount,
+          invalidSamples: landModel.invalidCount,
           samples: landPoints.length,
           autoSpeed: AUTO_SPEED,
-          renderer: 'real-continent-blue-noise'
+          renderer: 'natural-earth-dotted-globe'
         };
       }
     }
   });
 
-  requestAnimationFrame(frame);
+  syncRendering();
 }
