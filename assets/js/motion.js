@@ -47,6 +47,22 @@
     revealTargets.push(element);
   }
 
+  function registerGroup(selector, options = {}) {
+    const {
+      base = 0,
+      step = 42,
+      maxDelay = 180,
+      ...revealOptions
+    } = options;
+
+    document.querySelectorAll(selector).forEach((element, index) => {
+      registerReveal(element, {
+        ...revealOptions,
+        delay: base + Math.min(index * step, maxDelay)
+      });
+    });
+  }
+
   function reveal(element) {
     if (!element || element.classList.contains('is-visible')) return;
     element.classList.add('is-visible');
@@ -55,20 +71,30 @@
 
   function setupContent() {
     if (!reducedMotion.matches) {
-      /* Compact stagger values keep text reading as one sentence rather than a
-         sequence of individual effects. */
-      splitWords(document.querySelector('.hero__title'), 32, 90);
-      splitWords(document.querySelector('.association-mosaic__about h2'), 38, 0);
-      splitWords(document.querySelector('.countries-map__title'), 36, 0);
+      splitWords(document.querySelector('.hero__title'), 24, 60);
+      splitWords(document.querySelector('.association-mosaic__about h2'), 28, 0);
+      splitWords(document.querySelector('.countries-map__title'), 26, 0);
     }
 
-    registerReveal(document.querySelector('.hero__copy'), { delay: 150 });
-    registerReveal(document.querySelector('.hero__visual'), { delay: 90, scale: true });
+    registerReveal(document.querySelector('.hero__copy'), { delay: 130 });
+    registerReveal(document.querySelector('.hero__visual'), { delay: 70, scale: true });
+    registerReveal(document.querySelector('.bids-promo'), { delay: 35, scale: true });
 
-    registerReveal(document.querySelector('.association-mosaic'), { delay: 55, scale: true });
-    registerReveal(document.querySelector('.goal-statement__label'), { delay: 25, short: true });
-    registerReveal(document.querySelector('.goal-statement__title'), { delay: 80 });
+    registerReveal(document.querySelector('.association-mosaic'), { delay: 35, scale: true });
+    registerReveal(document.querySelector('.goal-statement__label'), { delay: 15, short: true });
+    registerReveal(document.querySelector('.goal-statement__title'), { delay: 55 });
 
+    registerGroup('.tasks__header, .tasks__card', { short: true });
+    registerGroup('.directions__header, .directions__card', { short: true });
+    registerGroup('.timeline__header, .timeline__card', { short: true });
+    registerGroup('.countries-map__desktop, .countries-map__mobile', { base: 35, scale: true });
+    registerGroup('.events__header, .events__slide', { short: true });
+    registerGroup('.leaders__header, .leader-card', { short: true });
+    registerGroup('.governance__copy, .governance-person', { short: true });
+    registerGroup('.members-section__header, .member-card', { short: true });
+    registerGroup('.documents-section__inner > h2, .document-card', { short: true });
+    registerGroup('.news-section__header, .news-card', { short: true });
+    registerGroup('.contact-stage__inner > h2, .contact-form, .site-footer', { short: true });
   }
 
   function waitForSiteReady(callback) {
@@ -102,10 +128,8 @@
         observer.unobserve(entry.target);
       });
     }, {
-      /* Trigger a little earlier, while the next section is approaching the
-         reading zone. This removes the stop-start feeling during slow scroll. */
-      threshold: 0.1,
-      rootMargin: '0px 0px -4% 0px'
+      threshold: 0.08,
+      rootMargin: '0px 0px -7% 0px'
     });
 
     [...wordTargets, ...revealTargets].forEach((element) => observer.observe(element));

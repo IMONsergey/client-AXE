@@ -1,25 +1,23 @@
 /* AXE motion language — quiet, editorial, no blur-based reveals. */
 
-/* Base reveal: smaller travel, longer deceleration. The movement should be felt,
-   not read as an effect. */
+/* Short staggered entrances share the interaction timing used by Bids & Offers. */
 .motion-ready .motion-reveal {
   opacity: 0;
-  transform: translate3d(0, 10px, 0);
+  transform: translate3d(0, 14px, 0);
   transition:
-    opacity 920ms var(--motion-ease),
-    transform 1260ms var(--motion-ease-soft);
+    opacity 420ms var(--motion-ease),
+    transform 620ms var(--motion-ease-soft);
   transition-delay: var(--motion-delay, 0ms);
   will-change: opacity, transform;
 }
 
 .motion-ready .motion-reveal.motion-reveal--short {
-  transform: translate3d(0, 6px, 0);
+  transform: translate3d(0, 7px, 0);
 }
 
-/* Legacy class name retained because the JS and QA use it. Structural groups do
-   not scale: scaling the layout makes precise geometry look unstable. */
+/* Scale reveals remain shallow so framed layouts keep their geometry. */
 .motion-ready .motion-reveal.motion-reveal--scale {
-  transform: translate3d(0, 8px, 0);
+  transform: translate3d(0, 10px, 0) scale(.988);
 }
 
 .motion-ready .motion-reveal.is-visible {
@@ -28,7 +26,7 @@
   will-change: auto;
 }
 
-/* Word reveals use a shallow masked lift instead of a full-height stomp. */
+/* Word reveals retain editorial rhythm without holding the page in transition. */
 .motion-word {
   display: inline-block;
   overflow: hidden;
@@ -37,11 +35,11 @@
 
 .motion-word__inner {
   display: inline-block;
-  transform: translate3d(0, .5em, 0);
+  transform: translate3d(0, .38em, 0);
   opacity: 0;
   transition:
-    transform 1180ms var(--motion-ease-soft),
-    opacity 820ms var(--motion-ease);
+    transform 620ms var(--motion-ease-soft),
+    opacity 360ms var(--motion-ease);
   transition-delay: var(--word-delay, 0ms);
   will-change: transform, opacity;
 }
@@ -55,17 +53,19 @@
 /* Header intro assembles almost imperceptibly. */
 .motion-ready .site-header .brand,
 .motion-ready .site-header .site-nav a,
+.motion-ready .site-header .site-language,
 .motion-ready .site-header .header-request,
 .motion-ready .site-header .menu-toggle {
   opacity: 0;
   transform: translate3d(0, -4px, 0);
   transition:
-    opacity 780ms var(--motion-ease),
-    transform 1040ms var(--motion-ease-soft);
+    opacity 360ms var(--motion-ease),
+    transform 520ms var(--motion-ease-soft);
 }
 
 .motion-ready.motion-intro-visible .site-header .brand,
 .motion-ready.motion-intro-visible .site-header .site-nav a,
+.motion-ready.motion-intro-visible .site-header .site-language,
 .motion-ready.motion-intro-visible .site-header .header-request,
 .motion-ready.motion-intro-visible .site-header .menu-toggle {
   opacity: 1;
@@ -81,15 +81,16 @@
 .motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(6) { transition-delay: 210ms; }
 .motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(7) { transition-delay: 232ms; }
 .motion-ready.motion-intro-visible .site-header .site-nav a:nth-child(8) { transition-delay: 254ms; }
+.motion-ready.motion-intro-visible .site-header .site-language { transition-delay: 205ms; }
 .motion-ready.motion-intro-visible .site-header .header-request { transition-delay: 210ms; }
 .motion-ready.motion-intro-visible .site-header .menu-toggle { transition-delay: 230ms; }
 
 /* Hero globe enters as one calm object; its native globe motion remains untouched. */
 .motion-ready .hero__visual.motion-reveal {
-  transform: translate3d(8px, 6px, 0) scale(.992);
+  transform: translate3d(10px, 8px, 0) scale(.985);
   transition:
-    opacity 980ms var(--motion-ease),
-    transform 1460ms var(--motion-ease-soft);
+    opacity 460ms var(--motion-ease),
+    transform 760ms var(--motion-ease-soft);
 }
 
 .motion-ready .hero__visual.motion-reveal.is-visible {
@@ -124,7 +125,7 @@
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
 .association-mosaic__nav-arrow {
-  transition: transform 460ms var(--motion-ease-soft);
+  transition: transform 280ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
@@ -141,6 +142,7 @@
   .motion-word__inner,
   .motion-ready .site-header .brand,
   .motion-ready .site-header .site-nav a,
+  .motion-ready .site-header .site-language,
   .motion-ready .site-header .header-request,
   .motion-ready .site-header .menu-toggle {
     opacity: 1 !important;

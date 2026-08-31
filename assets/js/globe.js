@@ -42,7 +42,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const ROTATION_SMOOTHING = 0.16;
   const INERTIA = 0.87;
   const AUTO_RESUME_DELAY = 1600;
-  const AUTO_SPEED = reducedMotion ? 0 : 0.025;
+  const AUTO_SPEED = reducedMotion ? 0 : 0.055;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
 
   function syncGlobeToHero() {
@@ -54,7 +54,7 @@ if (canvas && globeShell && heroContent && heroVisual) {
 
     const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
     const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
-    const size = Math.min(Math.max(contentHeight, 540), visualWidth);
+    const size = Math.min(Math.max(contentHeight, 640), visualWidth);
 
     if (size > 0) {
       globeShell.style.width = `${size}px`;
