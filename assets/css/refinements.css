@@ -69,3 +69,44 @@
     animation: none;
   }
 }
+
+/* The fixed header must live above every page section, not inside the isolated
+   hero stacking context. Anchored sections reserve its compact scrolled height. */
+.site-shell > .site-header {
+  isolation: isolate;
+}
+
+.site-shell [id] {
+  scroll-margin-top: 80px;
+}
+
+/* From the map onward, authored content follows the same desktop grid as the
+   header and the preceding sections. Full-bleed map and slider surfaces remain
+   full width while their headings, cards and snap starts share one gutter. */
+@media (min-width: 901px) {
+  .countries-map__title,
+  .countries-map__cards {
+    left: max(var(--layout-pad), calc((100vw - var(--layout-max)) / 2));
+  }
+
+  .events__inner,
+  .leaders__inner,
+  .governance__grid,
+  .members-section__inner,
+  .documents-section__inner,
+  .news-section__inner,
+  .contact-stage__inner,
+  .site-footer {
+    width: min(var(--layout-max), calc(100% - (var(--layout-pad) * 2)));
+  }
+
+  .leaders__track {
+    --leaders-gutter: max(var(--layout-pad), calc((100vw - var(--layout-max)) / 2));
+  }
+}
+
+@media (max-width: 680px) {
+  .site-shell [id] {
+    scroll-margin-top: 72px;
+  }
+}

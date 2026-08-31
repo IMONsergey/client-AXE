@@ -8,7 +8,7 @@
   <link rel="icon" href="assets/images/brand/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/styles.css?v=20260831-10">
-  <link rel="stylesheet" href="assets/css/refinements.css">
+  <link rel="stylesheet" href="assets/css/refinements.css?v=20260831-1">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/motion.css">
   <link rel="stylesheet" href="assets/css/motion-polish.css">
@@ -29,38 +29,38 @@
   </svg>
 
   <main class="site-shell">
+    <header class="site-header">
+      <div class="site-header__inner layout-container">
+        <a class="brand" href="#" aria-label="Международная ассоциация товарных и фьючерсных бирж">
+          <span class="brand__art" aria-hidden="true">
+            <img class="brand__ace" src="assets/images/brand/logo-ace.svg" alt="">
+            <img class="brand__caption" src="assets/images/brand/logo-caption.svg" alt="">
+          </span>
+        </a>
+
+        <nav class="site-nav" id="site-navigation" aria-label="Навигация">
+          <a class="typo" href="#about">Об Ассоциации</a>
+          <a class="typo" href="#events">Ключевые события</a>
+          <a class="typo" href="#governance">Органы управления</a>
+          <a class="typo" href="#members">Члены Ассоциации</a>
+          <a class="typo" href="#documents">Документы</a>
+          <a class="typo" href="#news">Новости</a>
+          <a class="typo" href="#contacts">Контакты</a>
+        </nav>
+
+        <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
+          <span class="menu-toggle__lines" aria-hidden="true"></span>
+        </button>
+
+        <a class="header-request" href="bids-offers/">
+          <span>Bids &amp; Offers</span>
+          <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+        </a>
+      </div>
+    </header>
+
     <section class="visual-stage" aria-labelledby="hero-title">
       <canvas class="visual-stage__dot-field" aria-hidden="true"></canvas>
-
-      <header class="site-header">
-        <div class="site-header__inner layout-container">
-          <a class="brand" href="#" aria-label="Международная ассоциация товарных и фьючерсных бирж">
-            <span class="brand__art" aria-hidden="true">
-              <img class="brand__ace" src="assets/images/brand/logo-ace.svg" alt="">
-              <img class="brand__caption" src="assets/images/brand/logo-caption.svg" alt="">
-            </span>
-          </a>
-
-          <nav class="site-nav" id="site-navigation" aria-label="Навигация">
-            <a class="typo" href="#about">Об Ассоциации</a>
-            <a class="typo" href="#events">Ключевые события</a>
-            <a class="typo" href="#governance">Органы управления</a>
-            <a class="typo" href="#members">Члены Ассоциации</a>
-            <a class="typo" href="#documents">Документы</a>
-            <a class="typo" href="#news">Новости</a>
-            <a class="typo" href="#contacts">Контакты</a>
-          </nav>
-
-          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
-            <span class="menu-toggle__lines" aria-hidden="true"></span>
-          </button>
-
-          <a class="header-request" href="bids-offers/">
-            <span>Bids &amp; Offers</span>
-            <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
-          </a>
-        </div>
-      </header>
 
       <section class="hero layout-container">
         <div class="hero__content">
