@@ -923,14 +923,17 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .timeline__track {
+  --timeline-gutter: max(var(--layout-pad), (100vw - var(--layout-max)) / 2);
   display: flex;
-  width: calc(100vw - max(var(--layout-pad), (100vw - var(--layout-max)) / 2));
+  width: 100%;
   gap: 16px;
   margin-top: 58px;
-  margin-left: max(var(--layout-pad), (100vw - var(--layout-max)) / 2);
+  margin-left: 0;
+  padding-inline: var(--timeline-gutter);
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   scroll-behavior: smooth;
+  scroll-padding-inline: var(--timeline-gutter);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -1948,10 +1951,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 
   .timeline__track {
-    width: calc(100vw - var(--layout-pad));
+    --timeline-gutter: var(--layout-pad);
+    width: 100%;
     gap: 22px;
     margin-top: 46px;
-    margin-left: var(--layout-pad);
+    margin-left: 0;
   }
 
   .timeline__card {
