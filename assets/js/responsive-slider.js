@@ -4,6 +4,7 @@
     const controls = root.previousElementSibling?.querySelector('[data-slider-controls]') ?? root.querySelector('[data-slider-controls]');
     const previous = controls?.querySelector('[data-slider-previous]');
     const next = controls?.querySelector('[data-slider-next]');
+    const advanceButtons = [...root.querySelectorAll('[data-slider-advance]')];
     const breakpoint = Number(root.dataset.sliderBreakpoint) || 780;
     const mobile = window.matchMedia(`(max-width: ${breakpoint}px)`);
     const trackMode = root.dataset.sliderMode === 'track';
@@ -90,6 +91,7 @@
 
     previous?.addEventListener('click', () => move(-1));
     next?.addEventListener('click', () => move(1));
+    advanceButtons.forEach((button) => button.addEventListener('click', () => move(1)));
     mobile.addEventListener?.('change', render);
 
     if (trackMode || responsiveTrackMode || mobileTrackMode) {

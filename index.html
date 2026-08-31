@@ -7,7 +7,7 @@
   <title>Международная ассоциация товарных и фьючерсных бирж</title>
   <link rel="icon" href="assets/images/brand/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-14">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-16">
   <link rel="stylesheet" href="assets/css/motion.css?v=20260831-2">
 </head>
 <body>
@@ -391,9 +391,23 @@
                 <time datetime="2026-04-03">03.04.2026</time>
                 <h3>Заголовок ключевого события</h3>
                 <p>Краткое описание ключевого события. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis,</p>
-                <span class="events__open" aria-hidden="true">
+                <button class="events__open" type="button" aria-label="Заголовок ключевого события" data-slider-advance>
                   <img src="assets/images/events/event-link-arrow.svg" alt="" width="53" height="53">
-                </span>
+                </button>
+              </div>
+            </article>
+
+            <article class="events__slide" data-slider-slide>
+              <div class="events__media">
+                <img src="assets/images/events/key-event-2.png" alt="" width="1922" height="963" loading="lazy">
+              </div>
+              <div class="events__content">
+                <time datetime="2026-04-03">03.04.2026</time>
+                <h3>Заголовок ключевого события</h3>
+                <p>Краткое описание ключевого события. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis,</p>
+                <button class="events__open" type="button" aria-label="Заголовок ключевого события" data-slider-advance>
+                  <img src="assets/images/events/event-link-arrow.svg" alt="" width="53" height="53">
+                </button>
               </div>
             </article>
           </div>
@@ -463,7 +477,7 @@
               <img class="leader-card__mark" src="assets/images/leaders/quote.svg" alt="" width="32" height="23">
               <p>Укрепление связей биржевых платформ европейских и азиатских стран, информационный обмен, вопросы таможенного оформления, финансовых расчетов, логистики способны обеспечить мировое лидерство в трансграничной торговле сырьевыми товарами.</p>
               <footer class="leader-card__person">
-                <img class="leader-card__portrait" src="assets/images/leaders/portrait-placeholder.png" alt="" width="267" height="267" loading="lazy">
+                <img class="leader-card__portrait" src="assets/images/leaders/zhang-hongping.png" alt="" width="267" height="267" loading="lazy">
                 <span class="leader-card__identity">
                   <cite>Госпожа Чжан Хунпин</cite>
                   <span>Председатель правления Синьцзянского Азиатско-Европейского международного торгового центра:</span>
@@ -477,7 +491,7 @@
               <img class="leader-card__mark" src="assets/images/leaders/quote.svg" alt="" width="32" height="23">
               <p>Работа в Ассоциации способна укрепить торговые взаимоотношения между всеми дружественными государствами. В том числе будет вестись работа в ключевой для нас сфере ТЭК, это позволит противодействовать монополиям, даст нашим контрагентам более удобный доступ к глобальным товарным потокам.</p>
               <footer class="leader-card__person">
-                <img class="leader-card__portrait" src="assets/images/leaders/portrait-placeholder.png" alt="" width="267" height="267" loading="lazy">
+                <img class="leader-card__portrait" src="assets/images/leaders/mohammed-nazifi.png" alt="" width="267" height="267" loading="lazy">
                 <span class="leader-card__identity">
                   <cite>Мохаммед Назифи</cite>
                   <span>президент Иранской энергетической биржи</span>
@@ -702,6 +716,28 @@
         </div>
       </section>
 
+      <section class="membership-section" id="membership" aria-labelledby="membership-title">
+        <div class="membership-section__inner">
+          <h2 id="membership-title">Вступление<br>в ассоциацию</h2>
+
+          <div class="membership-section__copy">
+            <p>Решение о приеме новых членов в Ассоциацию принимает Общее собрание на основании поданного заявления на имя исполнительного директора Ассоциации.</p>
+            <p><strong>Заполненные заявления необходимо направить на электронную почту <a href="mailto:executive@int-ace.com">executive@int-ace.com.</a></strong></p>
+          </div>
+
+          <article class="membership-document">
+            <h3>Заявление<br>о намерении вступить<br>в члены Ассоциации</h3>
+            <div class="membership-document__footer">
+              <button class="membership-document__download" type="button" disabled>
+                <span>Скачать документ</span>
+                <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+              </button>
+              <img class="membership-document__icon" src="assets/images/documents/document.svg" alt="" width="54" height="50" loading="lazy">
+            </div>
+          </article>
+        </div>
+      </section>
+
       <section class="contact-stage" id="contacts" aria-labelledby="contacts-title">
         <div class="contact-stage__inner">
           <h2 id="contacts-title"><span>Связаться</span> <span>с Ассоциацией</span></h2>
@@ -767,10 +803,10 @@
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/smooth-scroll.js?v=20260831-2"></script>
-  <script src="assets/js/responsive-slider.js?v=20260831-4"></script>
+  <script src="assets/js/responsive-slider.js?v=20260831-5"></script>
   <script src="assets/js/countries-map.js?v=20260831-2"></script>
-  <script src="assets/js/contact-form.js?v=20260831-1"></script>
-  <script src="assets/js/motion.js?v=20260831-1"></script>
+  <script src="assets/js/contact-form.js?v=20260831-2"></script>
+  <script src="assets/js/motion.js?v=20260831-2"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js?v=20260831-4"></script>
 </body>

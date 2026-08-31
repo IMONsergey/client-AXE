@@ -94,6 +94,7 @@
     registerGroup('.members-section__header, .member-card', { short: true });
     registerGroup('.documents-section__inner > h2, .document-card', { short: true });
     registerGroup('.news-section__header, .news-card', { short: true });
+    registerGroup('.membership-section h2, .membership-section__copy, .membership-document', { short: true });
     registerGroup('.contact-stage__inner > h2, .contact-form, .site-footer', { short: true });
   }
 
