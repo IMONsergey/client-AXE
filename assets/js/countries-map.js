@@ -26,6 +26,7 @@
     const logos = [...root.querySelectorAll(`[data-map-logo="${country}"]`)];
     const sceneRect = scene.getBoundingClientRect();
     const cardRect = card.getBoundingClientRect();
+    const headingRect = card.querySelector('.countries-map__country-heading')?.getBoundingClientRect() ?? cardRect;
 
     connections.replaceChildren();
     connections.setAttribute('viewBox', `0 0 ${sceneRect.width} ${sceneRect.height}`);
@@ -35,17 +36,18 @@
       logo.classList.toggle('is-active', logo.dataset.mapLogo === country);
     });
 
-    const startX = cardRect.right - sceneRect.left;
-    const startY = cardRect.top + (cardRect.height / 2) - sceneRect.top;
+    const startX = cardRect.right - sceneRect.left + 6;
+    const startY = headingRect.top + (headingRect.height / 2) - sceneRect.top;
 
     logos.forEach((logo) => {
       const logoRect = logo.getBoundingClientRect();
-      const targetX = logoRect.left + (logoRect.width / 2) - sceneRect.left;
-      const targetY = logoRect.top - sceneRect.top - 8;
+      const targetX = logoRect.left - sceneRect.left - 9;
+      const targetY = logoRect.top + (logoRect.height / 2) - sceneRect.top;
+      const span = Math.max(1, targetX - startX);
+      const controlOffset = Math.min(112, Math.max(42, span * 0.2));
       const path = document.createElementNS(svgNamespace, 'path');
       path.classList.add('countries-map__connection');
-      path.setAttribute('pathLength', '1');
-      path.setAttribute('d', `M ${startX.toFixed(2)} ${startY.toFixed(2)} H ${targetX.toFixed(2)} V ${targetY.toFixed(2)}`);
+      path.setAttribute('d', `M ${startX.toFixed(2)} ${startY.toFixed(2)} C ${(startX + controlOffset).toFixed(2)} ${startY.toFixed(2)}, ${(targetX - controlOffset).toFixed(2)} ${targetY.toFixed(2)}, ${targetX.toFixed(2)} ${targetY.toFixed(2)}`);
       connections.appendChild(path);
     });
 
@@ -55,7 +57,7 @@
   cards.forEach((card) => {
     card.addEventListener('pointerenter', () => drawConnections(card));
     card.addEventListener('pointerleave', () => {
-      if (document.activeElement !== card) clearConnections();
+      if (!card.matches(':focus-visible')) clearConnections();
     });
     card.addEventListener('focus', () => drawConnections(card));
     card.addEventListener('blur', clearConnections);
