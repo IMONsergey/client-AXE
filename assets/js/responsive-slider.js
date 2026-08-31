@@ -7,14 +7,19 @@
     const breakpoint = Number(root.dataset.sliderBreakpoint) || 780;
     const mobile = window.matchMedia(`(max-width: ${breakpoint}px)`);
     const trackMode = root.dataset.sliderMode === 'track';
+    const responsiveTrackMode = root.dataset.sliderMode === 'responsive-track';
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let activeIndex = 0;
     let touchStartX = null;
     let scrollSyncTimer = null;
     let resizeFrame = null;
 
+    function isTrackMode() {
+      return trackMode || (responsiveTrackMode && !mobile.matches);
+    }
+
     function getTrackStops() {
-      if (!trackMode || !slides.length) return [];
+      if (!isTrackMode() || !slides.length) return [];
 
       const firstOffset = slides[0].offsetLeft;
       const maximum = Math.max(0, root.scrollWidth - root.clientWidth);
@@ -43,13 +48,13 @@
       slides.forEach((slide, index) => {
         const isActive = index === slideIndex;
         slide.classList.toggle('is-active', isActive);
-        slide.hidden = !trackMode && mobile.matches && !isActive;
-        slide.setAttribute('aria-hidden', !trackMode && mobile.matches && !isActive ? 'true' : 'false');
+        slide.hidden = !isTrackMode() && mobile.matches && !isActive;
+        slide.setAttribute('aria-hidden', !isTrackMode() && mobile.matches && !isActive ? 'true' : 'false');
       });
     }
 
     function render() {
-      if (trackMode) {
+      if (isTrackMode()) {
         const stops = getTrackStops();
         activeIndex = Math.min(activeIndex, Math.max(0, stops.length - 1));
         const stop = stops[activeIndex] ?? { left: 0, slideIndex: 0 };
@@ -61,18 +66,19 @@
         return;
       }
 
+      if (responsiveTrackMode) root.scrollTo({ left: 0, behavior: 'auto' });
       setActiveSlide(activeIndex);
     }
 
     function move(step) {
-      const itemCount = trackMode ? getTrackStops().length : slides.length;
+      const itemCount = isTrackMode() ? getTrackStops().length : slides.length;
       if (!itemCount) return;
       activeIndex = (activeIndex + step + itemCount) % itemCount;
       render();
     }
 
     function syncTrackPosition() {
-      if (!trackMode) return;
+      if (!isTrackMode()) return;
       const stops = getTrackStops();
       if (!stops.length) return;
       activeIndex = stops.reduce((closest, stop, index) => (
@@ -85,7 +91,7 @@
     next?.addEventListener('click', () => move(1));
     mobile.addEventListener?.('change', render);
 
-    if (trackMode) {
+    if (trackMode || responsiveTrackMode) {
       root.addEventListener('scroll', () => {
         window.clearTimeout(scrollSyncTimer);
         scrollSyncTimer = window.setTimeout(syncTrackPosition, 100);
