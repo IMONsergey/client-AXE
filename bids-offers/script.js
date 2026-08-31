@@ -681,7 +681,7 @@ function setFieldError(field, message) {
   }
   if (error) {
     error.textContent = message;
-    error.hidden = false;
+    error.hidden = !message;
   }
   if (field.closest(".bo-auth-pane.is-active")) {
     requestAnimationFrame(updateAuthStageHeight);
@@ -690,7 +690,7 @@ function setFieldError(field, message) {
 
 function prepareValidationSlots() {
   document.querySelectorAll(".bo-field__error").forEach((error) => {
-    error.hidden = false;
+    error.hidden = !error.textContent;
   });
 }
 
