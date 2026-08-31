@@ -1,31 +1,25 @@
 /* AXE motion language — quiet, editorial, no blur-based reveals. */
 
-:root {
-  --motion-ease: cubic-bezier(.22,.72,.20,1);
-  --motion-ease-soft: cubic-bezier(.16,.84,.24,1);
-  --motion-ease-out: cubic-bezier(.18,.88,.22,1);
-}
-
 /* Base reveal: smaller travel, longer deceleration. The movement should be felt,
    not read as an effect. */
 .motion-ready .motion-reveal {
   opacity: 0;
-  transform: translate3d(0, 14px, 0);
+  transform: translate3d(0, 10px, 0);
   transition:
-    opacity 760ms var(--motion-ease),
-    transform 1040ms var(--motion-ease-soft);
+    opacity 920ms var(--motion-ease),
+    transform 1260ms var(--motion-ease-soft);
   transition-delay: var(--motion-delay, 0ms);
   will-change: opacity, transform;
 }
 
 .motion-ready .motion-reveal.motion-reveal--short {
-  transform: translate3d(0, 8px, 0);
+  transform: translate3d(0, 6px, 0);
 }
 
 /* Legacy class name retained because the JS and QA use it. Structural groups do
    not scale: scaling the layout makes precise geometry look unstable. */
 .motion-ready .motion-reveal.motion-reveal--scale {
-  transform: translate3d(0, 11px, 0);
+  transform: translate3d(0, 8px, 0);
 }
 
 .motion-ready .motion-reveal.is-visible {
@@ -43,11 +37,11 @@
 
 .motion-word__inner {
   display: inline-block;
-  transform: translate3d(0, .68em, 0);
+  transform: translate3d(0, .5em, 0);
   opacity: 0;
   transition:
-    transform 980ms var(--motion-ease-soft),
-    opacity 660ms var(--motion-ease);
+    transform 1180ms var(--motion-ease-soft),
+    opacity 820ms var(--motion-ease);
   transition-delay: var(--word-delay, 0ms);
   will-change: transform, opacity;
 }
@@ -64,10 +58,10 @@
 .motion-ready .site-header .header-request,
 .motion-ready .site-header .menu-toggle {
   opacity: 0;
-  transform: translate3d(0, -6px, 0);
+  transform: translate3d(0, -4px, 0);
   transition:
-    opacity 640ms var(--motion-ease),
-    transform 840ms var(--motion-ease-soft);
+    opacity 780ms var(--motion-ease),
+    transform 1040ms var(--motion-ease-soft);
 }
 
 .motion-ready.motion-intro-visible .site-header .brand,
@@ -92,10 +86,10 @@
 
 /* Hero globe enters as one calm object; its native globe motion remains untouched. */
 .motion-ready .hero__visual.motion-reveal {
-  transform: translate3d(12px, 9px, 0) scale(.988);
+  transform: translate3d(8px, 6px, 0) scale(.992);
   transition:
-    opacity 820ms var(--motion-ease),
-    transform 1240ms var(--motion-ease-soft);
+    opacity 980ms var(--motion-ease),
+    transform 1460ms var(--motion-ease-soft);
 }
 
 .motion-ready .hero__visual.motion-reveal.is-visible {
@@ -108,20 +102,38 @@
   transform: none;
 }
 
+.header-request,
+.hero__request {
+  opacity: 1 !important;
+  transition:
+    background-color 360ms var(--motion-ease),
+    color 360ms var(--motion-ease),
+    opacity 360ms var(--motion-ease) !important;
+}
+
+.header-request:hover,
+.header-request:focus-visible,
+.hero__request:hover,
+.hero__request:focus-visible {
+  color: var(--night);
+  background: #fff;
+  opacity: 1 !important;
+}
+
 /* Micro-interactions: short distance, slow finish. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
 .association-mosaic__nav-arrow {
-  transition: transform 340ms var(--motion-ease-soft);
+  transition: transform 460ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
 .hero__request:hover .icon-arrow {
-  transform: translate3d(3px, 0, 0);
+  transform: translate3d(2px, 0, 0);
 }
 
 .association-mosaic__nav-card:hover .association-mosaic__nav-arrow {
-  transform: translate3d(0, 3px, 0);
+  transform: translate3d(0, 2px, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
