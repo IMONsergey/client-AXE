@@ -98,3 +98,54 @@
 ## Result
 
 final result: passed
+---
+
+# Contact Form And Footer Design QA
+
+Дата: 2026-08-31
+
+## Artifacts
+
+- Desktop source: `/Users/erdc/Desktop/Снимок экрана — 2026-08-31 в 12.06.51.png`
+- Desktop implementation: `/tmp/ace-contact-desktop-implementation.jpg`
+- Mobile source: `/Users/erdc/Desktop/Снимок экрана — 2026-08-31 в 12.06.59.png`
+- Mobile implementation: `/tmp/ace-contact-mobile-implementation.jpg`
+- Desktop viewport and pixels: `1552 × 1188`, CSS `1552 × 1188`, density `1`.
+- Mobile viewport and pixels: `422 × 1254`, CSS `422 × 1254`, density `1`.
+- State: empty form, default focus state, contact anchor aligned to the viewport.
+
+## Evidence
+
+- Full-view source and implementation captures were opened together for desktop and mobile at identical dimensions.
+- The native-resolution mobile pair provided the focused review of labels, placeholders, borders, icon, button, logos and copyright.
+- Browser checks covered field entry, submit interception without navigation, responsive layout and horizontal overflow. No page-level runtime error surfaced during interaction; `contact-form.js` passed `node --check`.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Oswald, Inter and Inter Tight follow the established project roles; sizes, weights, line heights, uppercase treatment and mobile title wrapping match the references.
+- Spacing and layout rhythm: desktop section is `1552 × 1188` with a `1392 × 698` form; mobile section is `422 × 1254` with a `389 × 764` form. Footer and control positions match without overflow.
+- Colors and visual tokens: dark navy field, white form, pale gray inputs, teal controls and bottom radial light match the supplied captures.
+- Image quality and asset fidelity: the supplied attachment SVG is used directly. The footer reuses the canonical ACE logo and caption SVG assets.
+- Copy and content: all visible authored text is present in the approved registry and is unchanged.
+
+## Comparison History
+
+### Iteration 1
+
+- P1: mobile heading wrapped after `С`, unlike the source.
+- P2: desktop textarea exposed the browser resize marker.
+- P2: mobile form width, file gap and footer rhythm differed by `3–11px`.
+
+Fixes: split the approved heading into two responsive spans without changing its text, disabled textarea resizing, aligned the mobile form width and adjusted file/footer spacing.
+
+### Iteration 2
+
+- Post-fix captures match the source title wrapping and section dimensions.
+- No actionable P0, P1 or P2 differences remain.
+
+## Residual Test Gap
+
+- The native operating-system file picker cannot be automated through the selected in-app browser surface. The file input is present, keyboard-focusable and wired to replace its label with the selected filename.
+- No server endpoint was provided; valid submit is intentionally intercepted without leaving the page or inventing a success message.
+
+final result: passed
