@@ -1512,6 +1512,114 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-weight: 400;
 }
 
+.governance {
+  position: relative;
+  z-index: 3;
+  padding: 54px 0 110px;
+  color: #fff;
+}
+
+.governance__grid {
+  display: grid;
+  width: min(1748px, calc(100% - 10.7vw));
+  min-height: 483px;
+  margin-inline: auto;
+  border-top: 1px solid rgba(104, 221, 239, 0.38);
+  border-left: 1px solid rgba(104, 221, 239, 0.38);
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(220px, 234px));
+}
+
+.governance__copy,
+.governance-person {
+  border-right: 1px solid rgba(104, 221, 239, 0.38);
+  border-bottom: 1px solid rgba(104, 221, 239, 0.38);
+}
+
+.governance__copy {
+  padding: clamp(42px, 2.1vw, 44px) clamp(48px, 3.5vw, 70px) 40px;
+}
+
+.governance__copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(58px, 4.3vw, 86px);
+  line-height: 1;
+  letter-spacing: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.governance__copy p {
+  max-width: 960px;
+  margin: 67px 0 0;
+  font-size: clamp(20px, 1.35vw, 27px);
+  line-height: 1.34;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.governance__copy p + p {
+  margin-top: 34px;
+}
+
+.governance__copy .governance__emphasis {
+  font-weight: 700;
+}
+
+.governance-person {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.governance-person__photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 513 / 483;
+  border-bottom: 1px solid rgba(104, 221, 239, 0.38);
+  object-fit: cover;
+}
+
+.governance-person__details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 27px 26px 28px;
+}
+
+.governance-person__details h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 1.9vw, 38px);
+  line-height: 1;
+  letter-spacing: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.governance-person__role,
+.governance-person__term {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.governance-person__role {
+  margin-top: auto;
+  padding-top: 30px;
+  font-size: clamp(16px, 0.95vw, 19px);
+  line-height: 1.25;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.governance-person__term {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(15px, 0.9vw, 18px);
+  line-height: 1.25;
+  font-weight: 400;
+}
+
 @media (max-width: 900px) {
   .countries-map {
     min-height: 0;
@@ -1582,6 +1690,53 @@ button, a { -webkit-tap-highlight-color: transparent; }
     letter-spacing: 0;
     font-weight: 400;
     text-transform: uppercase;
+  }
+
+  .governance {
+    padding: 54px 0 84px;
+  }
+
+  .governance__grid {
+    width: calc(100% - 42px);
+    min-height: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .governance__copy {
+    padding: 42px 42px 44px;
+    grid-column: 1 / -1;
+  }
+
+  .governance__copy h2 {
+    font-size: clamp(44px, 10.6vw, 56px);
+    line-height: 0.98;
+  }
+
+  .governance__copy p {
+    margin-top: 36px;
+    font-size: clamp(18px, 4.15vw, 22px);
+    line-height: 1.42;
+  }
+
+  .governance__copy p + p {
+    margin-top: 30px;
+  }
+
+  .governance-person__details {
+    min-height: 252px;
+    padding: 27px 27px 28px;
+  }
+
+  .governance-person__details h3 {
+    font-size: clamp(32px, 7.2vw, 38px);
+  }
+
+  .governance-person__role {
+    font-size: clamp(16px, 3.6vw, 19px);
+  }
+
+  .governance-person__term {
+    font-size: clamp(15px, 3.4vw, 18px);
   }
 }
 
@@ -2511,6 +2666,50 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .leader-card__identity span {
     font-size: 17px;
+  }
+
+  .governance {
+    padding-top: 38px;
+  }
+
+  .governance__grid {
+    width: calc(100% - 38px);
+  }
+
+  .governance__copy {
+    padding: 36px 30px 38px;
+  }
+
+  .governance__copy h2 {
+    font-size: 44px;
+  }
+
+  .governance__copy p {
+    margin-top: 32px;
+    font-size: 17px;
+    line-height: 1.48;
+  }
+
+  .governance__copy p + p {
+    margin-top: 28px;
+  }
+
+  .governance-person__details {
+    min-height: 230px;
+    padding: 24px 20px 26px;
+  }
+
+  .governance-person__details h3 {
+    font-size: 31px;
+  }
+
+  .governance-person__role {
+    padding-top: 26px;
+    font-size: clamp(13px, 3.2vw, 15px);
+  }
+
+  .governance-person__term {
+    font-size: 14px;
   }
 }
 
