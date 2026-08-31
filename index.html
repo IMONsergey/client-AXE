@@ -7,7 +7,7 @@
   <title>Международная ассоциация товарных и фьючерсных бирж</title>
   <link rel="icon" href="assets/images/brand/logo-ace.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-9">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260831-10">
   <link rel="stylesheet" href="assets/css/refinements.css">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/motion.css">
@@ -707,6 +707,65 @@
           </div>
         </div>
       </section>
+
+      <section class="contact-stage" id="contacts" aria-labelledby="contacts-title">
+        <div class="contact-stage__inner">
+          <h2 id="contacts-title"><span>Связаться</span> <span>с Ассоциацией</span></h2>
+
+          <form class="contact-form" data-contact-form>
+            <h3>Форма обратной связи</h3>
+
+            <div class="contact-form__fields">
+              <label class="contact-field">
+                <span>Ваше имя*</span>
+                <input type="text" name="name" placeholder="ИВАНОВ ИВАН ИВАНОВИЧ" autocomplete="name" required>
+              </label>
+
+              <label class="contact-field">
+                <span>E-mail*</span>
+                <input type="email" name="email" placeholder="EXAMPLE@MAIL.COM" autocomplete="email" required>
+              </label>
+
+              <label class="contact-field contact-field--wide">
+                <span>Организация*</span>
+                <input type="text" name="organization" placeholder="НАЗВАНИЕ ОРГАНИЗАЦИИ" autocomplete="organization" required>
+              </label>
+
+              <label class="contact-field contact-field--wide">
+                <span>Сообщение*</span>
+                <textarea name="message" placeholder="ВВЕДИТЕ СООБЩЕНИЕ" required></textarea>
+              </label>
+
+              <label class="contact-file contact-field--wide">
+                <input type="file" name="attachment" data-contact-file>
+                <span class="contact-file__content">
+                  <img src="assets/images/contact/attach-file.svg" alt="" width="24" height="18">
+                  <span data-contact-file-label>Прикрепить файл</span>
+                </span>
+              </label>
+            </div>
+
+            <button class="contact-form__submit" type="submit">
+              <span>Отправить</span>
+              <svg class="icon-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <footer class="site-footer">
+          <a class="site-footer__brand" href="#" aria-label="Международная ассоциация товарных и фьючерсных бирж">
+            <img class="site-footer__ace" src="assets/images/brand/logo-ace.svg" alt="">
+            <img class="site-footer__caption" src="assets/images/brand/logo-caption.svg" alt="">
+          </a>
+
+          <p class="site-footer__copyright">International Association of Commodity and Futures Exchanges © 2026</p>
+
+          <nav class="site-footer__nav" aria-label="Навигация">
+            <a href="#contacts">Контакты</a>
+            <a href="#documents">Документы</a>
+          </nav>
+        </footer>
+      </section>
     </div>
   </main>
 
@@ -716,6 +775,7 @@
   <script src="assets/js/smooth-scroll.js"></script>
   <script src="assets/js/responsive-slider.js?v=20260831-4"></script>
   <script src="assets/js/countries-map.js?v=20260831-2"></script>
+  <script src="assets/js/contact-form.js?v=20260831-1"></script>
   <script src="assets/js/motion.js"></script>
   <script type="module" src="assets/js/dot-field.js"></script>
   <script type="module" src="assets/js/globe.js"></script>
