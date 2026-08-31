@@ -52,3 +52,14 @@ Visual constraints for this standalone page:
 - on mobile request-form width, the top cancel action is hidden and bottom form actions stretch to the form width;
 - `ТИП` and `СТАТУС` table headers expose column filters;
 - `ДАТА ЗАЯВКИ`, `ОБЪЁМ`, and `ЦЕНА И УСЛОВИЯ` table headers expose sorting.
+
+## Visual correction pass: 2026-08-31
+
+- `На главную` is a real link to the published homepage; `Выйти` returns the demo flow to the login screen.
+- Header actions may change color on hover, but their position and dimensions stay static.
+- Oswald remains limited to display headings, Inter is used for body text and segmented/text controls, and Inter Tight is used for command buttons.
+- The active login or registration segment uses the dark interface color `#1F323F`.
+- `Восстановить`, `Зарегистрироваться`, and `Войти` text links are underlined.
+- Empty validation messages do not reserve vertical space; errors appear only after validation.
+- Confirmation, password recovery, and password-reset actions span the content width. The password-recovery screen contains only the `Подтвердить` action.
+- Auth and new-request forms use compact vertical spacing while preserving the existing validation and responsive layouts.
