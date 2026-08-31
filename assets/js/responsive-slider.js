@@ -8,6 +8,7 @@
     const mobile = window.matchMedia(`(max-width: ${breakpoint}px)`);
     const trackMode = root.dataset.sliderMode === 'track';
     const responsiveTrackMode = root.dataset.sliderMode === 'responsive-track';
+    const mobileTrackMode = root.dataset.sliderMode === 'mobile-track';
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let activeIndex = 0;
     let touchStartX = null;
@@ -15,7 +16,7 @@
     let resizeFrame = null;
 
     function isTrackMode() {
-      return trackMode || (responsiveTrackMode && !mobile.matches);
+      return trackMode || (responsiveTrackMode && !mobile.matches) || (mobileTrackMode && mobile.matches);
     }
 
     function getTrackStops() {
@@ -66,7 +67,7 @@
         return;
       }
 
-      if (responsiveTrackMode) root.scrollTo({ left: 0, behavior: 'auto' });
+      if (responsiveTrackMode || mobileTrackMode) root.scrollTo({ left: 0, behavior: 'auto' });
       setActiveSlide(activeIndex);
     }
 
@@ -91,7 +92,7 @@
     next?.addEventListener('click', () => move(1));
     mobile.addEventListener?.('change', render);
 
-    if (trackMode || responsiveTrackMode) {
+    if (trackMode || responsiveTrackMode || mobileTrackMode) {
       root.addEventListener('scroll', () => {
         window.clearTimeout(scrollSyncTimer);
         scrollSyncTimer = window.setTimeout(syncTrackPosition, 100);
