@@ -16,6 +16,7 @@
     let scrollSyncTimer = null;
     let resizeFrame = null;
     let transitionTimer = null;
+    let transitionCleanup = null;
 
     function isTrackMode() {
       return trackMode || (responsiveTrackMode && !mobile.matches) || (mobileTrackMode && mobile.matches);
@@ -55,18 +56,46 @@
         window.clearTimeout(transitionTimer);
         transitionTimer = null;
       }
+      transitionCleanup?.();
+      transitionCleanup = null;
 
       if (animate) {
         const previousSlide = slides.find((slide) => slide.classList.contains('is-active'));
         const nextSlide = slides[slideIndex];
 
         if (previousSlide && nextSlide && previousSlide !== nextSlide) {
+          const rootStyles = {
+            minHeight: root.style.minHeight,
+            position: root.style.position,
+            overflow: root.style.overflow
+          };
+          const rootPosition = window.getComputedStyle(root).position;
+          const rootRect = root.getBoundingClientRect();
+          const slideRect = previousSlide.getBoundingClientRect();
+          const slideTop = slideRect.top - rootRect.top;
+          const slideLeft = slideRect.left - rootRect.left;
+          const slideWidth = previousSlide.offsetWidth;
+          const rootHeight = root.offsetHeight;
+
+          root.classList.add('is-slider-transitioning');
+          root.style.minHeight = `${rootHeight}px`;
+          root.style.overflow = 'hidden';
+          if (rootPosition === 'static') root.style.position = 'relative';
+
           previousSlide.classList.add('is-slider-leaving');
           previousSlide.classList.remove('is-slider-entering');
           nextSlide.hidden = false;
           nextSlide.setAttribute('aria-hidden', 'false');
           nextSlide.classList.add('is-active', 'is-slider-entering');
           nextSlide.classList.remove('is-slider-leaving');
+
+          [previousSlide, nextSlide].forEach((slide, index) => {
+            slide.style.position = 'absolute';
+            slide.style.top = `${slideTop}px`;
+            slide.style.left = `${slideLeft}px`;
+            slide.style.width = `${slideWidth}px`;
+            slide.style.zIndex = String(index + 1);
+          });
 
           const previousAnimation = previousSlide.animate?.([
             { opacity: 1, transform: 'translate3d(0, 0, 0)' },
@@ -86,9 +115,25 @@
             fill: 'forwards'
           });
 
+          transitionCleanup = () => {
+            root.classList.remove('is-slider-transitioning');
+            root.style.minHeight = rootStyles.minHeight;
+            root.style.position = rootStyles.position;
+            root.style.overflow = rootStyles.overflow;
+            [previousSlide, nextSlide].forEach((slide) => {
+              slide.style.position = '';
+              slide.style.top = '';
+              slide.style.left = '';
+              slide.style.width = '';
+              slide.style.zIndex = '';
+            });
+          };
+
           transitionTimer = window.setTimeout(() => {
             previousAnimation?.cancel();
             nextAnimation?.cancel();
+            transitionCleanup?.();
+            transitionCleanup = null;
             slides.forEach((slide, index) => {
               const isActive = index === slideIndex;
               slide.classList.toggle('is-active', isActive);

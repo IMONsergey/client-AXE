@@ -7,7 +7,7 @@ import {
   prepareLandPoints,
   projectPoint,
   wrapPi
-} from './globe-model.js?v=20260831-5';
+} from './globe-model.js?v=20260901-1';
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
@@ -39,7 +39,7 @@ if (canvas && globeShell) {
   const ROTATION_SMOOTHING = 0.16;
   const INERTIA = 0.87;
   const AUTO_RESUME_DELAY = 1600;
-  const AUTO_SPEED = reducedMotion ? 0.008 : 0.025;
+  const AUTO_SPEED = reducedMotion ? 0.008 : 0.075;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
 
   function canvasSize() {
