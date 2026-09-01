@@ -15,6 +15,7 @@
     let touchStartX = null;
     let scrollSyncTimer = null;
     let resizeFrame = null;
+    let transitionTimer = null;
 
     function isTrackMode() {
       return trackMode || (responsiveTrackMode && !mobile.matches) || (mobileTrackMode && mobile.matches);
@@ -46,16 +47,71 @@
       return stops.filter((stop, index) => index === 0 || Math.abs(stop.left - stops[index - 1].left) > 1);
     }
 
-    function setActiveSlide(slideIndex) {
+    function setActiveSlide(slideIndex, options = {}) {
+      const usesSingleSlide = !isTrackMode() && mobile.matches;
+      const animate = options.animate && usesSingleSlide && !reducedMotion.matches;
+
+      if (transitionTimer) {
+        window.clearTimeout(transitionTimer);
+        transitionTimer = null;
+      }
+
+      if (animate) {
+        const previousSlide = slides.find((slide) => slide.classList.contains('is-active'));
+        const nextSlide = slides[slideIndex];
+
+        if (previousSlide && nextSlide && previousSlide !== nextSlide) {
+          previousSlide.classList.add('is-slider-leaving');
+          previousSlide.classList.remove('is-slider-entering');
+          nextSlide.hidden = false;
+          nextSlide.setAttribute('aria-hidden', 'false');
+          nextSlide.classList.add('is-active', 'is-slider-entering');
+          nextSlide.classList.remove('is-slider-leaving');
+
+          const previousAnimation = previousSlide.animate?.([
+            { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+            { opacity: 0, transform: 'translate3d(-12px, 0, 0)' }
+          ], {
+            duration: 260,
+            easing: 'cubic-bezier(.4, 0, .2, 1)',
+            fill: 'forwards'
+          });
+
+          const nextAnimation = nextSlide.animate?.([
+            { opacity: 0, transform: 'translate3d(18px, 0, 0)' },
+            { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+          ], {
+            duration: 420,
+            easing: 'cubic-bezier(.16, .84, .24, 1)',
+            fill: 'forwards'
+          });
+
+          transitionTimer = window.setTimeout(() => {
+            previousAnimation?.cancel();
+            nextAnimation?.cancel();
+            slides.forEach((slide, index) => {
+              const isActive = index === slideIndex;
+              slide.classList.toggle('is-active', isActive);
+              slide.hidden = !isActive;
+              slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+              slide.classList.remove('is-slider-entering', 'is-slider-leaving');
+            });
+            transitionTimer = null;
+          }, 430);
+          return;
+        }
+      }
+
       slides.forEach((slide, index) => {
         const isActive = index === slideIndex;
         slide.classList.toggle('is-active', isActive);
+        slide.classList.remove('is-slider-entering', 'is-slider-leaving');
         slide.hidden = !isTrackMode() && mobile.matches && !isActive;
         slide.setAttribute('aria-hidden', !isTrackMode() && mobile.matches && !isActive ? 'true' : 'false');
       });
     }
 
-    function render() {
+    function render(options = {}) {
       if (isTrackMode()) {
         const stops = getTrackStops();
         activeIndex = Math.min(activeIndex, Math.max(0, stops.length - 1));
@@ -69,14 +125,14 @@
       }
 
       if (responsiveTrackMode || mobileTrackMode) root.scrollTo({ left: 0, behavior: 'auto' });
-      setActiveSlide(activeIndex);
+      setActiveSlide(activeIndex, options);
     }
 
     function move(step) {
       const itemCount = isTrackMode() ? getTrackStops().length : slides.length;
       if (!itemCount) return;
       activeIndex = (activeIndex + step + itemCount) % itemCount;
-      render();
+      render({ animate: true });
     }
 
     function syncTrackPosition() {
