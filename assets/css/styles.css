@@ -3174,7 +3174,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .news-card {
     width: 100%;
-    height: clamp(522px, 136vw, 560px);
+    height: clamp(530px, 138vw, 568px);
     min-height: 0;
     border-radius: 0;
   }
@@ -4071,7 +4071,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
   .directions__card {
     display: none;
-    height: clamp(336px, 62vw, 420px);
+    height: clamp(344px, 62vw, 420px);
     min-height: 0;
     padding: clamp(36px, 8vw, 58px);
     overflow: hidden;
