@@ -9,6 +9,20 @@
 
   form.noValidate = true;
 
+  function isEmpty(field) {
+    return !field.value || !field.value.trim();
+  }
+
+  function getErrorMessage(field) {
+    if (isEmpty(field)) return "Заполните обязательное поле";
+    return field.validity.typeMismatch ? "Введите корректный e-mail" : "Заполните обязательное поле";
+  }
+
+  function isValid(field) {
+    if (isEmpty(field)) return false;
+    return field.validity.valid;
+  }
+
   function clearError(field) {
     field.classList.remove("is-invalid");
     field.removeAttribute("aria-invalid");
@@ -23,7 +37,7 @@
     const errorId = `contact-error-${field.name}`;
     error.id = errorId;
     error.className = "contact-field__error";
-    error.textContent = field.validity.typeMismatch ? "Введите корректный e-mail" : "Заполните обязательное поле";
+    error.textContent = getErrorMessage(field);
 
     field.classList.add("is-invalid");
     field.setAttribute("aria-invalid", "true");
@@ -33,7 +47,15 @@
 
   requiredFields.forEach((field) => {
     field.addEventListener("input", () => {
-      if (field.validity.valid) clearError(field);
+      if (isValid(field)) clearError(field);
+    });
+
+    field.addEventListener("blur", () => {
+      if (isValid(field)) {
+        clearError(field);
+        return;
+      }
+      showError(field);
     });
   });
 
@@ -47,7 +69,7 @@
 
     let firstInvalid = null;
     requiredFields.forEach((field) => {
-      if (field.validity.valid) {
+      if (isValid(field)) {
         clearError(field);
         return;
       }
@@ -61,12 +83,16 @@
     }
 
     const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const organization = String(data.get("organization") || "").trim();
+    const message = String(data.get("message") || "").trim();
     const body = [
-      `Ваше имя: ${data.get("name")}`,
-      `E-mail: ${data.get("email")}`,
-      `Организация: ${data.get("organization")}`,
+      `Ваше имя: ${name}`,
+      `E-mail: ${email}`,
+      `Организация: ${organization}`,
       "",
-      `Сообщение: ${data.get("message")}`
+      `Сообщение: ${message}`
     ].join("\n");
 
     window.location.href = `mailto:executive@int-ace.com?subject=${encodeURIComponent("Связаться с Ассоциацией")}&body=${encodeURIComponent(body)}`;

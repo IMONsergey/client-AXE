@@ -10,25 +10,15 @@
   let open = false;
   let scrolled = false;
   let scrollFrame = 0;
-  let lockedScrollY = 0;
 
   function lockPageScroll() {
-    lockedScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${lockedScrollY}px`;
-    document.body.style.right = '0';
-    document.body.style.left = '0';
-    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
   }
 
   function unlockPageScroll() {
-    if (document.body.style.position !== 'fixed') return;
-    document.body.style.removeProperty('position');
-    document.body.style.removeProperty('top');
-    document.body.style.removeProperty('right');
-    document.body.style.removeProperty('left');
-    document.body.style.removeProperty('width');
-    window.scrollTo(0, lockedScrollY);
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('touch-action');
   }
 
   function syncState(nextOpen, { restoreFocus = false } = {}) {

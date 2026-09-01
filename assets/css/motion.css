@@ -115,14 +115,28 @@
     opacity 220ms var(--motion-ease) !important;
 }
 
+.header-request,
+.hero__request,
+.site-nav__request {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
 .header-request:hover,
 .header-request:focus-visible,
 .hero__request:hover,
 .hero__request:focus-visible,
-.bids-promo__link:hover,
-.bids-promo__link:focus-visible,
 .site-nav__request:hover,
 .site-nav__request:focus-visible {
+  color: #fff;
+  background: #006f81;
+  border-color: #006f81;
+  opacity: 1 !important;
+}
+
+.bids-promo__link:hover,
+.bids-promo__link:focus-visible {
   color: #004f5c;
   background: #eafcff;
   opacity: 1 !important;
@@ -130,8 +144,13 @@
 
 .header-request:active,
 .hero__request:active,
-.bids-promo__link:active,
 .site-nav__request:active {
+  color: #fff;
+  background: #005d6a;
+  border-color: #005d6a;
+}
+
+.bids-promo__link:active {
   color: #003f49;
   background: #d6f7fb;
 }
