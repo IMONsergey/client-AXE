@@ -105,6 +105,8 @@ input[type="search"] {
   padding: 0 14px;
   font-size: 14px;
   font-weight: 500;
+  cursor: default;
+  transition: color var(--bo-motion-fast) var(--bo-ease-standard), opacity var(--bo-motion-fast) var(--bo-ease-standard);
 }
 
 .bo-language__line {
@@ -113,6 +115,22 @@ input[type="search"] {
 
 .bo-language__muted {
   opacity: .3;
+}
+
+.bo-language span {
+  display: inline-block;
+  transition: color var(--bo-motion-fast) var(--bo-ease-standard), opacity var(--bo-motion-fast) var(--bo-ease-standard), transform var(--bo-motion-standard) var(--bo-ease-enter);
+}
+
+.bo-language:hover span:first-child,
+.bo-language:focus-within span:first-child {
+  color: var(--bo-teal);
+  transform: translateY(-1px);
+}
+
+.bo-language:hover .bo-language__muted,
+.bo-language:focus-within .bo-language__muted {
+  opacity: .56;
 }
 
 .bo-outline,
@@ -143,7 +161,7 @@ input[type="search"] {
 .bo-add-button,
 .bo-tab,
 .bo-icon-button {
-  transition: background-color var(--bo-motion-fast) var(--bo-ease-standard), border-color var(--bo-motion-fast) var(--bo-ease-standard), color var(--bo-motion-fast) var(--bo-ease-standard), box-shadow var(--bo-motion-fast) var(--bo-ease-standard);
+  transition: background-color var(--bo-motion-fast) var(--bo-ease-standard), border-color var(--bo-motion-fast) var(--bo-ease-standard), color var(--bo-motion-fast) var(--bo-ease-standard), box-shadow var(--bo-motion-fast) var(--bo-ease-standard), transform var(--bo-motion-standard) var(--bo-ease-enter);
 }
 
 .bo-outline {
