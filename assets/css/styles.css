@@ -1261,9 +1261,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .countries-map__surface {
   position: absolute;
-  top: -11px;
-  left: -12.59%;
-  width: 113.16%;
+  top: 55px;
+  left: 10%;
+  width: 90%;
   aspect-ratio: 2382 / 1722;
 }
 
@@ -1325,14 +1325,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   transform: scale(1.08);
 }
 
-.countries-map__logo--spimex { top: 23.52%; left: 24.14%; width: 8.49%; }
-.countries-map__logo--butb { top: 31.29%; left: 20.65%; width: 7.06%; }
-.countries-map__logo--ets { top: 41.8%; left: 64.49%; width: 5.75%; }
-.countries-map__logo--asia { top: 41.71%; left: 72.09%; width: 10.41%; }
-.countries-map__logo--uzex { top: 45.88%; left: 51.95%; width: 8.56%; }
-.countries-map__logo--irenex { top: 54.5%; left: 43.6%; width: 7.19%; }
-.countries-map__logo--ime { top: 60%; left: 49.35%; width: 7.47%; }
-.countries-map__logo--emx { top: 63.13%; left: 25.51%; width: 8.7%; }
+.countries-map__logo--spimex { top: 25.41%; left: 14.73%; width: 9.61%; }
+.countries-map__logo--butb { top: 34.2%; left: 10.78%; width: 7.98%; }
+.countries-map__logo--ets { top: 46%; left: 60.39%; width: 6.51%; }
+.countries-map__logo--asia { top: 46.1%; left: 68.99%; width: 11.78%; }
+.countries-map__logo--uzex { top: 50.71%; left: 46.2%; width: 9.69%; }
+.countries-map__logo--irenex { top: 60.47%; left: 36.74%; width: 8.14%; }
+.countries-map__logo--ime { top: 66.69%; left: 43.26%; width: 8.45%; }
+.countries-map__logo--emx { top: 70.23%; left: 16.28%; width: 9.84%; }
 
 .countries-map__cards {
   position: absolute;
