@@ -11,15 +11,12 @@ import {
 
 const canvas = document.getElementById('axe-globe');
 const globeShell = document.querySelector('.hero__globe-shell');
-const heroContent = document.querySelector('.hero__content');
-const heroVisual = document.querySelector('.hero__visual');
 
-if (canvas && globeShell && heroContent && heroVisual) {
+if (canvas && globeShell) {
   const context = canvas.getContext('2d', { alpha: true });
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const renderQuery = window.matchMedia('(min-width: 901px)');
-  const desktopQuery = window.matchMedia('(min-width: 1200px)');
   const landModel = prepareLandPoints(LAND_DATA);
   const landPoints = landModel.points;
 
@@ -42,25 +39,8 @@ if (canvas && globeShell && heroContent && heroVisual) {
   const ROTATION_SMOOTHING = 0.16;
   const INERTIA = 0.87;
   const AUTO_RESUME_DELAY = 1600;
-  const AUTO_SPEED = reducedMotion ? 0 : 0.055;
+  const AUTO_SPEED = reducedMotion ? 0.008 : 0.025;
   const VERTICAL_LIMIT = 68 * Math.PI / 180;
-
-  function syncGlobeToHero() {
-    if (!desktopQuery.matches) {
-      globeShell.style.removeProperty('width');
-      globeShell.style.removeProperty('height');
-      return;
-    }
-
-    const contentHeight = Math.round(heroContent.getBoundingClientRect().height);
-    const visualWidth = Math.round(heroVisual.getBoundingClientRect().width);
-    const size = Math.min(Math.max(contentHeight * 0.86, 500), visualWidth, 600);
-
-    if (size > 0) {
-      globeShell.style.width = `${size}px`;
-      globeShell.style.height = `${size}px`;
-    }
-  }
 
   function canvasSize() {
     const rect = canvas.getBoundingClientRect();
@@ -68,7 +48,6 @@ if (canvas && globeShell && heroContent && heroVisual) {
   }
 
   function resizeCanvas() {
-    syncGlobeToHero();
     const size = canvasSize();
     const pixelSize = Math.max(1, Math.round(size * dpr));
 
@@ -147,13 +126,12 @@ if (canvas && globeShell && heroContent && heroVisual) {
     });
   }
 
-  const resizeObserver = new ResizeObserver(() => {
-    if (renderQuery.matches) resizeCanvas();
-  });
-  resizeObserver.observe(heroContent);
-  resizeObserver.observe(heroVisual);
-
-  desktopQuery.addEventListener?.('change', resizeCanvas);
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(() => {
+      if (renderQuery.matches) resizeCanvas();
+    });
+    resizeObserver.observe(globeShell);
+  }
   window.addEventListener('resize', () => {
     if (renderQuery.matches) resizeCanvas();
   }, { passive: true });
@@ -253,7 +231,11 @@ if (canvas && globeShell && heroContent && heroVisual) {
     if (!animationFrame) animationFrame = requestAnimationFrame(frame);
   }
 
-  renderQuery.addEventListener?.('change', syncRendering);
+  if (renderQuery.addEventListener) {
+    renderQuery.addEventListener('change', syncRendering);
+  } else {
+    renderQuery.addListener(syncRendering);
+  }
 
   Object.defineProperty(window, '__AXE_GLOBE__', {
     configurable: true,

@@ -10,8 +10,29 @@
   let open = false;
   let scrolled = false;
   let scrollFrame = 0;
+  let lockedScrollY = 0;
+
+  function lockPageScroll() {
+    lockedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.right = '0';
+    document.body.style.left = '0';
+    document.body.style.width = '100%';
+  }
+
+  function unlockPageScroll() {
+    if (document.body.style.position !== 'fixed') return;
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    document.body.style.removeProperty('right');
+    document.body.style.removeProperty('left');
+    document.body.style.removeProperty('width');
+    window.scrollTo(0, lockedScrollY);
+  }
 
   function syncState(nextOpen, { restoreFocus = false } = {}) {
+    const wasOpen = open;
     open = Boolean(nextOpen && mobileQuery.matches);
     toggle.classList.toggle('is-open', open);
     nav.classList.toggle('is-open', open);
@@ -20,6 +41,10 @@
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
     nav.setAttribute('aria-hidden', mobileQuery.matches ? String(!open) : 'false');
+    nav.inert = Boolean(mobileQuery.matches && !open);
+
+    if (open && !wasOpen) lockPageScroll();
+    if (!open && wasOpen) unlockPageScroll();
 
     if (open) {
       requestAnimationFrame(() => links[0]?.focus({ preventScroll: true }));
@@ -66,14 +91,22 @@
     }
   });
 
-  mobileQuery.addEventListener?.('change', () => {
+  function handleMobileQueryChange() {
     if (!mobileQuery.matches) {
       close();
       nav.setAttribute('aria-hidden', 'false');
+      nav.inert = false;
     } else {
       nav.setAttribute('aria-hidden', String(!open));
+      nav.inert = !open;
     }
-  });
+  }
+
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', handleMobileQueryChange);
+  } else {
+    mobileQuery.addListener(handleMobileQueryChange);
+  }
 
   function updateScrollState() {
     scrollFrame = 0;

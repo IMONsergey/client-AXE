@@ -104,32 +104,55 @@
 }
 
 .header-request,
-.hero__request {
+.hero__request,
+.bids-promo__link,
+.site-nav__request {
   opacity: 1 !important;
   transition:
-    background-color 360ms var(--motion-ease),
-    color 360ms var(--motion-ease),
-    opacity 360ms var(--motion-ease) !important;
+    background-color 220ms var(--motion-ease),
+    border-color 220ms var(--motion-ease),
+    color 220ms var(--motion-ease),
+    opacity 220ms var(--motion-ease) !important;
 }
 
 .header-request:hover,
 .header-request:focus-visible,
 .hero__request:hover,
-.hero__request:focus-visible {
-  color: var(--night);
-  background: #fff;
+.hero__request:focus-visible,
+.bids-promo__link:hover,
+.bids-promo__link:focus-visible,
+.site-nav__request:hover,
+.site-nav__request:focus-visible {
+  color: #004f5c;
+  background: #eafcff;
   opacity: 1 !important;
+}
+
+.header-request:active,
+.hero__request:active,
+.bids-promo__link:active,
+.site-nav__request:active {
+  color: #003f49;
+  background: #d6f7fb;
 }
 
 /* Micro-interactions: short distance, slow finish. */
 .header-request .icon-arrow,
 .hero__request .icon-arrow,
+.bids-promo__link .icon-arrow,
+.site-nav__request .icon-arrow,
 .association-mosaic__nav-arrow {
   transition: transform 280ms var(--motion-ease-soft);
 }
 
 .header-request:hover .icon-arrow,
-.hero__request:hover .icon-arrow {
+.header-request:focus-visible .icon-arrow,
+.hero__request:hover .icon-arrow,
+.hero__request:focus-visible .icon-arrow,
+.bids-promo__link:hover .icon-arrow,
+.bids-promo__link:focus-visible .icon-arrow,
+.site-nav__request:hover .icon-arrow,
+.site-nav__request:focus-visible .icon-arrow {
   transform: translate3d(2px, 0, 0);
 }
 

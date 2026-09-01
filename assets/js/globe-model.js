@@ -1,5 +1,5 @@
 export const GLOBE_VIEW = Object.freeze({
-  phi: 163 * Math.PI / 180,
+  phi: 68 * Math.PI / 180,
   theta: 27 * Math.PI / 180
 });
 

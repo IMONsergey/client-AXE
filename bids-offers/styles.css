@@ -29,6 +29,8 @@ html,
 body {
   min-height: 100%;
   margin: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body.is-drawer-open {
@@ -47,13 +49,20 @@ button {
   font-family: "Inter Tight", Inter, Arial, sans-serif;
 }
 
+input[type="search"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 [hidden] {
   display: none !important;
 }
 
 .bo-app {
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
+  overflow-x: hidden;
   overflow-x: clip;
   font-synthesis: none;
   background:
@@ -619,6 +628,15 @@ button {
   background: var(--bo-teal-dark);
 }
 
+.bo-primary:active,
+.bo-secondary:active,
+.bo-add-button:active,
+.bo-small-primary:active,
+.bo-outline:active,
+.bo-icon-button:active {
+  transform: translateY(1px);
+}
+
 .bo-secondary:hover,
 .bo-icon-button:hover {
   background: #e2e9ee;
@@ -790,7 +808,7 @@ button {
 .bo-table {
   width: 100%;
   min-width: 1180px;
-  display: block;
+  display: table;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
@@ -798,20 +816,30 @@ button {
 
 .bo-table thead,
 .bo-table tbody {
-  display: block;
+  display: table-row-group;
+}
+
+.bo-table thead {
+  display: table-header-group;
 }
 
 .bo-table tr {
-  display: grid;
-  grid-template-columns: 150px 100px 150px 155px 102px 295px 240px 130px;
+  display: table-row;
 }
+
+.bo-col-date { width: 11.35%; }
+.bo-col-type { width: 7.56%; }
+.bo-col-participant { width: 11.35%; }
+.bo-col-product { width: 11.72%; }
+.bo-col-volume { width: 7.72%; }
+.bo-col-price { width: 22.31%; }
+.bo-col-delivery { width: 18.15%; }
+.bo-col-status { width: 9.84%; }
 
 .bo-table th {
   height: 48px;
   min-width: 0;
   position: relative;
-  display: flex;
-  align-items: center;
   padding: 0;
   background: var(--bo-ink);
   border-right: 1px solid rgba(255, 255, 255, .025);
@@ -820,13 +848,14 @@ button {
   font-weight: 600;
   line-height: 1.2;
   text-align: left;
+  vertical-align: middle;
 }
 
 .bo-table th:last-child {
   border-right: 0;
 }
 
-.bo-table th:not(:has(.bo-th-control)) {
+.bo-table th > span {
   padding: 0 12px;
 }
 
@@ -1437,12 +1466,14 @@ body.is-drawer-open .bo-drawer-backdrop {
   .bo-header {
     position: fixed;
     top: 0;
-    left: 50%;
+    right: 0;
+    left: 0;
     z-index: 55;
+    width: 100%;
+    max-width: none;
+    padding-right: max(56px, calc((100vw - 1760px) / 2));
+    padding-left: max(56px, calc((100vw - 1760px) / 2));
     background: rgba(248, 251, 253, .88);
-    box-shadow: 0 0 0 100vmax rgba(248, 251, 253, .88);
-    clip-path: inset(0 -100vmax);
-    transform: translateX(-50%);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -1455,16 +1486,6 @@ body.is-drawer-open .bo-drawer-backdrop {
 
   .bo-table {
     min-width: 100%;
-  }
-
-  .bo-table thead {
-    position: sticky;
-    top: 76px;
-    z-index: 14;
-  }
-
-  .bo-table tr {
-    grid-template-columns: 11.35% 7.56% 11.35% 11.72% 7.72% 22.31% 18.15% 9.84%;
   }
 
   .bo-table th:first-child {
@@ -1538,6 +1559,14 @@ body.is-drawer-open .bo-drawer-backdrop {
   .bo-filters input,
   .bo-filters select {
     width: 100%;
+    font-size: 16px;
+  }
+
+  .bo-field input,
+  .bo-field select,
+  .bo-field textarea,
+  .bo-input-shell input {
+    font-size: 16px;
   }
 
   .bo-table-card {
@@ -1551,7 +1580,13 @@ body.is-drawer-open .bo-drawer-backdrop {
   }
 
   .bo-table {
+    width: 100%;
     min-width: 0;
+    display: block;
+  }
+
+  .bo-table colgroup {
+    display: none;
   }
 
   .bo-table thead {
